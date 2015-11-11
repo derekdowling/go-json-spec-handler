@@ -9,9 +9,9 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 )
 
-func TestParsing(t *testing.T) {
+func TestRequest(t *testing.T) {
 
-	Convey("Parse Tests", t, func() {
+	Convey("Request Tests", t, func() {
 
 		Convey("->ParseObject()", func() {
 			objectJSON := `{"data": {"type": "user", "id": "sweetID123", "attributes": {"ID":"123"}}}`

@@ -2,6 +2,7 @@ package japi
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"io/ioutil"
 )
@@ -21,16 +22,19 @@ func ParseObject(reader io.ReadCloser) (*Object, error) {
 		return nil, err
 	}
 
-	request := struct {
-		Object *Object `json:"data"`
+	data := struct {
+		Object Object `json:"data"`
 	}{}
 
-	err = json.Unmarshal(byteData, request)
+	err = json.Unmarshal(byteData, &data)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("Unable to parse json: \n%s\nError:%s",
+			string(byteData),
+			err.Error(),
+		)
 	}
 
-	return request.Object, nil
+	return &data.Object, nil
 }
 
 // ParseList returns a JSON List for a given io.ReadCloser containing
@@ -43,14 +47,17 @@ func ParseList(reader io.ReadCloser) ([]*Object, error) {
 		return nil, err
 	}
 
-	request := struct {
+	data := struct {
 		List []*Object `json:"data"`
-	}{}
+	}{List: []*Object{}}
 
-	err = json.Unmarshal(byteData, request)
+	err = json.Unmarshal(byteData, &data)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("Unable to parse json: \n%s\nError:%s",
+			string(byteData),
+			err.Error(),
+		)
 	}
 
-	return request.List, nil
+	return data.List, nil
 }
