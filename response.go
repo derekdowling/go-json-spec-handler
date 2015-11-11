@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 )
 
 type DataResponse struct {
@@ -57,9 +58,17 @@ func RespondWithErrors(w http.ResponseWriter, errors []*Error) error {
 
 // Respond formats a JSON response with the appropriate headers.
 func respond(w http.ResponseWriter, status int, payload interface{}) error {
+	content, err := json.MarshalIndent(payload, "", "  ")
+	if err != nil {
+		return err
+	}
+
 	w.Header().Add("Content-Type", ContentType)
+	w.Header().Set("Content-Length", strconv.Itoa(len(content)))
 	w.WriteHeader(status)
-	return json.NewEncoder(w).Encode(payload)
+	w.Write(content)
+
+	return nil
 }
 
 func prepareError(error *Error) *ErrorResponse {
