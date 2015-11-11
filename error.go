@@ -1,4 +1,4 @@
-package japi
+package jsh
 
 // Error represents a JSON Spec Error
 type Error struct {

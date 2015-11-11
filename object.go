@@ -1,4 +1,4 @@
-package japi
+package jsh
 
 // Object represents the default JSON spec for objects
 type Object struct {

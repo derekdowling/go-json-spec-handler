@@ -1,4 +1,4 @@
-package japi
+package jsh
 
 import (
 	"bytes"
@@ -9,7 +9,7 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 )
 
-func TestRequest(t *testing.T) {
+func TestParsing(t *testing.T) {
 
 	Convey("Request Tests", t, func() {
 

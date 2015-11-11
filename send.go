@@ -1,4 +1,4 @@
-package japi
+package jsh
 
 import (
 	"encoding/json"
