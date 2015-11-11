@@ -1,12 +1,14 @@
 Go JSON API
 ---
 
+[![godoc reference](https://godoc.org/github.com/derekdowling/go-json-spec-handler?status.png)][godoc]
+
 Go API helpers for achieving a [JSON API Specification](http://jsonapi.org/)
 compatible backend.
 
 ## Mission
 
-To make dealing with JSON APIs in Go simple, consistent, and easy.
+To make writing an API that matches the JSON Specification easy in Go.
 
 ## Installation
 
