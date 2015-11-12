@@ -1,6 +1,7 @@
 package jsh
 
 import (
+	"encoding/json"
 	"testing"
 
 	. "github.com/smartystreets/goconvey/convey"
@@ -20,14 +21,14 @@ func TestParsing(t *testing.T) {
 			So(object, ShouldNotBeEmpty)
 			So(object.Type, ShouldEqual, "user")
 			So(object.ID, ShouldEqual, "sweetID123")
-			So(object.Attributes, ShouldResemble, map[string]interface{}{"ID": "123"})
+			So(object.Attributes, ShouldResemble, json.RawMessage(`{"ID":"123"}`))
 		})
 
 		Convey("->ParseList()", func() {
 			listJSON :=
 				`{"data": [
-	{"type": "user", "id": "sweetID123", "attributes": {"ID": "123"}},
-	{"type": "user", "id": "sweetID456", "attributes": {"ID": "456"}}
+	{"type": "user", "id": "sweetID123", "attributes": {"ID":"123"}},
+	{"type": "user", "id": "sweetID456", "attributes": {"ID":"456"}}
 ]}`
 
 			closer := createIOCloser([]byte(listJSON))
@@ -39,7 +40,7 @@ func TestParsing(t *testing.T) {
 			object := list[1]
 			So(object.Type, ShouldEqual, "user")
 			So(object.ID, ShouldEqual, "sweetID456")
-			So(object.Attributes, ShouldResemble, map[string]interface{}{"ID": "456"})
+			So(object.Attributes, ShouldResemble, json.RawMessage(`{"ID":"456"}`))
 		})
 	})
 }

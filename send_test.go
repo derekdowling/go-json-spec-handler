@@ -1,6 +1,7 @@
 package jsh
 
 import (
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
@@ -17,11 +18,9 @@ func TestSend(t *testing.T) {
 		request := &http.Request{}
 
 		object := &Object{
-			ID:   "1234",
-			Type: "user",
-			Attributes: map[string]string{
-				"foo": "bar",
-			},
+			ID:         "1234",
+			Type:       "user",
+			Attributes: json.RawMessage(`{"foo":"bar"}`),
 		}
 
 		Convey("Success Handlers", func() {
