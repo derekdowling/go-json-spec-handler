@@ -4,4 +4,12 @@ go:
   - 1.4
   - tip
 
-script: godep go test ./... -cover
+install:
+  - go get github.com/tools/godep
+  - go get github.com/smartystreets/goconvey
+  - go get github.com/kisielk/errcheck
+  - go get -u github.com/golang/lint/golint
+
+
+script:
+  - godep go test ./... -cover
