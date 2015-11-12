@@ -15,3 +15,7 @@ To make writing an API that matches the JSON Specification easy in Go.
 ```
 $ go get github.com/derekdowling/go-jsonapi
 ```
+
+## Examples
+
+There are lots of great examples in the tests themselves that show exactly how it works, also check out the [godocs](https://godoc.org/github.com/derekdowling/go-json-spec-handler) as linked above.
