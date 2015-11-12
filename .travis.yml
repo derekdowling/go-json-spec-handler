@@ -4,4 +4,5 @@ go:
   - 1.4
   - tip
 install:
+    - go get github.com/tools/godep
     - godep go test ./... -cover
