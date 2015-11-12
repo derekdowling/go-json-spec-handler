@@ -21,4 +21,5 @@ There are lots of great examples in the tests themselves that show exactly how i
 
 ## What's Missing
 
-- Linking, XToX relationships
+- Linking
+- XToX relationships
