@@ -19,13 +19,27 @@ type ErrorResponse struct {
 }
 
 // SendObject sends a single data object as a JSON response
-func SendObject(w http.ResponseWriter, status int, object *Object) error {
+func SendObject(w http.ResponseWriter, r *http.Request, object *Object) error {
+
+	var status int
+
+	switch r.Method {
+	case "POST":
+		status = http.StatusCreated
+	case "PATCH":
+		status = http.StatusOK
+	case "GET":
+		status = http.StatusOK
+	default:
+		return fmt.Errorf("SendObject does not support HTTP Request type: %s", r.Method)
+	}
+
 	return Send(w, status, prepareObject(object))
 }
 
 // SendList sends a list of data objects as a JSON response
-func SendList(w http.ResponseWriter, status int, list []*Object) error {
-	return Send(w, status, prepareList(list))
+func SendList(w http.ResponseWriter, list []*Object) error {
+	return Send(w, http.StatusOK, prepareList(list))
 }
 
 // SendError is a convenience function that puts an error into an array
@@ -42,6 +56,14 @@ func SendErrors(w http.ResponseWriter, errors []*Error) error {
 
 	if len(errors) == 0 {
 		return fmt.Errorf("No errors provided for attempted error response.")
+	}
+
+	for _, err := range errors {
+		if err.Status < 400 || err.Status > 500 {
+			return fmt.Errorf("Invalid Status for error %+v\n", err)
+		} else if err.Status == 422 && err.Source.Pointer == "" {
+			return fmt.Errorf("Source Pointer must be set for 422 Status errors")
+		}
 	}
 
 	// use the first error to set the error status

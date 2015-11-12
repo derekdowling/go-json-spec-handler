@@ -1,9 +1,6 @@
 package jsh
 
 import (
-	"bytes"
-	"io"
-	"io/ioutil"
 	"testing"
 
 	. "github.com/smartystreets/goconvey/convey"
@@ -45,9 +42,4 @@ func TestParsing(t *testing.T) {
 			So(object.Attributes, ShouldResemble, map[string]interface{}{"ID": "456"})
 		})
 	})
-}
-
-func createIOCloser(data []byte) io.ReadCloser {
-	reader := bytes.NewReader(data)
-	return ioutil.NopCloser(reader)
 }
