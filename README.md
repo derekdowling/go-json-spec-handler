@@ -1,7 +1,7 @@
 Go JSON API
 ---
 
-[![godoc reference](https://godoc.org/github.com/derekdowling/go-json-spec-handler?status.png)][godoc]
+[![GoDoc](https://godoc.org/github.com/derekdowling/go-json-spec-handler?status.png)](https://godoc.org/github.com/derekdowling/go-json-spec-handler)
 
 Go API helpers for achieving a [JSON API Specification](http://jsonapi.org/)
 compatible backend.
