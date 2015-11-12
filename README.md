@@ -1,7 +1,7 @@
 Go JSON API
 ---
 
-[![GoDoc](https://godoc.org/github.com/derekdowling/go-json-spec-handler?status.png)](https://godoc.org/github.com/derekdowling/go-json-spec-handler)[![Build Status](https://travis-ci.org/derekdowling/go-json-spec-handler.svg?branch=master)](https://travis-ci.org/derekdowling/go-json-spec-handler)
+[![GoDoc](https://godoc.org/github.com/derekdowling/go-json-spec-handler?status.png)](https://godoc.org/github.com/derekdowling/go-json-spec-handler) [![Build Status](https://img.shields.io/travis/derekdowling/go-json-spec-handler.svg)](https://travis-ci.org/derekdowling/go-json-spec-handler)
 
 A Golang API helper that deals with request serialization and response sending for creating a [JSON API Specification](http://jsonapi.org/) compatible Golang API.
 
