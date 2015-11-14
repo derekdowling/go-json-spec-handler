@@ -2,6 +2,8 @@ package jsh
 
 import (
 	"encoding/json"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 
 	. "github.com/smartystreets/goconvey/convey"
@@ -16,6 +18,8 @@ func TestObject(t *testing.T) {
 			Type:       "testConversion",
 			Attributes: json.RawMessage(`{"foo":"bar"}`),
 		}
+
+		request := &http.Request{}
 
 		Convey("->NewObject()", func() {
 
@@ -46,25 +50,56 @@ func TestObject(t *testing.T) {
 				err := testObject.Unmarshal("badType", &testConversion)
 				So(err, ShouldNotBeNil)
 			})
+
+			Convey("with input validation", func() {
+
+				Convey("should not error if input validates properly", func() {
+
+				})
+
+				Convey("should return a 422 Error correctly for validation failure", func() {
+
+				})
+			})
 		})
 
-		Convey("->ParseList()", func() {
-			listJSON :=
-				`{"data": [
-	{"type": "user", "id": "sweetID123", "attributes": {"ID":"123"}},
-	{"type": "user", "id": "sweetID456", "attributes": {"ID":"456"}}
-]}`
+		Convey("->Prepare()", func() {
 
-			closer := createIOCloser([]byte(listJSON))
+			Convey("should handle a POST response correctly", func() {
+				request.Method = "POST"
+				resp, err := testObject.Prepare(request)
+				So(err, ShouldBeNil)
+				So(resp.HTTPStatus, ShouldEqual, http.StatusCreated)
+			})
 
-			list, err := ParseList(closer)
+			Convey("should handle a GET response correctly", func() {
+				request.Method = "GET"
+				resp, err := testObject.Prepare(request)
+				So(err, ShouldBeNil)
+				So(resp.HTTPStatus, ShouldEqual, http.StatusOK)
+			})
+
+			Convey("should handle a PATCH response correctly", func() {
+				request.Method = "PATCH"
+				resp, err := testObject.Prepare(request)
+				So(err, ShouldBeNil)
+				So(resp.HTTPStatus, ShouldEqual, http.StatusOK)
+			})
+
+			Convey("should return a formatted Error for an unsupported method Type", func() {
+				request.Method = "PUT"
+				resp, err := testObject.Prepare(request)
+				So(err, ShouldBeNil)
+				So(resp.HTTPStatus, ShouldEqual, http.StatusNotAcceptable)
+			})
+		})
+
+		Convey("->Send(Object)", func() {
+			request.Method = "POST"
+			writer := httptest.NewRecorder()
+			err := Send(request, writer, testObject)
 			So(err, ShouldBeNil)
-			So(len(list), ShouldEqual, 2)
-
-			object := list[1]
-			So(object.Type, ShouldEqual, "user")
-			So(object.ID, ShouldEqual, "sweetID456")
-			So(object.Attributes, ShouldResemble, json.RawMessage(`{"ID":"456"}`))
+			So(writer.Code, ShouldEqual, http.StatusCreated)
 		})
 	})
 }
