@@ -1,5 +1,5 @@
 {
-	"ImportPath": "github.com/derekdowling/go-jsonapi",
+	"ImportPath": "github.com/derekdowling/go-json-spec-handler",
 	"GoVersion": "go1.5.1",
 	"Packages": [
 		"./..."
@@ -18,6 +18,10 @@
 			"ImportPath": "github.com/smartystreets/goconvey/convey",
 			"Comment": "1.5.0-398-gab7641a",
 			"Rev": "ab7641a0db76b0e88765294b1377b026ec01f26b"
+		},
+		{
+			"ImportPath": "gopkg.in/validator.v2",
+			"Rev": "8e445b9dc14ab1a1a78cc1f712df991307173ee6"
 		}
 	]
 }
