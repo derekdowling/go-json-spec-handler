@@ -1,10 +1,9 @@
 Go JSON API Specification Handler
 ---
 
-[![GoDoc](https://godoc.org/github.com/derekdowling/go-json-spec-handler?status.png)](https://godoc.org/github.com/derekdowling/go-json-spec-handler)[![Build Status](https://travis-ci.org/derekdowling/go-json-spec-handler.svg?branch=master)](https://travis-ci.org/derekdowling/go-json-spec-handler)
+[![GoDoc](https://godoc.org/github.com/derekdowling/go-json-spec-handler?status.png)](https://godoc.org/github.com/derekdowling/go-json-spec-handler) [![Build Status](https://img.shields.io/travis/derekdowling/go-json-spec-handler.svg)](https://travis-ci.org/derekdowling/go-json-spec-handler)
 
-Go JSON API helpers for achieving a [JSON API Specification](http://jsonapi.org/)
-compatible backend.
+A Golang API helper that deals with request serialization and response sending for creating a [JSON API Specification](http://jsonapi.org/) compatible Golang API. Great for Ember.js!
 
 ## Features
 
@@ -38,3 +37,12 @@ compatible backend.
 ```
 $ go get github.com/derekdowling/go-json-spec-handler
 ```
+
+## Examples
+
+There are lots of great examples in the tests themselves that show exactly how it works, also check out the [godocs](https://godoc.org/github.com/derekdowling/go-json-spec-handler) as linked above.
+
+## What's Missing
+
+- Linking
+- XToX relationships
