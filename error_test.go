@@ -1,7 +1,6 @@
 package jsh
 
 import (
-	"log"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
@@ -55,33 +54,55 @@ func TestError(t *testing.T) {
 		})
 
 		Convey("->Send()", func() {
+			err := Send(request, writer, testError)
+			So(err, ShouldBeNil)
+			So(writer.Code, ShouldEqual, http.StatusBadRequest)
+		})
 
-			testErrors := &ErrorList{Errors: []*Error{&Error{
-				Status: http.StatusForbidden,
-				Title:  "Forbidden",
-				Detail: "Can't Go Here",
-			}, testError}}
+		Convey("Error List Tests", func() {
 
-			Convey("->Send(Error)", func() {
-				err := Send(request, writer, testError)
-				So(err, ShouldBeNil)
-				log.Printf("err = %+v\n", err)
-				log.Printf("writer = %+v\n", writer)
-				So(writer.Code, ShouldEqual, http.StatusBadRequest)
+			Convey("->Add()", func() {
+
+				list := &ErrorList{}
+
+				Convey("should successfully add a valid error", func() {
+					err := list.Add(testError)
+					So(err, ShouldBeNil)
+					So(len(list.Errors), ShouldEqual, 1)
+				})
+
+				Convey("should error if validation fails while adding an error", func() {
+					badError := &Error{
+						Title:  "Invalid",
+						Detail: "So badly",
+					}
+
+					err := list.Add(badError)
+					So(err.Status, ShouldEqual, 500)
+					So(list.Errors, ShouldBeEmpty)
+				})
 			})
 
-			Convey("should send a properly formatted JSON Error", func() {
-				err := Send(request, writer, testErrors)
+			Convey("->Send(ErrorList)", func() {
 
-				So(err, ShouldBeNil)
-				So(writer.Code, ShouldEqual, http.StatusForbidden)
+				testErrors := &ErrorList{Errors: []*Error{&Error{
+					Status: http.StatusForbidden,
+					Title:  "Forbidden",
+					Detail: "Can't Go Here",
+				}, testError}}
 
-				contentLength, convErr := strconv.Atoi(writer.HeaderMap.Get("Content-Length"))
-				So(convErr, ShouldBeNil)
-				So(contentLength, ShouldBeGreaterThan, 0)
-				So(writer.HeaderMap.Get("Content-Type"), ShouldEqual, ContentType)
+				Convey("should send a properly formatted JSON error list", func() {
+					err := Send(request, writer, testErrors)
+
+					So(err, ShouldBeNil)
+					So(writer.Code, ShouldEqual, http.StatusForbidden)
+
+					contentLength, convErr := strconv.Atoi(writer.HeaderMap.Get("Content-Length"))
+					So(convErr, ShouldBeNil)
+					So(contentLength, ShouldBeGreaterThan, 0)
+					So(writer.HeaderMap.Get("Content-Type"), ShouldEqual, ContentType)
+				})
 			})
-
 		})
 	})
 }

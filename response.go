@@ -11,6 +11,12 @@ import (
 // http://jsonapi.org/format/1.1/
 const JSONAPIVersion = "1.1"
 
+// Sendable implements functions that allows different response types
+// to produce a sendable JSON Response format
+type Sendable interface {
+	Prepare(r *http.Request) (*Response, SendableError)
+}
+
 // Response represents the top level json format of incoming requests
 // and outgoing responses
 type Response struct {
@@ -48,15 +54,9 @@ func (r *Response) Validate() *Error {
 	return nil
 }
 
-// Sendable implements functions that allow different data types
-// to produce a sendable JSON Response format
-type Sendable interface {
-	Prepare(r *http.Request) (*Response, *Error)
-}
-
 // Send fires a JSON response if the payload is prepared successfully, otherwise it
 // returns an Error which can also be sent.
-func Send(r *http.Request, w http.ResponseWriter, payload Sendable) *Error {
+func Send(r *http.Request, w http.ResponseWriter, payload Sendable) SendableError {
 	response, err := payload.Prepare(r)
 	if err != nil {
 		return err
@@ -67,7 +67,7 @@ func Send(r *http.Request, w http.ResponseWriter, payload Sendable) *Error {
 
 // SendResponse handles sending a fully packaged JSON Response allows API consumers
 // to more manually build their Responses in case they want to send Meta, Links, etc
-func SendResponse(r *http.Request, w http.ResponseWriter, response *Response) *Error {
+func SendResponse(r *http.Request, w http.ResponseWriter, response *Response) SendableError {
 
 	err := response.Validate()
 	if err != nil {

@@ -15,7 +15,7 @@ const (
 
 // ParseObject returns a JSON object for a given io.ReadCloser containing
 // a raw JSON payload
-func ParseObject(reader io.ReadCloser) (*Object, *Error) {
+func ParseObject(reader io.ReadCloser) (*Object, SendableError) {
 	defer closeReader(reader)
 
 	byteData, err := ioutil.ReadAll(reader)
@@ -35,12 +35,13 @@ func ParseObject(reader io.ReadCloser) (*Object, *Error) {
 		))
 	}
 
-	return &data.Object, nil
+	object := &data.Object
+	return object, validateInput(object)
 }
 
 // ParseList returns a JSON List for a given io.ReadCloser containing
 // a raw JSON payload
-func ParseList(reader io.ReadCloser) ([]*Object, *Error) {
+func ParseList(reader io.ReadCloser) ([]*Object, SendableError) {
 	defer closeReader(reader)
 
 	byteData, err := ioutil.ReadAll(reader)
@@ -58,6 +59,13 @@ func ParseList(reader io.ReadCloser) ([]*Object, *Error) {
 			string(byteData),
 			err.Error(),
 		))
+	}
+
+	for _, object := range data.List {
+		err := validateInput(object)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return data.List, nil

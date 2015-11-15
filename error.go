@@ -3,6 +3,7 @@ package jsh
 import (
 	"fmt"
 	"net/http"
+	"strings"
 )
 
 // DefaultError can be customized in order to provide a more customized error
@@ -12,6 +13,13 @@ var DefaultErrorDetail = "Request failed, something went wrong."
 
 // DefaultTitle can be customized to provide a more customized ISE Title
 var DefaultErrorTitle = "Internal Server Error"
+
+// SendableError conforms to a standard error format for logging, but can also
+// be sent as a JSON response
+type SendableError interface {
+	Sendable
+	Error() string
+}
 
 // Error represents a JSON Specification Error. Error.Source.Pointer is used in 422
 // status responses to indicate validation errors on a JSON Object attribute.
@@ -31,9 +39,13 @@ type Error struct {
 	ISE string `json:"-"`
 }
 
+func (e *Error) Error() string {
+	return fmt.Sprintf("%s: %s. %s", e.Title, e.Detail, e.Source.Pointer)
+}
+
 // Prepare returns a response containing a prepared error list since the JSON
 // API specification requires that errors are returned as a list
-func (e *Error) Prepare(req *http.Request) (*Response, *Error) {
+func (e *Error) Prepare(req *http.Request) (*Response, SendableError) {
 	list := &ErrorList{Errors: []*Error{e}}
 	return list.Prepare(req)
 }
@@ -43,8 +55,17 @@ type ErrorList struct {
 	Errors []*Error
 }
 
+// Error allows ErrorList to conform to the default Go error interface
+func (e *ErrorList) Error() string {
+	err := "Errors: "
+	for _, e := range e.Errors {
+		err = fmt.Sprintf("%s%s;", err, e.Error())
+	}
+	return err
+}
+
 // Add first validates the error, and then appends it to the ErrorList
-func (e *ErrorList) Add(newError *Error) error {
+func (e *ErrorList) Add(newError *Error) *Error {
 	err := validateError(newError)
 	if err != nil {
 		return err
@@ -55,7 +76,7 @@ func (e *ErrorList) Add(newError *Error) error {
 }
 
 // Prepare first validates the errors, and then returns an appropriate response
-func (e *ErrorList) Prepare(req *http.Request) (*Response, *Error) {
+func (e *ErrorList) Prepare(req *http.Request) (*Response, SendableError) {
 	if len(e.Errors) == 0 {
 		return nil, ISE("No errors provided for attempted error response.")
 	}
@@ -64,12 +85,12 @@ func (e *ErrorList) Prepare(req *http.Request) (*Response, *Error) {
 }
 
 // validateError ensures that the error is ready for a response in it's current state
-func validateError(err *Error) error {
+func validateError(err *Error) *Error {
 
 	if err.Status < 400 || err.Status > 600 {
-		return fmt.Errorf("Invalid HTTP Status for error %+v\n", err)
+		return ISE(fmt.Sprintf("Invalid HTTP Status for error %+v\n", err))
 	} else if err.Status == 422 && err.Source.Pointer == "" {
-		return fmt.Errorf("Source Pointer must be set for 422 Status errors")
+		return ISE(fmt.Sprintf("Source Pointer must be set for 422 Status errors"))
 	}
 
 	return nil
@@ -97,7 +118,7 @@ func InputError(attribute string, detail string) *Error {
 	}
 
 	// Assign this after the fact, easier to do
-	err.Source.Pointer = fmt.Sprintf("data/attributes/%s", attribute)
+	err.Source.Pointer = fmt.Sprintf("data/attributes/%s", strings.ToLower(attribute))
 
 	return err
 }

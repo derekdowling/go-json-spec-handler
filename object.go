@@ -3,16 +3,15 @@ package jsh
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 
-	"gopkg.in/validator.v2"
+	"github.com/asaskevich/govalidator"
 )
 
 // Object represents the default JSON spec for objects
 type Object struct {
-	Type          string             `json:"type"`
-	ID            string             `json:"id"`
+	Type          string             `json:"type" valid:"alpha,required"`
+	ID            string             `json:"id" valid:"required"`
 	Attributes    json.RawMessage    `json:"attributes,omitempty"`
 	Links         map[string]*Link   `json:"links,omitempty"`
 	Relationships map[string]*Object `json:"relationships,omitempty"`
@@ -20,7 +19,7 @@ type Object struct {
 
 // NewObject prepares a new JSON Object for an API response. Whatever is provided
 // as attributes will be marshalled to JSON.
-func NewObject(id string, objType string, attributes interface{}) (*Object, error) {
+func NewObject(id string, objType string, attributes interface{}) (*Object, SendableError) {
 	object := &Object{
 		ID:            id,
 		Type:          objType,
@@ -30,7 +29,7 @@ func NewObject(id string, objType string, attributes interface{}) (*Object, erro
 
 	rawJSON, err := json.MarshalIndent(attributes, "", "  ")
 	if err != nil {
-		return nil, fmt.Errorf("Error marshaling attrs while creating a new JSON Object: %s", err)
+		return nil, ISE(fmt.Sprintf("Error marshaling attrs while creating a new JSON Object: %s", err))
 	}
 
 	object.Attributes = rawJSON
@@ -58,7 +57,7 @@ func NewObject(id string, objType string, attributes interface{}) (*Object, erro
 //			// log errors via error.ISE
 //			jsh.Send(r, w, errors)
 //		}
-func (o *Object) Unmarshal(objType string, target interface{}) (err Sendable) {
+func (o *Object) Unmarshal(objType string, target interface{}) (err SendableError) {
 
 	if objType != o.Type {
 		err = ISE(fmt.Sprintf(
@@ -80,17 +79,12 @@ func (o *Object) Unmarshal(objType string, target interface{}) (err Sendable) {
 		return
 	}
 
-	ok, errors := validateInput(target)
-	if !ok {
-		return errors
-	}
-
-	return nil
+	return validateInput(target)
 }
 
 // Prepare creates a new JSON single object response with an appropriate HTTP status
 // to match the request method type.
-func (o *Object) Prepare(r *http.Request) (*Response, *Error) {
+func (o *Object) Prepare(r *http.Request) (*Response, SendableError) {
 
 	var status int
 
@@ -115,21 +109,28 @@ func (o *Object) Prepare(r *http.Request) (*Response, *Error) {
 
 // validateInput runs go-validator on each attribute on the struct and returns all
 // errors that it picks up
-func validateInput(target interface{}) (ok bool, errors *ErrorList) {
-	ok = true
-	errors = &ErrorList{}
+func validateInput(target interface{}) SendableError {
 
-	err := validator.Validate(target)
-	if err != nil {
-		ok = false
-		log.Printf("errors = %+v\n", errors)
+	_, validationError := govalidator.ValidateStruct(target)
+	if validationError != nil {
 
-		// Each attribute can have multiple errors, only return the first one for each
-		// for attributeName, attributeErrors := range errs {
-		// attributeError := attributeErrors[0]
-		// errors.Add(InputError(attributeName, attributeError))
-		// }
+		manyErrors, isType := validationError.(govalidator.Errors)
+		if isType {
+			list := &ErrorList{}
+			for _, err := range manyErrors.Errors() {
+				singleErr, _ := err.(govalidator.Error)
+				list.Add(InputError(singleErr.Name, singleErr.Err.Error()))
+			}
+
+			// Don't send back a list if it's just a single error, govalidator
+			// seems to always return an error Array even for a single error
+			if len(list.Errors) == 1 {
+				return list.Errors[0]
+			}
+
+			return list
+		}
 	}
 
-	return
+	return nil
 }

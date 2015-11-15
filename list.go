@@ -8,6 +8,6 @@ type List struct {
 }
 
 // Prepare returns a success status response
-func (l List) Prepare(r *http.Request) (*Response, *Error) {
+func (l List) Prepare(r *http.Request) (*Response, SendableError) {
 	return &Response{Data: l.Objects, HTTPStatus: http.StatusOK}, nil
 }
