@@ -43,20 +43,21 @@ func NewObject(id string, objType string, attributes interface{}) (*Object, Send
 // Optionally, used https://github.com/go-validator/validator for request input validation.
 // Simply define your struct with valid input tags:
 //
-//		struct {
-//			Username string `validate:"min=3,max=40,regexp=^[a-zA-Z]$"`
-//		}
+//	struct {
+//		Username string `json:"username" valid:"required,alphanum"`
+//	}
 //
-//	and the function will run go-validator on the unmarshal result. If the validator
-//	fails, a Sendable error response of HTTP Status 422 will be returned containing
-//	each validation error with a populated Error.Source.Pointer specifying each struct
-//	attribute that failed. In this case, all you need to do is:
 //
-//		errors := obj.Unmarshal("mytype", &myType)
-//		if errors != nil {
-//			// log errors via error.ISE
-//			jsh.Send(r, w, errors)
-//		}
+// As the final action, the Unmarshal function will run govalidator on the unmarshal
+// result. If the validator fails, a Sendable error response of HTTP Status 422 will
+// be returned containing each validation error with a populated Error.Source.Pointer
+// specifying each struct attribute that failed. In this case, all you need to do is:
+//
+//	errors := obj.Unmarshal("mytype", &myType)
+//	if errors != nil {
+//		// log errors via error.ISE
+//		jsh.Send(r, w, errors)
+//	}
 func (o *Object) Unmarshal(objType string, target interface{}) (err SendableError) {
 
 	if objType != o.Type {
