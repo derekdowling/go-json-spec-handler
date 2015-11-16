@@ -15,6 +15,38 @@ const (
 
 // ParseObject returns a JSON object for a given io.ReadCloser containing
 // a raw JSON payload
+//
+//	func Handler(w http.ResponseWriter, r *http.Request) {
+//		obj, error := jsh.ParseObject(r.Body)
+//		if error != nil {
+//			// log your error
+//			jsh.Send(r, w, error)
+//			return
+//		}
+//
+//		yourType := &YourType
+//
+//		err := object.Unmarshal("yourtype", &YourType)
+//		if err != nil {
+//			jsh.Send(r, w, err)
+//			return
+//		}
+//
+//		yourType.ID = obj.ID
+//		// do business logic
+//
+//		response, err := jsh.NewObject(yourType.ID, "yourtype", &yourType)
+//		if err != nil {
+//			// log error
+//			jsh.Send(r, w, err)
+//			return
+//		}
+//
+//		err := jsh.Send(r, w, response)
+//		if err != nil {
+//			http.Error(w, err.Status, err.Detail)
+//		}
+//	}
 func ParseObject(reader io.ReadCloser) (*Object, SendableError) {
 	defer closeReader(reader)
 
