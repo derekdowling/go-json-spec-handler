@@ -34,8 +34,7 @@ func TestList(t *testing.T) {
 			Convey("should send a properly formatted List response", func() {
 
 				writer := httptest.NewRecorder()
-				err := Send(writer, req, testList)
-				So(err, ShouldBeNil)
+				Send(writer, req, testList)
 				So(writer.Code, ShouldEqual, http.StatusOK)
 
 				contentLength, convErr := strconv.Atoi(writer.HeaderMap.Get("Content-Length"))

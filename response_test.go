@@ -31,8 +31,7 @@ func TestSend(t *testing.T) {
 
 					request.Method = "GET"
 
-					err := Send(writer, request, object)
-					So(err, ShouldBeNil)
+					Send(writer, request, object)
 					So(writer.Code, ShouldEqual, http.StatusOK)
 
 					contentLength, convErr := strconv.Atoi(writer.HeaderMap.Get("Content-Length"))

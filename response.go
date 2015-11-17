@@ -2,7 +2,7 @@ package jsh
 
 import (
 	"encoding/json"
-	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 )
@@ -33,7 +33,7 @@ type Response struct {
 }
 
 // Validate checks JSON Spec for the top level JSON document
-func (r *Response) Validate() *Error {
+func (r *Response) Validate() SendableError {
 
 	if r.Errors == nil && r.Data == nil {
 		return ISE("Both `errors` and `data` cannot be blank for a JSON response")
@@ -56,34 +56,45 @@ func (r *Response) Validate() *Error {
 
 // Send fires a JSON response if the payload is prepared successfully, otherwise it
 // returns an Error which can also be sent.
-func Send(w http.ResponseWriter, r *http.Request, payload Sendable) SendableError {
+func Send(w http.ResponseWriter, r *http.Request, payload Sendable) {
 	response, err := payload.Prepare(r)
 	if err != nil {
-		return err
+		response, err = err.Prepare(r)
+
+		// If we ever hit this, something seriously wrong has happened
+		if err != nil {
+			log.Printf("Error preparing JSH error: %s", err.Error())
+			http.Error(w, DefaultErrorTitle, http.StatusInternalServerError)
+			return
+		}
 	}
 
-	return SendResponse(w, r, response)
+	SendResponse(w, r, response)
 }
 
 // SendResponse handles sending a fully packaged JSON Response allows API consumers
 // to more manually build their Responses in case they want to send Meta, Links, etc
-func SendResponse(w http.ResponseWriter, r *http.Request, response *Response) SendableError {
+func SendResponse(w http.ResponseWriter, r *http.Request, response *Response) {
 
 	err := response.Validate()
 	if err != nil {
-		return err
+		response, err = err.Prepare(r)
+
+		// If we ever hit this, something seriously wrong has happened
+		if err != nil {
+			log.Printf("Error preparing JSH error: %s", err.Error())
+			http.Error(w, DefaultErrorTitle, http.StatusInternalServerError)
+		}
 	}
 
 	content, jsonErr := json.MarshalIndent(response, "", "  ")
 	if jsonErr != nil {
-		// Sendception
-		return ISE(fmt.Sprintf("Unable to prepare payload JSON: %s", jsonErr))
+		log.Printf("Unable to prepare payload JSON: %s", jsonErr)
+		http.Error(w, DefaultErrorTitle, http.StatusInternalServerError)
 	}
 
 	w.Header().Add("Content-Type", ContentType)
 	w.Header().Set("Content-Length", strconv.Itoa(len(content)))
 	w.WriteHeader(response.HTTPStatus)
 	w.Write(content)
-
-	return nil
 }
