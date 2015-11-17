@@ -8,6 +8,11 @@ type List struct {
 }
 
 // Prepare returns a success status response
-func (l List) Prepare(r *http.Request) (*Response, SendableError) {
+func (l *List) Prepare(r *http.Request) (*Response, SendableError) {
 	return &Response{Data: l.Objects, HTTPStatus: http.StatusOK}, nil
+}
+
+// Add is just a convenience function that appends an additional object to a list
+func (l *List) Add(o *Object) {
+	l.Objects = append(l.Objects, o)
 }
