@@ -54,7 +54,7 @@ func TestError(t *testing.T) {
 		})
 
 		Convey("->Send()", func() {
-			err := Send(request, writer, testError)
+			err := Send(writer, request, testError)
 			So(err, ShouldBeNil)
 			So(writer.Code, ShouldEqual, http.StatusBadRequest)
 		})
@@ -92,7 +92,7 @@ func TestError(t *testing.T) {
 				}, testError}}
 
 				Convey("should send a properly formatted JSON error list", func() {
-					err := Send(request, writer, testErrors)
+					err := Send(writer, request, testErrors)
 
 					So(err, ShouldBeNil)
 					So(writer.Code, ShouldEqual, http.StatusForbidden)

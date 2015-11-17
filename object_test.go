@@ -140,7 +140,7 @@ func TestObject(t *testing.T) {
 		Convey("->Send(Object)", func() {
 			request.Method = "POST"
 			writer := httptest.NewRecorder()
-			err := Send(request, writer, testObject)
+			err := Send(writer, request, testObject)
 			So(err, ShouldBeNil)
 			So(writer.Code, ShouldEqual, http.StatusCreated)
 		})

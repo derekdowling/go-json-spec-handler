@@ -56,18 +56,18 @@ func (r *Response) Validate() *Error {
 
 // Send fires a JSON response if the payload is prepared successfully, otherwise it
 // returns an Error which can also be sent.
-func Send(r *http.Request, w http.ResponseWriter, payload Sendable) SendableError {
+func Send(w http.ResponseWriter, r *http.Request, payload Sendable) SendableError {
 	response, err := payload.Prepare(r)
 	if err != nil {
 		return err
 	}
 
-	return SendResponse(r, w, response)
+	return SendResponse(w, r, response)
 }
 
 // SendResponse handles sending a fully packaged JSON Response allows API consumers
 // to more manually build their Responses in case they want to send Meta, Links, etc
-func SendResponse(r *http.Request, w http.ResponseWriter, response *Response) SendableError {
+func SendResponse(w http.ResponseWriter, r *http.Request, response *Response) SendableError {
 
 	err := response.Validate()
 	if err != nil {

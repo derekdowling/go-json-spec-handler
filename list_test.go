@@ -34,7 +34,7 @@ func TestList(t *testing.T) {
 			Convey("should send a properly formatted List response", func() {
 
 				writer := httptest.NewRecorder()
-				err := Send(req, writer, testList)
+				err := Send(writer, req, testList)
 
 				So(err, ShouldBeNil)
 				So(writer.Code, ShouldEqual, http.StatusOK)

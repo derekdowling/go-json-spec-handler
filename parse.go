@@ -17,10 +17,10 @@ const (
 // a raw JSON payload
 //
 //	func Handler(w http.ResponseWriter, r *http.Request) {
-//		obj, error := jsh.ParseObject(r.Body)
+//		obj, error := jsh.ParseObject(r)
 //		if error != nil {
 //			// log your error
-//			jsh.Send(r, w, error)
+//			jsh.Send(w, r, error)
 //			return
 //		}
 //
@@ -28,7 +28,7 @@ const (
 //
 //		err := object.Unmarshal("yourtype", &YourType)
 //		if err != nil {
-//			jsh.Send(r, w, err)
+//			jsh.Send(w, r, err)
 //			return
 //		}
 //
@@ -38,11 +38,11 @@ const (
 //		response, err := jsh.NewObject(yourType.ID, "yourtype", &yourType)
 //		if err != nil {
 //			// log error
-//			jsh.Send(r, w, err)
+//			jsh.Send(w, r, err)
 //			return
 //		}
 //
-//		err := jsh.Send(r, w, response)
+//		err := jsh.Send(w, r, response)
 //		if err != nil {
 //			http.Error(w, err.Status, err.Detail)
 //		}

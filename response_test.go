@@ -31,7 +31,7 @@ func TestSend(t *testing.T) {
 
 					request.Method = "GET"
 
-					err := Send(request, writer, object)
+					err := Send(writer, request, object)
 					So(err, ShouldBeNil)
 					So(writer.Code, ShouldEqual, http.StatusOK)
 
