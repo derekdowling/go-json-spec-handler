@@ -18,7 +18,7 @@ const (
 )
 
 // ParseObject returns a JSON object for a given io.ReadCloser containing
-// a raw JSON payload
+// a raw JSON payload. Here's an example of how to use it as part of your full flow.
 //
 //	func Handler(w http.ResponseWriter, r *http.Request) {
 //		obj, error := jsh.ParseObject(r)
@@ -46,10 +46,7 @@ const (
 //			return
 //		}
 //
-//		err := jsh.Send(w, r, response)
-//		if err != nil {
-//			http.Error(w, err.Status, err.Detail)
-//		}
+//		jsh.Send(w, r, response)
 //	}
 func ParseObject(r *http.Request) (*Object, SendableError) {
 
