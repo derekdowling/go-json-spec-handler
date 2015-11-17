@@ -2,6 +2,7 @@ package jsh
 
 import (
 	"encoding/json"
+	"net/http"
 	"testing"
 
 	. "github.com/smartystreets/goconvey/convey"
@@ -11,15 +12,38 @@ func TestParsing(t *testing.T) {
 
 	Convey("Request Tests", t, func() {
 
+		Convey("->validateRequest()", func() {
+			req, err := http.NewRequest("GET", "", nil)
+			So(err, ShouldBeNil)
+			req.Header.Set("Content-Type", "jpeg")
+
+			err = validateRequest(req)
+			So(err, ShouldNotBeNil)
+
+			singleErr := err.(*Error)
+			So(singleErr.Status, ShouldEqual, http.StatusNotAcceptable)
+		})
+
+		Convey("->loadJSON()", func() {
+			req, err := http.NewRequest("GET", "", createIOCloser([]byte("1234")))
+			So(err, ShouldBeNil)
+			req.Header.Set("Content-Type", ContentType)
+
+			bytes, err := loadJSON(req)
+			So(err, ShouldBeNil)
+			So(string(bytes), ShouldEqual, "1234")
+		})
+
 		Convey("->ParseObject()", func() {
 
 			Convey("should parse a valid object", func() {
 
 				objectJSON := `{"data": {"type": "user", "id": "sweetID123", "attributes": {"ID":"123"}}}`
 
-				closer := createIOCloser([]byte(objectJSON))
+				req, reqErr := testRequest([]byte(objectJSON))
+				So(reqErr, ShouldBeNil)
 
-				object, err := ParseObject(closer)
+				object, err := ParseObject(req)
 				So(err, ShouldBeNil)
 				So(object, ShouldNotBeEmpty)
 				So(object.Type, ShouldEqual, "user")
@@ -29,9 +53,11 @@ func TestParsing(t *testing.T) {
 
 			Convey("should reject an object with missing attributes", func() {
 				objectJSON := `{"data": {"id": "sweetID123", "attributes": {"ID":"123"}}}`
-				closer := createIOCloser([]byte(objectJSON))
 
-				_, err := ParseObject(closer)
+				req, reqErr := testRequest([]byte(objectJSON))
+				So(reqErr, ShouldBeNil)
+
+				_, err := ParseObject(req)
 				So(err, ShouldNotBeNil)
 
 				vErr, ok := err.(*Error)
@@ -50,10 +76,10 @@ func TestParsing(t *testing.T) {
 	{"type": "user", "id": "sweetID123", "attributes": {"ID":"123"}},
 	{"type": "user", "id": "sweetID456", "attributes": {"ID":"456"}}
 ]}`
+				req, reqErr := testRequest([]byte(listJSON))
+				So(reqErr, ShouldBeNil)
 
-				closer := createIOCloser([]byte(listJSON))
-
-				list, err := ParseList(closer)
+				list, err := ParseList(req)
 				So(err, ShouldBeNil)
 				So(len(list), ShouldEqual, 2)
 
@@ -70,9 +96,10 @@ func TestParsing(t *testing.T) {
 	{"type": "user", "attributes": {"ID":"456"}}
 ]}`
 
-				closer := createIOCloser([]byte(listJSON))
+				req, reqErr := testRequest([]byte(listJSON))
+				So(reqErr, ShouldBeNil)
 
-				_, err := ParseList(closer)
+				_, err := ParseList(req)
 				So(err, ShouldNotBeNil)
 
 				vErr, ok := err.(*Error)

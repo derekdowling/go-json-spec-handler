@@ -35,16 +35,19 @@ func TestList(t *testing.T) {
 
 				writer := httptest.NewRecorder()
 				err := Send(writer, req, testList)
-
 				So(err, ShouldBeNil)
 				So(writer.Code, ShouldEqual, http.StatusOK)
+
 				contentLength, convErr := strconv.Atoi(writer.HeaderMap.Get("Content-Length"))
 				So(convErr, ShouldBeNil)
 				So(contentLength, ShouldBeGreaterThan, 0)
 				So(writer.HeaderMap.Get("Content-Type"), ShouldEqual, ContentType)
 
-				closer := createIOCloser(writer.Body.Bytes())
-				responseList, err := ParseList(closer)
+				req, reqErr := testRequest(writer.Body.Bytes())
+				So(reqErr, ShouldBeNil)
+
+				responseList, err := ParseList(req)
+				So(err, ShouldBeNil)
 				So(len(responseList), ShouldEqual, 1)
 			})
 		})

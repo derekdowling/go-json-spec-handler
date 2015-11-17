@@ -6,6 +6,7 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
+	"net/http"
 )
 
 const (
@@ -47,19 +48,18 @@ const (
 //			http.Error(w, err.Status, err.Detail)
 //		}
 //	}
-func ParseObject(reader io.ReadCloser) (*Object, SendableError) {
-	defer closeReader(reader)
+func ParseObject(r *http.Request) (*Object, SendableError) {
 
-	byteData, err := ioutil.ReadAll(reader)
-	if err != nil {
-		return nil, ISE(fmt.Sprintf("Error attempting to read request body: %s", err))
+	byteData, loadErr := loadJSON(r)
+	if loadErr != nil {
+		return nil, loadErr
 	}
 
 	data := struct {
 		Object Object `json:"data"`
 	}{}
 
-	err = json.Unmarshal(byteData, &data)
+	err := json.Unmarshal(byteData, &data)
 	if err != nil {
 		return nil, ISE(fmt.Sprintf("Unable to parse json: \n%s\nError:%s",
 			string(byteData),
@@ -73,19 +73,18 @@ func ParseObject(reader io.ReadCloser) (*Object, SendableError) {
 
 // ParseList returns a JSON List for a given io.ReadCloser containing
 // a raw JSON payload
-func ParseList(reader io.ReadCloser) ([]*Object, SendableError) {
-	defer closeReader(reader)
+func ParseList(r *http.Request) ([]*Object, SendableError) {
 
-	byteData, err := ioutil.ReadAll(reader)
-	if err != nil {
-		return nil, ISE(fmt.Sprintf("Error attempting to read request body: %s", err))
+	byteData, loadErr := loadJSON(r)
+	if loadErr != nil {
+		return nil, loadErr
 	}
 
 	data := struct {
 		List []*Object `json:"data"`
 	}{List: []*Object{}}
 
-	err = json.Unmarshal(byteData, &data)
+	err := json.Unmarshal(byteData, &data)
 	if err != nil {
 		return nil, ISE(fmt.Sprintf("Unable to parse json: \n%s\nError:%s",
 			string(byteData),
@@ -103,9 +102,39 @@ func ParseList(reader io.ReadCloser) ([]*Object, SendableError) {
 	return data.List, nil
 }
 
+func loadJSON(r *http.Request) ([]byte, SendableError) {
+	defer closeReader(r.Body)
+
+	validationErr := validateRequest(r)
+	if validationErr != nil {
+		return nil, validationErr
+	}
+
+	byteData, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		return nil, ISE(fmt.Sprintf("Error attempting to read request body: %s", err))
+	}
+
+	return byteData, nil
+}
+
 func closeReader(reader io.ReadCloser) {
 	err := reader.Close()
 	if err != nil {
 		log.Println("Unabled to close request Body")
 	}
+}
+
+func validateRequest(r *http.Request) SendableError {
+
+	reqContentType := r.Header.Get("Content-Type")
+	if reqContentType != ContentType {
+		return SpecificationError(fmt.Sprintf(
+			"Expected Content-Type header to be %s, got: %s",
+			ContentType,
+			reqContentType,
+		))
+	}
+
+	return nil
 }
