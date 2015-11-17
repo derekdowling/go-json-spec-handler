@@ -89,7 +89,7 @@ func SendResponse(w http.ResponseWriter, r *http.Request, response *Response) {
 
 	content, jsonErr := json.MarshalIndent(response, "", "  ")
 	if jsonErr != nil {
-		log.Printf("Unable to prepare payload JSON: %s", jsonErr)
+		log.Printf("Unable to prepare JSON content: %s", jsonErr)
 		http.Error(w, DefaultErrorTitle, http.StatusInternalServerError)
 	}
 

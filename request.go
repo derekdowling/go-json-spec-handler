@@ -7,6 +7,9 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
+	"strconv"
+	"strings"
 )
 
 const (
@@ -137,4 +140,44 @@ func validateRequest(r *http.Request) SendableError {
 	}
 
 	return nil
+}
+
+// NewObjectRequest allows you to create a formatted request that can be used with an
+// http.Client or for testing
+func NewObjectRequest(method string, baseURL *url.URL, object *Object) (*http.Request, error) {
+
+	switch method {
+	case "PATCH":
+	case "DELETE":
+		baseURL.Path = strings.Join([]string{object.Type, object.ID}, "/")
+		break
+	case "POST":
+		break
+	default:
+		return nil, SpecificationError(fmt.Sprintf(
+			"Cannot use HTTP method ''%s' for a JSON Request", method,
+		))
+	}
+
+	request, err := http.NewRequest(method, baseURL.String(), nil)
+	if err != nil {
+		return nil, fmt.Errorf("Error creating new HTTP request: %s", err.Error())
+	}
+
+	// use Prepare to generate a payload
+	payload, err := object.Prepare(request)
+	if err != nil {
+		return nil, fmt.Errorf("Error preparing object: %s", err.Error())
+	}
+
+	content, jsonErr := json.MarshalIndent(payload, "", "  ")
+	if jsonErr != nil {
+		return nil, fmt.Errorf("Unable to prepare JSON content: %s", jsonErr)
+	}
+
+	request.Header.Add("Content-Type", ContentType)
+	request.Header.Set("Content-Length", strconv.Itoa(len(content)))
+	request.Body = createIOCloser(content)
+
+	return request, nil
 }

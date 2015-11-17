@@ -3,6 +3,7 @@ package jsh
 import (
 	"encoding/json"
 	"net/http"
+	"net/url"
 	"testing"
 
 	. "github.com/smartystreets/goconvey/convey"
@@ -106,6 +107,30 @@ func TestParsing(t *testing.T) {
 				So(ok, ShouldBeTrue)
 				So(vErr.Status, ShouldEqual, 422)
 				So(vErr.Source.Pointer, ShouldEqual, "data/attributes/id")
+			})
+		})
+
+		Convey("->NewObjectRequest()", func() {
+
+			Convey("should create a valid HTTP request", func() {
+				url := &url.URL{Host: "test123"}
+				obj := &Object{ID: "test123", Type: "obj"}
+				req, err := NewObjectRequest("POST", url, obj)
+
+				So(err, ShouldBeNil)
+				So(req.Method, ShouldEqual, "POST")
+				So(req.URL, ShouldResemble, url)
+			})
+
+			Convey("should error for invalid HTTP methods", func() {
+				url := &url.URL{}
+				obj := &Object{}
+				_, err := NewObjectRequest("PUT", url, obj)
+				So(err, ShouldNotBeNil)
+
+				singleErr, ok := err.(*Error)
+				So(ok, ShouldBeTrue)
+				So(singleErr.Status, ShouldEqual, http.StatusNotAcceptable)
 			})
 		})
 	})

@@ -87,6 +87,13 @@ func (o *Object) Unmarshal(objType string, target interface{}) (err SendableErro
 // to match the request method type.
 func (o *Object) Prepare(r *http.Request) (*Response, SendableError) {
 
+	if len(o.ID) == 0 {
+		return nil, SpecificationError("ID must be set for Object response")
+	}
+
+	if len(o.Type) == 0 {
+		return nil, SpecificationError("Type must be set for Object response")
+	}
 	var status int
 
 	switch r.Method {
