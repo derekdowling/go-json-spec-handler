@@ -8,11 +8,15 @@ Go JSON API Specification Handler
 Built to handle both HTTP Client and Server needs for dealing with [JSON Specification](http://jsonapi.org/) 
 APIs. Great for Ember.js!
 
-## Features
+# Packages
 
-#### Packages
+### jsh - JSON Spec Handler
 
-##### jsh - JSON Spec Handler - For Building Your OWN JSON Spec API
+```go
+import github.com/derekdowling/go-json-spec-handler
+```
+
+For Building Your OWN JSON Spec API
 
     Implemented:
 
@@ -39,9 +43,11 @@ APIs. Great for Ember.js!
     - Pagination
     - Filtering
 
-##### Subpackages:
+### jsc - JSON Spec Client - For Consuming JSON Spec APIs
 
-###### -> jsc - JSON Spec Client - For Consuming JSON Spec APIs
+```go
+import github.com/derekdowling/go-json-spec-handler/jsc
+```
 
     Implmented:
 
@@ -53,12 +59,6 @@ APIs. Great for Ember.js!
 
     - GET Request
     - PATCH Request
-
-## Installation
-
-```
-$ go get github.com/derekdowling/go-json-spec-handler
-```
 
 ## Examples
 
