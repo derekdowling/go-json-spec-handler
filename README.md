@@ -5,34 +5,54 @@ Go JSON API Specification Handler
 [![Build Status](https://travis-ci.org/derekdowling/go-json-spec-handler.svg?branch=master)](https://travis-ci.org/derekdowling/go-json-spec-handler)
 [TestCoverage](http://gocover.io/github.com/derekdowling/go-json-spec-handler?version=1.5rc1)
 
-A Golang API helper that deals with request serialization and response sending for creating a [JSON API Specification](http://jsonapi.org/) compatible Golang API. Great for Ember.js!
+Built to handle both HTTP Client and Server needs for dealing with [JSON Specification](http://jsonapi.org/) 
+APIs. Great for Ember.js!
 
 ## Features
 
-    Implemented:
+    #### Packages
 
-    - Handles both single object and array based JSON requests and responses
-    - Input validation with HTTP 422 Status support via [go-validator](https://github.com/go-validator/validator)
-    - Client request validation with HTTP 406 Status responses
-    - Links, Relationship, Meta fields
-    - Prepackaged error responses, easy to use Internal Service Error builder
-    - Smart responses with correct HTTP Statuses based on Request Method and HTTP Headers
+    ##### jsh - JSON Spec Handler - For Building Your OWN JSON Spec API
 
-    TODO:
+        Implemented:
 
-    - Reserved character checking
+        - Handles both single object and array based JSON requests and responses
+        - Input validation with HTTP 422 Status support via [go-validator](https://github.com/go-validator/validator)
+        - Client request validation with HTTP 406 Status responses
+        - Links, Relationship, Meta fields
+        - Prepackaged error responses, easy to use Internal Service Error builder
+        - Smart responses with correct HTTP Statuses based on Request Method and HTTP Headers
 
-    Not Implenting:
+        TODO:
 
-    * These features aren't handled because they are beyond the scope of what
-      this library is meant to be. In the future, I might build a framework
-      utilizing this library to handle these complex features which require
-      Router and ORM compatibility.
+        - Reserved character checking
 
-    - Relationship management
-    - Sorting
-    - Pagination
-    - Filtering
+        Not Implenting:
+
+        * These features aren't handled because they are beyond the scope of what
+          this library is meant to be. In the future, I might build a framework
+          utilizing this library to handle these complex features which require
+          Router and ORM compatibility.
+
+        - Relationship management
+        - Sorting
+        - Pagination
+        - Filtering
+
+    ##### Subpackages:
+
+    ###### -> jsc - JSON Spec Client - For Consuming JSON Spec APIs
+
+        Implmented:
+
+        - POST Request
+        - DELETE (NOOP)
+        - PUT (Not Used)
+
+        TODO:
+
+        - GET Request
+        - PATCH Request
 
 ## Installation
 
