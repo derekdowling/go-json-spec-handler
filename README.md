@@ -10,49 +10,49 @@ APIs. Great for Ember.js!
 
 ## Features
 
-    #### Packages
+#### Packages
 
-    ##### jsh - JSON Spec Handler - For Building Your OWN JSON Spec API
+##### jsh - JSON Spec Handler - For Building Your OWN JSON Spec API
 
-        Implemented:
+    Implemented:
 
-        - Handles both single object and array based JSON requests and responses
-        - Input validation with HTTP 422 Status support via [go-validator](https://github.com/go-validator/validator)
-        - Client request validation with HTTP 406 Status responses
-        - Links, Relationship, Meta fields
-        - Prepackaged error responses, easy to use Internal Service Error builder
-        - Smart responses with correct HTTP Statuses based on Request Method and HTTP Headers
+    - Handles both single object and array based JSON requests and responses
+    - Input validation with HTTP 422 Status support via [go-validator](https://github.com/go-validator/validator)
+    - Client request validation with HTTP 406 Status responses
+    - Links, Relationship, Meta fields
+    - Prepackaged error responses, easy to use Internal Service Error builder
+    - Smart responses with correct HTTP Statuses based on Request Method and HTTP Headers
 
-        TODO:
+    TODO:
 
-        - Reserved character checking
+    - Reserved character checking
 
-        Not Implenting:
+    Not Implenting:
 
-        * These features aren't handled because they are beyond the scope of what
-          this library is meant to be. In the future, I might build a framework
-          utilizing this library to handle these complex features which require
-          Router and ORM compatibility.
+    * These features aren't handled because they are beyond the scope of what
+      this library is meant to be. In the future, I might build a framework
+      utilizing this library to handle these complex features which require
+      Router and ORM compatibility.
 
-        - Relationship management
-        - Sorting
-        - Pagination
-        - Filtering
+    - Relationship management
+    - Sorting
+    - Pagination
+    - Filtering
 
-    ##### Subpackages:
+##### Subpackages:
 
-    ###### -> jsc - JSON Spec Client - For Consuming JSON Spec APIs
+###### -> jsc - JSON Spec Client - For Consuming JSON Spec APIs
 
-        Implmented:
+    Implmented:
 
-        - POST Request
-        - DELETE (NOOP)
-        - PUT (Not Used)
+    - POST Request
+    - DELETE (NOOP)
+    - PUT (Not Used)
 
-        TODO:
+    TODO:
 
-        - GET Request
-        - PATCH Request
+    - GET Request
+    - PATCH Request
 
 ## Installation
 
