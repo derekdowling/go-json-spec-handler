@@ -78,7 +78,7 @@ func TestObject(t *testing.T) {
 
 					e, ok := unmarshalErr.(*Error)
 					So(ok, ShouldBeTrue)
-					So(e.Source.Pointer, ShouldEqual, "data/attributes/foo")
+					So(e.Source.Pointer, ShouldEqual, "/data/attributes/foo")
 				})
 
 				Convey("should return a 422 Error correctly for multiple validation failures", func() {
@@ -99,8 +99,8 @@ func TestObject(t *testing.T) {
 
 					errorList, ok := unmarshalErr.(*ErrorList)
 					So(ok, ShouldBeTrue)
-					So(errorList.Errors[0].Source.Pointer, ShouldEqual, "data/attributes/foo")
-					So(errorList.Errors[1].Source.Pointer, ShouldEqual, "data/attributes/baz")
+					So(errorList.Errors[0].Source.Pointer, ShouldEqual, "/data/attributes/foo")
+					So(errorList.Errors[1].Source.Pointer, ShouldEqual, "/data/attributes/baz")
 				})
 
 			})

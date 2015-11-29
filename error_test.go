@@ -35,7 +35,7 @@ func TestError(t *testing.T) {
 				testError.Status = 422
 
 				Convey("should accept a properly formatted 422 error", func() {
-					testError.Source.Pointer = "data/attributes/test"
+					testError.Source.Pointer = "/data/attributes/test"
 					err := validateError(testError)
 					So(err, ShouldBeNil)
 				})

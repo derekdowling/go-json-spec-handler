@@ -63,7 +63,7 @@ func TestParsing(t *testing.T) {
 				vErr, ok := err.(*Error)
 				So(ok, ShouldBeTrue)
 				So(vErr.Status, ShouldEqual, 422)
-				So(vErr.Source.Pointer, ShouldEqual, "data/attributes/type")
+				So(vErr.Source.Pointer, ShouldEqual, "/data/attributes/type")
 			})
 		})
 
@@ -105,7 +105,7 @@ func TestParsing(t *testing.T) {
 				vErr, ok := err.(*Error)
 				So(ok, ShouldBeTrue)
 				So(vErr.Status, ShouldEqual, 422)
-				So(vErr.Source.Pointer, ShouldEqual, "data/attributes/id")
+				So(vErr.Source.Pointer, ShouldEqual, "/data/attributes/id")
 			})
 		})
 	})
