@@ -118,7 +118,7 @@ func InputError(attribute string, detail string) *Error {
 	}
 
 	// Assign this after the fact, easier to do
-	err.Source.Pointer = fmt.Sprintf("data/attributes/%s", strings.ToLower(attribute))
+	err.Source.Pointer = fmt.Sprintf("/data/attributes/%s", strings.ToLower(attribute))
 
 	return err
 }
