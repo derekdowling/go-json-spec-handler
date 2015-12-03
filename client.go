@@ -60,12 +60,10 @@ func NewGetRequest(urlStr string, resourceType string, id string) (*Request, err
 	}
 
 	// ghetto pluralization, fix when it becomes an issue
-	plural := fmt.Sprintf("%ss", resourceType)
+	u.Path = fmt.Sprintf("%ss", resourceType)
 
-	if id == "" {
-		u.Path = plural
-	} else {
-		u.Path = strings.Join([]string{plural, id}, "/")
+	if id != "" {
+		u.Path = strings.Join([]string{u.Path, id}, "/")
 	}
 
 	request, err := http.NewRequest("GET", u.String(), nil)
@@ -94,7 +92,7 @@ func NewRequest(method string, urlStr string, object *Object) (*Request, error) 
 	}
 
 	// ghetto pluralization, fix when it becomes an issue
-	plural := fmt.Sprintf("%ss", object.Type)
+	u.Path = fmt.Sprintf("%ss", object.Type)
 
 	switch method {
 	case "GET":
@@ -106,7 +104,7 @@ func NewRequest(method string, urlStr string, object *Object) (*Request, error) 
 				"Object must be present for HTTP method '%s'", method,
 			))
 		}
-		u.Path = strings.Join([]string{plural, object.ID}, "/")
+		u.Path = strings.Join([]string{u.Path, object.ID}, "/")
 		break
 	case "POST":
 		break
