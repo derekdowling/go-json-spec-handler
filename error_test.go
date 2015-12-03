@@ -91,7 +91,8 @@ func TestError(t *testing.T) {
 				}, testError}}
 
 				Convey("should send a properly formatted JSON error list", func() {
-					Send(writer, request, testErrors)
+					err := Send(writer, request, testErrors)
+					So(err, ShouldBeNil)
 					So(writer.Code, ShouldEqual, http.StatusForbidden)
 
 					contentLength, convErr := strconv.Atoi(writer.HeaderMap.Get("Content-Length"))

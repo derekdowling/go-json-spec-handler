@@ -40,11 +40,11 @@ const (
 //		response, err := jsh.NewObject(yourType.ID, "yourtype", &yourType)
 //		if err != nil {
 //			// log error
-//			jsh.Send(w, r, err)
+//			err := jsh.Send(w, r, err)
 //			return
 //		}
 //
-//		jsh.Send(w, r, response)
+//		err := jsh.Send(w, r, response)
 //	}
 func ParseObject(r *http.Request) (*Object, SendableError) {
 

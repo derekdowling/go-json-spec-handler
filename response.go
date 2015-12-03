@@ -2,7 +2,7 @@ package jsh
 
 import (
 	"encoding/json"
-	"log"
+	"fmt"
 	"net/http"
 	"strconv"
 )
@@ -54,27 +54,30 @@ func (r *Response) Validate() SendableError {
 	return nil
 }
 
-// Send fires a JSON response if the payload is prepared successfully, otherwise it
-// returns an Error which can also be sent.
-func Send(w http.ResponseWriter, r *http.Request, payload Sendable) {
+// Send will return a JSON payload to the requestor. If the payload response validation
+// fails, it will send an appropriate error to the requestor and will return the error
+func Send(w http.ResponseWriter, r *http.Request, payload Sendable) error {
+
 	response, err := payload.prepare(r, true)
 	if err != nil {
-		response, err = err.prepare(r, true)
 
-		// If we ever hit this, something seriously wrong has happened
+		response, err = err.prepare(r, true)
 		if err != nil {
-			log.Printf("Error preparing JSH error: %s", err.Error())
 			http.Error(w, DefaultErrorTitle, http.StatusInternalServerError)
-			return
+			return fmt.Errorf("Error preparing JSH error: %s", err.Error())
 		}
+
+		return fmt.Errorf("Error preparing JSON payload: %s", err.Error())
 	}
 
-	SendResponse(w, r, response)
+	return SendResponse(w, r, response)
 }
 
 // SendResponse handles sending a fully packaged JSON Response allows API consumers
 // to more manually build their Responses in case they want to send Meta, Links, etc
-func SendResponse(w http.ResponseWriter, r *http.Request, response *Response) {
+// The function will always, send but will return the last error it encountered
+// to help with debugging
+func SendResponse(w http.ResponseWriter, r *http.Request, response *Response) error {
 
 	err := response.Validate()
 	if err != nil {
@@ -82,19 +85,23 @@ func SendResponse(w http.ResponseWriter, r *http.Request, response *Response) {
 
 		// If we ever hit this, something seriously wrong has happened
 		if err != nil {
-			log.Printf("Error preparing JSH error: %s", err.Error())
 			http.Error(w, DefaultErrorTitle, http.StatusInternalServerError)
+			return fmt.Errorf("Error preparing JSH error: %s", err.Error())
 		}
+
+		return fmt.Errorf("Response validation error: %s", err.Error())
 	}
 
 	content, jsonErr := json.MarshalIndent(response, "", "  ")
 	if jsonErr != nil {
-		log.Printf("Unable to prepare JSON content: %s", jsonErr)
 		http.Error(w, DefaultErrorTitle, http.StatusInternalServerError)
+		return fmt.Errorf("Unable to marshal JSON payload: %s", jsonErr.Error())
 	}
 
 	w.Header().Add("Content-Type", ContentType)
 	w.Header().Set("Content-Length", strconv.Itoa(len(content)))
 	w.WriteHeader(response.HTTPStatus)
 	w.Write(content)
+
+	return nil
 }
