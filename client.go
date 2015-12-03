@@ -3,6 +3,7 @@ package jsh
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -30,6 +31,18 @@ func (c *ClientResponse) GetObject() (*Object, SendableError) {
 // body if possible
 func (c *ClientResponse) GetList() ([]*Object, SendableError) {
 	return parseMany(c.Header, c.Body)
+}
+
+// BodyStr is a convenience function that parses the body of the response into a
+// string BUT DOESN'T close the ReadCloser
+func (c *ClientResponse) BodyStr() (string, error) {
+
+	byteData, err := ioutil.ReadAll(c.Body)
+	if err != nil {
+		return "", fmt.Errorf("Error attempting to read request body: %s", err)
+	}
+
+	return string(byteData), nil
 }
 
 // Send sends an http.Request and handles parsing the response back
