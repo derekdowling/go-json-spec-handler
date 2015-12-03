@@ -56,7 +56,7 @@ func NewObject(id string, objType string, attributes interface{}) (*Object, Send
 //	errors := obj.Unmarshal("mytype", &myType)
 //	if errors != nil {
 //		// log errors via error.ISE
-//		jsh.Send(r, w, errors)
+//		jsh.Send(w, r, errors)
 //	}
 func (o *Object) Unmarshal(objType string, target interface{}) (err SendableError) {
 

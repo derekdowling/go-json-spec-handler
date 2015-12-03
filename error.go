@@ -28,7 +28,16 @@ type SendableError interface {
 // logging/troubleshooting, but is never returned in a response.
 //
 // Once a jsh.Error is returned, and you have logged/handled it accordingly, you
-// can simply return it using jsh.SendError() or jsh.SendErrors()
+// can simply return it using jsh.Send():
+//
+//	error := &jsh.Error{
+//		Title: "Authentication Failure",
+//		Detail: "Category 4 Username Failure",
+//		Status: 401
+//	}
+//
+//	jsh.Send(w, r, error)
+//
 type Error struct {
 	Title  string `json:"title"`
 	Detail string `json:"detail"`
