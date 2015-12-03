@@ -12,4 +12,4 @@ install:
 
 
 script:
-  - godep go test ./...
+  - godep go test $(go list ./... | grep -v /vendor/)
