@@ -60,11 +60,7 @@ func NewGetRequest(urlStr string, resourceType string, id string) (*Request, err
 	}
 
 	// ghetto pluralization, fix when it becomes an issue
-	u.Path = fmt.Sprintf("%ss", resourceType)
-
-	if id != "" {
-		u.Path = strings.Join([]string{u.Path, id}, "/")
-	}
+	setPath(u, resourceType, id)
 
 	request, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
@@ -91,9 +87,6 @@ func NewRequest(method string, urlStr string, object *Object) (*Request, error) 
 		return nil, err
 	}
 
-	// ghetto pluralization, fix when it becomes an issue
-	u.Path = fmt.Sprintf("%ss", object.Type)
-
 	switch method {
 	case "GET":
 		return nil, ISE("Use jsh.NewGetRequest() for 'GET' method http requests")
@@ -104,9 +97,10 @@ func NewRequest(method string, urlStr string, object *Object) (*Request, error) 
 				"Object must be present for HTTP method '%s'", method,
 			))
 		}
-		u.Path = strings.Join([]string{u.Path, object.ID}, "/")
+		setPath(u, object.Type, object.ID)
 		break
 	case "POST":
+		setPath(u, object.Type, object.ID)
 		break
 	default:
 		return nil, SpecificationError(fmt.Sprintf(
@@ -142,4 +136,17 @@ func NewRequest(method string, urlStr string, object *Object) (*Request, error) 
 	request.Header.Set("Content-Length", strconv.Itoa(len(content)))
 
 	return &Request{request}, nil
+}
+
+func setPath(url *url.URL, resource string, id string) {
+
+	if url.Path != "" && !strings.HasSuffix(url.Path, "/") {
+		url.Path = url.Path + "/"
+	}
+
+	url.Path = fmt.Sprintf("%s%ss", url.Path, resource)
+
+	if id != "" {
+		url.Path = strings.Join([]string{url.Path, id}, "/")
+	}
 }

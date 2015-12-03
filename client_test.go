@@ -1,6 +1,7 @@
 package jsh
 
 import (
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -15,6 +16,26 @@ func TestClientRequest(t *testing.T) {
 
 	Convey("Client Request Tests", t, func() {
 
+		Convey("->setPath()", func() {
+			url := &url.URL{Host: "test"}
+
+			Convey("should format properly", func() {
+				setPath(url, "test", "1")
+				So(url.String(), ShouldEqual, "//test/tests/1")
+			})
+
+			Convey("should work with an empty ID", func() {
+				setPath(url, "test", "")
+				So(url.String(), ShouldEqual, "//test/tests")
+			})
+
+			Convey("should respect an existing path", func() {
+				url.Path = "admin"
+				setPath(url, "test", "")
+				So(url.String(), ShouldEqual, "//test/admin/tests")
+			})
+		})
+
 		Convey("->NewRequest()", func() {
 
 			Convey("should create a valid HTTP request", func() {
@@ -24,7 +45,7 @@ func TestClientRequest(t *testing.T) {
 
 				So(err, ShouldBeNil)
 				So(req.Method, ShouldEqual, "POST")
-				So(req.URL, ShouldResemble, url)
+				So(req.URL.String(), ShouldResemble, "//test123/objs/123")
 			})
 
 			Convey("should error for invalid HTTP methods", func() {
@@ -72,11 +93,12 @@ func TestClientRequest(t *testing.T) {
 		Convey("->Send()", func() {
 			obj := &Object{ID: "test123", Type: "obj"}
 			req, err := NewRequest("POST", testURL, obj)
+			log.Printf("req.URL.String() = %+v\n", req.URL.String())
 			So(err, ShouldBeNil)
 
 			resp, err := req.Send()
 			So(err, ShouldBeNil)
-			So(resp.StatusCode, ShouldEqual, 405)
+			So(resp.StatusCode, ShouldEqual, 404)
 		})
 	})
 }
