@@ -35,8 +35,13 @@ func (c *ClientResponse) GetList() ([]*Object, SendableError) {
 // Send sends an http.Request and handles parsing the response back
 func (r *Request) Send() (*ClientResponse, error) {
 	client := &http.Client{}
+
 	res, err := client.Do(r.Request)
-	return &ClientResponse{res}, err
+	if err != nil {
+		return nil, err
+	}
+
+	return &ClientResponse{res}, nil
 }
 
 // NewGetRequest allows a user to make an outbound GET /resource(/:id) request.
