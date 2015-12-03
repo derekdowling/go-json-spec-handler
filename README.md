@@ -5,7 +5,7 @@ Go JSON API Specification Handler
 [![Build Status](https://travis-ci.org/derekdowling/go-json-spec-handler.svg?branch=master)](https://travis-ci.org/derekdowling/go-json-spec-handler)
 [TestCoverage](http://gocover.io/github.com/derekdowling/go-json-spec-handler?version=1.5rc1)
 
-Built to handle both HTTP Client and Server needs for dealing with [JSON Specification](http://jsonapi.org/) 
+An HTTP Client and Server request/response handler for dealing with [JSON Specification](http://jsonapi.org/) 
 APIs. Great for Ember.js!
 
 # Packages
@@ -26,6 +26,7 @@ For Building Your OWN JSON Spec API
     - Links, Relationship, Meta fields
     - Prepackaged error responses, easy to use Internal Service Error builder
     - Smart responses with correct HTTP Statuses based on Request Method and HTTP Headers
+    - HTTP Client for GET, POST, DELETE, PATCH
 
     TODO:
 
@@ -42,23 +43,6 @@ For Building Your OWN JSON Spec API
     - Sorting
     - Pagination
     - Filtering
-
-### jsc - JSON Spec Client - For Consuming JSON Spec APIs
-
-```go
-import github.com/derekdowling/go-json-spec-handler/jsc
-```
-
-    Implmented:
-
-    - POST Request
-    - DELETE (NOOP)
-    - PUT (Not Used)
-
-    TODO:
-
-    - GET Request
-    - PATCH Request
 
 ## Examples
 
