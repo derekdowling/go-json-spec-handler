@@ -11,7 +11,7 @@ import (
 // Object represents the default JSON spec for objects
 type Object struct {
 	Type          string             `json:"type" valid:"alpha,required"`
-	ID            string             `json:"id" valid:"required"`
+	ID            string             `json:"id"`
 	Attributes    json.RawMessage    `json:"attributes,omitempty"`
 	Links         map[string]*Link   `json:"links,omitempty"`
 	Relationships map[string]*Object `json:"relationships,omitempty"`
@@ -99,8 +99,8 @@ func (o *Object) prepare(r *http.Request, response bool) (*Response, SendableErr
 	if o.Type == "" {
 		return nil, SpecificationError("Type must be set for Object response")
 	}
-	var status int
 
+	var status int
 	switch r.Method {
 	case "POST":
 		status = http.StatusCreated

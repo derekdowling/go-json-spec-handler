@@ -65,6 +65,24 @@ func TestParsing(t *testing.T) {
 				So(vErr.Status, ShouldEqual, 422)
 				So(vErr.Source.Pointer, ShouldEqual, "/data/attributes/type")
 			})
+
+			Convey("should accept empty ID only for POST", func() {
+				objectJSON := `{"data": {"id": "", "type":"test", "attributes": {"ID":"123"}}}`
+				req, reqErr := testRequest([]byte(objectJSON))
+				So(reqErr, ShouldBeNil)
+
+				Convey("POST test", func() {
+					req.Method = "POST"
+					_, err := ParseObject(req)
+					So(err, ShouldBeNil)
+				})
+
+				Convey("PATCH test", func() {
+					req.Method = "PATCH"
+					_, err := ParseObject(req)
+					So(err, ShouldNotBeNil)
+				})
+			})
 		})
 
 		Convey("->ParseList()", func() {

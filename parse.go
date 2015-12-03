@@ -47,7 +47,17 @@ const (
 //		jsh.Send(w, r, response)
 //	}
 func ParseObject(r *http.Request) (*Object, SendableError) {
-	return parseSingle(r.Header, r.Body)
+
+	object, err := parseSingle(r.Header, r.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	if r.Method != "POST" && object.ID == "" {
+		return nil, InputError("id", "Missing mandatory object attribute")
+	}
+
+	return object, nil
 }
 
 func parseSingle(headers http.Header, closer io.ReadCloser) (*Object, SendableError) {
@@ -69,7 +79,13 @@ func parseSingle(headers http.Header, closer io.ReadCloser) (*Object, SendableEr
 	}
 
 	object := &data.Object
-	return object, validateInput(object)
+
+	inputErr := validateInput(object)
+	if inputErr != nil {
+		return nil, inputErr
+	}
+
+	return object, nil
 }
 
 // ParseList validates the HTTP request and returns a resulting list of objects
@@ -100,6 +116,10 @@ func parseMany(headers http.Header, closer io.ReadCloser) ([]*Object, SendableEr
 		err := validateInput(object)
 		if err != nil {
 			return nil, err
+		}
+
+		if object.ID == "" {
+			return nil, InputError("id", "Object without ID present in list")
 		}
 	}
 
