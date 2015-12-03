@@ -126,7 +126,7 @@ func NewRequest(method string, urlStr string, object *Object) (*Request, error) 
 	// use Prepare to generate a payload
 	if object != nil {
 
-		payload, err := object.Prepare(request)
+		payload, err := object.prepare(request, false)
 		if err != nil {
 			return nil, fmt.Errorf("Error preparing object: %s", err.Error())
 		}

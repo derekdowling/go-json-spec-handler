@@ -85,13 +85,18 @@ func (o *Object) Unmarshal(objType string, target interface{}) (err SendableErro
 
 // Prepare creates a new JSON single object response with an appropriate HTTP status
 // to match the request method type.
-func (o *Object) Prepare(r *http.Request) (*Response, SendableError) {
+func (o *Object) prepare(r *http.Request, response bool) (*Response, SendableError) {
 
-	if len(o.ID) == 0 {
-		return nil, SpecificationError("ID must be set for Object response")
+	if o.ID == "" {
+
+		// don't error if the client is attempting to performing a POST request, in
+		// which case, ID shouldn't actually be set
+		if !response && r.Method != "POST" {
+			return nil, SpecificationError("ID must be set for Object response")
+		}
 	}
 
-	if len(o.Type) == 0 {
+	if o.Type == "" {
 		return nil, SpecificationError("Type must be set for Object response")
 	}
 	var status int
@@ -109,7 +114,7 @@ func (o *Object) Prepare(r *http.Request) (*Response, SendableError) {
 		return SpecificationError(fmt.Sprintf(
 			"The JSON Specification does not accept '%s' requests.",
 			r.Method,
-		)).Prepare(r)
+		)).prepare(r, response)
 	}
 
 	return &Response{HTTPStatus: status, Data: o}, nil

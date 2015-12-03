@@ -131,7 +131,7 @@ func mockClientObjectResponse(object *Object) (*http.Response, error) {
 		return nil, err
 	}
 
-	resp, err := object.Prepare(req.Request)
+	resp, err := object.prepare(req.Request, false)
 	if err != nil {
 		return nil, err
 	}
@@ -148,7 +148,7 @@ func mockClientListResponse(list *List) (*http.Response, error) {
 		return nil, err
 	}
 
-	resp, err := list.Prepare(req.Request)
+	resp, err := list.prepare(req.Request, false)
 	if err != nil {
 		return nil, err
 	}

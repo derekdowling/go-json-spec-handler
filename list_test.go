@@ -24,7 +24,7 @@ func TestList(t *testing.T) {
 		req := &http.Request{}
 
 		Convey("->Prepare()", func() {
-			response, err := testList.Prepare(req)
+			response, err := testList.prepare(req, true)
 			So(err, ShouldBeNil)
 			So(response.HTTPStatus, ShouldEqual, http.StatusOK)
 		})
