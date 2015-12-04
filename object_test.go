@@ -106,6 +106,19 @@ func TestObject(t *testing.T) {
 			})
 		})
 
+		Convey("->Marshal()", func() {
+
+			Convey("should properly update attributes", func() {
+				attrs := map[string]string{"foo": "baz"}
+				err := testObject.Marshal(attrs)
+				So(err, ShouldBeNil)
+
+				raw, jsonErr := json.MarshalIndent(attrs, "", " ")
+				So(jsonErr, ShouldBeNil)
+				So(string(testObject.Attributes), ShouldEqual, string(raw))
+			})
+		})
+
 		Convey("->Prepare()", func() {
 
 			Convey("should handle a POST response correctly", func() {

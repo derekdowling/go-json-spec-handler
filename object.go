@@ -27,7 +27,7 @@ func NewObject(id string, objType string, attributes interface{}) (*Object, Send
 		Relationships: map[string]*Object{},
 	}
 
-	rawJSON, err := json.MarshalIndent(attributes, "", "  ")
+	rawJSON, err := json.MarshalIndent(attributes, "", " ")
 	if err != nil {
 		return nil, ISE(fmt.Sprintf("Error marshaling attrs while creating a new JSON Object: %s", err))
 	}
@@ -58,29 +58,39 @@ func NewObject(id string, objType string, attributes interface{}) (*Object, Send
 //		// log errors via error.ISE
 //		jsh.Send(w, r, errors)
 //	}
-func (o *Object) Unmarshal(objType string, target interface{}) (err SendableError) {
+func (o *Object) Unmarshal(objType string, target interface{}) SendableError {
 
 	if objType != o.Type {
-		err = ISE(fmt.Sprintf(
+		return ISE(fmt.Sprintf(
 			"Expected type %s, when converting actual type: %s",
 			objType,
 			o.Type,
 		))
-		return
 	}
 
 	jsonErr := json.Unmarshal(o.Attributes, target)
 	if jsonErr != nil {
-		err = ISE(fmt.Sprintf(
+		return ISE(fmt.Sprintf(
 			"For type '%s' unable to marshal: %s\nError:%s",
 			objType,
 			string(o.Attributes),
 			jsonErr.Error(),
 		))
-		return
 	}
 
 	return validateInput(target)
+}
+
+// Marshal allows you to load a modified payload back into an object to preserve
+// all of the data it has
+func (o *Object) Marshal(attributes interface{}) SendableError {
+	raw, err := json.MarshalIndent(attributes, "", " ")
+	if err != nil {
+		return ISE(fmt.Sprintf("Error marshaling attrs while creating a new JSON Object: %s", err))
+	}
+
+	o.Attributes = raw
+	return nil
 }
 
 // Prepare creates a new JSON single object response with an appropriate HTTP status

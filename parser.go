@@ -37,14 +37,14 @@ const (
 //		yourType.ID = obj.ID
 //		// do business logic
 //
-//		response, err := jsh.NewObject(yourType.ID, "yourtype", &yourType)
+//		err := object.Marshal(yourType)
 //		if err != nil {
 //			// log error
 //			err := jsh.Send(w, r, err)
 //			return
 //		}
 //
-//		err := jsh.Send(w, r, response)
+//		err := jsh.Send(w, r, object)
 //	}
 func ParseObject(r *http.Request) (*Object, SendableError) {
 
