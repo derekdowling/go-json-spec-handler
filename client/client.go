@@ -75,7 +75,10 @@ func setPath(url *url.URL, resource string) {
 // ID specifier.
 func setIDPath(url *url.URL, resource string, id string) {
 	setPath(url, resource)
-	url.Path = strings.Join([]string{url.Path, id}, "/")
+
+	if id != "" {
+		url.Path = strings.Join([]string{url.Path, id}, "/")
+	}
 }
 
 // objectToPayload first prepares/validates the object to ensure it is JSON

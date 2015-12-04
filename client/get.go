@@ -2,6 +2,7 @@ package jsc
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"net/url"
 
@@ -25,13 +26,14 @@ import (
 //
 func Get(urlStr string, resourceType string, id string) (*Response, *jsh.Error) {
 
+	log.Printf("urlStr = %+v\n", urlStr)
 	u, err := url.Parse(urlStr)
+	log.Printf("u.String() = %+v\n", u.String())
 	if err != nil {
 		return nil, jsh.ISE(fmt.Sprintf("Error parsing URL: %s", err.Error()))
 	}
 
-	// ghetto pluralization, fix when it becomes an issue
-	setPath(u, resourceType)
+	setIDPath(u, resourceType, id)
 
 	response, err := http.Get(u.String())
 	if err != nil {
