@@ -10,13 +10,23 @@ APIs. Great for Ember.js!
 
 # Packages
 
-### jsh - JSON Spec Handler
+### jsh - JSON Specification Handler
 
 ```go
 import github.com/derekdowling/go-json-spec-handler
 ```
 
-For Building Your OWN JSON Spec API
+Perfect middleware, or input/output handling for a new, or existing API server.
+
+### jsc - JSON Specification Client
+
+```go
+import github.com/derekdowling/go-json-spec-handler/client
+```
+
+HTTP Client for interacting with JSON APIs.
+
+### Features 
 
     Implemented:
 
