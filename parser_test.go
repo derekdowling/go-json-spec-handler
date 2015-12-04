@@ -24,12 +24,12 @@ func TestParsing(t *testing.T) {
 			So(singleErr.Status, ShouldEqual, http.StatusNotAcceptable)
 		})
 
-		Convey("->loadJSON()", func() {
+		Convey("->prepareJSON()", func() {
 			req, err := http.NewRequest("GET", "", CreateReadCloser([]byte("1234")))
 			So(err, ShouldBeNil)
 			req.Header.Set("Content-Type", ContentType)
 
-			bytes, err := loadJSON(req.Header, req.Body)
+			bytes, err := prepareJSON(req.Header, req.Body)
 			So(err, ShouldBeNil)
 			So(string(bytes), ShouldEqual, "1234")
 		})

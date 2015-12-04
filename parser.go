@@ -22,7 +22,7 @@ const (
 //		obj, error := jsh.ParseObject(r)
 //		if error != nil {
 //			// log your error
-//			jsh.Send(w, r, error)
+//			err := jsh.Send(w, r, error)
 //			return
 //		}
 //
@@ -30,7 +30,7 @@ const (
 //
 //		err := object.Unmarshal("yourtype", &yourType)
 //		if err != nil {
-//			jsh.Send(w, r, err)
+//			err := jsh.Send(w, r, err)
 //			return
 //		}
 //
@@ -85,13 +85,13 @@ func buildParser(request *http.Request) *Parser {
 
 // GetObject returns a single JSON data object from the parser
 func (p *Parser) GetObject() (*Object, SendableError) {
-	byteData, loadErr := loadJSON(p.Headers, p.Payload)
+	byteData, loadErr := prepareJSON(p.Headers, p.Payload)
 	if loadErr != nil {
 		return nil, loadErr
 	}
 
 	data := struct {
-		Object Object `json:"data"`
+		Object *Object `json:"data"`
 	}{}
 
 	err := json.Unmarshal(byteData, &data)
@@ -102,7 +102,7 @@ func (p *Parser) GetObject() (*Object, SendableError) {
 		))
 	}
 
-	object := &data.Object
+	object := data.Object
 
 	inputErr := validateInput(object)
 	if inputErr != nil {
@@ -114,7 +114,7 @@ func (p *Parser) GetObject() (*Object, SendableError) {
 
 // GetList returns a JSON data list from the parser
 func (p *Parser) GetList() (List, SendableError) {
-	byteData, loadErr := loadJSON(p.Headers, p.Payload)
+	byteData, loadErr := prepareJSON(p.Headers, p.Payload)
 	if loadErr != nil {
 		return nil, loadErr
 	}
@@ -145,7 +145,9 @@ func (p *Parser) GetList() (List, SendableError) {
 	return data.List, nil
 }
 
-func loadJSON(headers http.Header, closer io.ReadCloser) ([]byte, SendableError) {
+// prepareJSON ensures that the provide headers are JSON API compatible and then
+// reads and closes the closer
+func prepareJSON(headers http.Header, closer io.ReadCloser) ([]byte, SendableError) {
 	defer closeReader(closer)
 
 	validationErr := validateHeaders(headers)
