@@ -51,7 +51,7 @@ type Error struct {
 
 // Error is a safe for public consumption error message
 func (e *Error) Error() string {
-	msg := fmt.Sprintf("%s: %s.", e.Title, e.Detail)
+	msg := fmt.Sprintf("%s: %s", e.Title, e.Detail)
 	if e.Source.Pointer != "" {
 		msg += fmt.Sprintf("Source.Pointer: %s", e.Source.Pointer)
 	}
@@ -81,7 +81,7 @@ type ErrorList struct {
 func (e *ErrorList) Error() string {
 	err := "Errors: "
 	for _, e := range e.Errors {
-		err = fmt.Sprintf("%s%s;", err, e.Error())
+		err = strings.Join([]string{err, fmt.Sprintf("%s;", e.Error())}, "\n")
 	}
 	return err
 }
