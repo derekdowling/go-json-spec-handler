@@ -10,8 +10,9 @@ import (
 
 // Post allows a user to make an outbound POST /resources request:
 //
-//	resp, err := jsh.Get("http://apiserver", "user", "2")
-//	obj := resp.GetObject()
+//	obj, _ := jsh.NewObject("123", "user", payload)
+//	resp, _ := jsh.Post("http://apiserver", obj)
+//	createdObj := resp.GetObject()
 //
 func Post(urlStr string, object *jsh.Object) (*Response, error) {
 

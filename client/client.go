@@ -18,13 +18,13 @@ type Response struct {
 	*http.Response
 }
 
-// GetObject validates the http response and parses out the JSON object from the
+// GetObject validates the HTTP response and parses out the JSON object from the
 // body if possible
 func (r *Response) GetObject() (*jsh.Object, error) {
 	return buildParser(r).GetObject()
 }
 
-// GetList validates the http response and parses out the JSON list from the
+// GetList validates the HTTP response and parses out the JSON list from the
 // body if possible
 func (r *Response) GetList() (jsh.List, error) {
 	return buildParser(r).GetList()
