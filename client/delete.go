@@ -8,8 +8,7 @@ import (
 
 // Delete allows a user to make an outbound DELETE /resources/:id request:
 //
-//	resp, err := jsh.Get("http://apiserver", "user", "2")
-//	obj := resp.GetObject()
+//	resp, err := jsh.Delete("http://apiserver", "user", "2")
 //
 func Delete(urlStr string, resourceType string, id string) (*http.Response, error) {
 
