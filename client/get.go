@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+
+	"github.com/derekdowling/go-json-spec-handler"
 )
 
 // Get allows a user to make an outbound GET /resources(/:id) request.
@@ -21,11 +23,11 @@ import (
 //	resp, err := jsh.Get("http://apiserver", "user", "2")
 //	obj := resp.GetObject()
 //
-func Get(urlStr string, resourceType string, id string) (*Response, error) {
+func Get(urlStr string, resourceType string, id string) (*Response, *jsh.Error) {
 
 	u, err := url.Parse(urlStr)
 	if err != nil {
-		return nil, err
+		return nil, jsh.ISE(fmt.Sprintf("Error parsing URL: %s", err.Error()))
 	}
 
 	// ghetto pluralization, fix when it becomes an issue
@@ -33,7 +35,7 @@ func Get(urlStr string, resourceType string, id string) (*Response, error) {
 
 	response, err := http.Get(u.String())
 	if err != nil {
-		return nil, fmt.Errorf("Error performing GET request: %s", err.Error())
+		return nil, jsh.ISE(fmt.Sprintf("Error performing GET request: %s", err.Error()))
 	}
 
 	return &Response{response}, nil

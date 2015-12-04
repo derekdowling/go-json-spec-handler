@@ -15,18 +15,18 @@ import (
 //  resp, _ := jsc.Patch("http://postap.com", obj)
 //  updatedObj, _ := resp.GetObject()
 //
-func Patch(urlStr string, object *jsh.Object) (*Response, error) {
+func Patch(urlStr string, object *jsh.Object) (*Response, *jsh.Error) {
 
 	u, err := url.Parse(urlStr)
 	if err != nil {
-		return nil, err
+		return nil, jsh.ISE(fmt.Sprintf("Error parsing URL: %s", err.Error()))
 	}
 
 	setIDPath(u, object.Type, object.ID)
 
 	request, err := http.NewRequest("PATCH", u.String(), nil)
 	if err != nil {
-		return nil, fmt.Errorf("Error creating new HTTP request: %s", err.Error())
+		return nil, jsh.ISE(fmt.Sprintf("Error creating PATCH request: %s", err.Error()))
 	}
 
 	return sendObjectRequest(request, object)
