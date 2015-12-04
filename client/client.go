@@ -20,23 +20,33 @@ type Response struct {
 
 // GetObject validates the HTTP response and parses out the JSON object from the
 // body if possible
-func (r *Response) GetObject() (*jsh.Object, error) {
-	return buildParser(r).GetObject()
+func (r *Response) GetObject() (*jsh.Object, *jsh.Error) {
+	obj, objErr := buildParser(r).GetObject()
+	if objErr != nil {
+		return nil, objErr.(*jsh.Error)
+	}
+
+	return obj, nil
 }
 
 // GetList validates the HTTP response and parses out the JSON list from the
 // body if possible
-func (r *Response) GetList() (jsh.List, error) {
-	return buildParser(r).GetList()
+func (r *Response) GetList() (jsh.List, *jsh.Error) {
+	list, listErr := buildParser(r).GetList()
+	if listErr != nil {
+		return nil, listErr.(*jsh.Error)
+	}
+
+	return list, nil
 }
 
 // BodyStr is a convenience function that parses the body of the response into a
 // string BUT DOESN'T close the ReadCloser
-func (r *Response) BodyStr() (string, error) {
+func (r *Response) BodyStr() (string, *jsh.Error) {
 
 	byteData, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		return "", fmt.Errorf("Error attempting to read request body: %s", err)
+		return "", jsh.ISE(fmt.Sprintf("Error attempting to read request body: %s", err.Error()))
 	}
 
 	return string(byteData), nil
@@ -70,16 +80,16 @@ func setIDPath(url *url.URL, resource string, id string) {
 
 // objectToPayload first prepares/validates the object to ensure it is JSON
 // spec compatible, and then marshals it to JSON
-func objectToPayload(request *http.Request, object *jsh.Object) ([]byte, error) {
+func objectToPayload(request *http.Request, object *jsh.Object) ([]byte, *jsh.Error) {
 
 	payload, err := object.Prepare(request, false)
 	if err != nil {
-		return nil, fmt.Errorf("Error preparing object: %s", err.Error())
+		return nil, jsh.ISE(fmt.Sprintf("Error preparing object: %s", err.Error()))
 	}
 
 	jsonContent, jsonErr := json.MarshalIndent(payload, "", "  ")
 	if jsonErr != nil {
-		return nil, fmt.Errorf("Unable to prepare JSON content: %s", jsonErr)
+		return nil, jsh.ISE(fmt.Sprintf("Unable to prepare JSON content: %s", jsonErr))
 	}
 
 	return jsonContent, nil
@@ -87,11 +97,11 @@ func objectToPayload(request *http.Request, object *jsh.Object) ([]byte, error) 
 
 // sendPayloadRequest is required for sending JSON payload related requests
 // because by default the http package does not set Content-Length headers
-func sendObjectRequest(request *http.Request, object *jsh.Object) (*Response, error) {
+func sendObjectRequest(request *http.Request, object *jsh.Object) (*Response, *jsh.Error) {
 
 	payload, err := objectToPayload(request, object)
 	if err != nil {
-		return nil, fmt.Errorf("Error converting object to JSON: %s", err.Error())
+		return nil, jsh.ISE(fmt.Sprintf("Error converting object to JSON: %s", err.Error()))
 	}
 
 	// prepare payload and corresponding headers
@@ -100,11 +110,11 @@ func sendObjectRequest(request *http.Request, object *jsh.Object) (*Response, er
 	request.Header.Set("Content-Length", strconv.Itoa(len(payload)))
 
 	client := &http.Client{}
-	response, err := client.Do(request)
-	if err != nil {
-		return nil, fmt.Errorf(
-			"Error sending %s request: %s", request.Method, err.Error(),
-		)
+	response, clientErr := client.Do(request)
+	if clientErr != nil {
+		return nil, jsh.ISE(fmt.Sprintf(
+			"Error sending %s request: %s", request.Method, clientErr.Error(),
+		))
 	}
 
 	return &Response{response}, nil
