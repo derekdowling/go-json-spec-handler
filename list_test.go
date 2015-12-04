@@ -20,11 +20,11 @@ func TestList(t *testing.T) {
 			Attributes: json.RawMessage(`{"foo":"bar"}`),
 		}
 
-		testList := &List{Objects: []*Object{testObject}}
+		testList := List{testObject}
 		req := &http.Request{}
 
 		Convey("->Prepare()", func() {
-			response, err := testList.prepare(req, true)
+			response, err := testList.Prepare(req, true)
 			So(err, ShouldBeNil)
 			So(response.HTTPStatus, ShouldEqual, http.StatusOK)
 		})

@@ -54,9 +54,9 @@ func (e *Error) Error() string {
 
 // Prepare returns a response containing a prepared error list since the JSON
 // API specification requires that errors are returned as a list
-func (e *Error) prepare(req *http.Request, response bool) (*Response, SendableError) {
+func (e *Error) Prepare(req *http.Request, response bool) (*Response, SendableError) {
 	list := &ErrorList{Errors: []*Error{e}}
-	return list.prepare(req, response)
+	return list.Prepare(req, response)
 }
 
 // ErrorList is just a wrapped error array that implements Sendable
@@ -85,7 +85,7 @@ func (e *ErrorList) Add(newError *Error) *Error {
 }
 
 // Prepare first validates the errors, and then returns an appropriate response
-func (e *ErrorList) prepare(req *http.Request, response bool) (*Response, SendableError) {
+func (e *ErrorList) Prepare(req *http.Request, response bool) (*Response, SendableError) {
 	if len(e.Errors) == 0 {
 		return nil, ISE("No errors provided for attempted error response.")
 	}

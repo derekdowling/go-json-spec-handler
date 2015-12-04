@@ -48,7 +48,7 @@ const (
 //	}
 func ParseObject(r *http.Request) (*Object, SendableError) {
 
-	object, err := parseSingle(r.Header, r.Body)
+	object, err := buildParser(r).GetObject()
 	if err != nil {
 		return nil, err
 	}
@@ -60,8 +60,32 @@ func ParseObject(r *http.Request) (*Object, SendableError) {
 	return object, nil
 }
 
-func parseSingle(headers http.Header, closer io.ReadCloser) (*Object, SendableError) {
-	byteData, loadErr := loadJSON(headers, closer)
+// ParseList validates the HTTP request and returns a resulting list of objects
+// parsed from the request Body. Use just like ParseObject.
+func ParseList(r *http.Request) (List, SendableError) {
+	return buildParser(r).GetList()
+}
+
+// Parser is an abstraction layer to support parsing JSON payload from many types
+// of sources in order to allow other packages to use this parser
+type Parser struct {
+	Method  string
+	Headers http.Header
+	Payload io.ReadCloser
+}
+
+// BuildParser creates a parser from an http.Request
+func buildParser(request *http.Request) *Parser {
+	return &Parser{
+		Method:  request.Method,
+		Headers: request.Header,
+		Payload: request.Body,
+	}
+}
+
+// GetObject returns a single JSON data object from the parser
+func (p *Parser) GetObject() (*Object, SendableError) {
+	byteData, loadErr := loadJSON(p.Headers, p.Payload)
 	if loadErr != nil {
 		return nil, loadErr
 	}
@@ -88,21 +112,16 @@ func parseSingle(headers http.Header, closer io.ReadCloser) (*Object, SendableEr
 	return object, nil
 }
 
-// ParseList validates the HTTP request and returns a resulting list of objects
-// parsed from the request Body. Use just like ParseObject.
-func ParseList(r *http.Request) ([]*Object, SendableError) {
-	return parseMany(r.Header, r.Body)
-}
-
-func parseMany(headers http.Header, closer io.ReadCloser) ([]*Object, SendableError) {
-	byteData, loadErr := loadJSON(headers, closer)
+// GetList returns a JSON data list from the parser
+func (p *Parser) GetList() (List, SendableError) {
+	byteData, loadErr := loadJSON(p.Headers, p.Payload)
 	if loadErr != nil {
 		return nil, loadErr
 	}
 
 	data := struct {
-		List []*Object `json:"data"`
-	}{List: []*Object{}}
+		List List `json:"data"`
+	}{List{}}
 
 	err := json.Unmarshal(byteData, &data)
 	if err != nil {

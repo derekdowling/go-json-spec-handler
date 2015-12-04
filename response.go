@@ -14,7 +14,7 @@ const JSONAPIVersion = "1.1"
 // Sendable implements functions that allows different response types
 // to produce a sendable JSON Response format
 type Sendable interface {
-	prepare(r *http.Request, response bool) (*Response, SendableError)
+	Prepare(r *http.Request, response bool) (*Response, SendableError)
 }
 
 // Response represents the top level json format of incoming requests
@@ -58,10 +58,10 @@ func (r *Response) Validate() SendableError {
 // fails, it will send an appropriate error to the requestor and will return the error
 func Send(w http.ResponseWriter, r *http.Request, payload Sendable) error {
 
-	response, err := payload.prepare(r, true)
+	response, err := payload.Prepare(r, true)
 	if err != nil {
 
-		response, err = err.prepare(r, true)
+		response, err = err.Prepare(r, true)
 		if err != nil {
 			http.Error(w, DefaultErrorTitle, http.StatusInternalServerError)
 			return fmt.Errorf("Error preparing JSH error: %s", err.Error())
@@ -81,7 +81,7 @@ func SendResponse(w http.ResponseWriter, r *http.Request, response *Response) er
 
 	err := response.Validate()
 	if err != nil {
-		response, err = err.prepare(r, true)
+		response, err = err.Prepare(r, true)
 
 		// If we ever hit this, something seriously wrong has happened
 		if err != nil {

@@ -1,18 +1,15 @@
 package jsh
 
-import "net/http"
+import (
+	"log"
+	"net/http"
+)
 
 // List is just a wrapper around an object array that implements Sendable
-type List struct {
-	Objects []*Object `json:"data"`
-}
+type List []*Object
 
 // Prepare returns a success status response
-func (l *List) prepare(r *http.Request, response bool) (*Response, SendableError) {
-	return &Response{Data: l.Objects, HTTPStatus: http.StatusOK}, nil
-}
-
-// Add is just a convenience function that appends an additional object to a list
-func (l *List) Add(o *Object) {
-	l.Objects = append(l.Objects, o)
+func (list List) Prepare(r *http.Request, response bool) (*Response, SendableError) {
+	log.Printf("prepare = %+v\n", list)
+	return &Response{Data: list, HTTPStatus: http.StatusOK}, nil
 }
