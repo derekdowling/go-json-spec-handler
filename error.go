@@ -19,6 +19,7 @@ var DefaultErrorTitle = "Internal Server Error"
 type SendableError interface {
 	Sendable
 	Error() string
+	String() string
 }
 
 // Error represents a JSON Specification Error. Error.Source.Pointer is used in 422
@@ -48,8 +49,20 @@ type Error struct {
 	ISE string `json:"-"`
 }
 
+// Error is a safe for public consumption error message
 func (e *Error) Error() string {
-	return fmt.Sprintf("%s: %s. %s", e.Title, e.Detail, e.Source.Pointer)
+	msg := fmt.Sprintf("%s: %s.", e.Title, e.Detail)
+	if e.Source.Pointer != "" {
+		msg += fmt.Sprintf("Source.Pointer: %s", e.Source.Pointer)
+	}
+	return msg
+}
+
+// String is a convenience function that prints out the full error including the
+// ISE which is useful when debugging, NOT to be used for returning errors to user,
+// use e.Error() for that
+func (e *Error) String() string {
+	return fmt.Sprintf("%s ISE: %s", e.Error(), e.ISE)
 }
 
 // Prepare returns a response containing a prepared error list since the JSON
@@ -69,6 +82,15 @@ func (e *ErrorList) Error() string {
 	err := "Errors: "
 	for _, e := range e.Errors {
 		err = fmt.Sprintf("%s%s;", err, e.Error())
+	}
+	return err
+}
+
+// String prints a formatted error list including ISE's, useful for debugging
+func (e *ErrorList) String() string {
+	err := "Errors:"
+	for _, e := range e.Errors {
+		err = strings.Join([]string{err, fmt.Sprintf("%s;", e.String())}, "\n")
 	}
 	return err
 }
