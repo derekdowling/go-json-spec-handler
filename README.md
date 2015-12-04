@@ -56,4 +56,9 @@ HTTP Client for interacting with JSON APIs.
 
 ## Examples
 
-There are lots of great examples in the tests themselves that show exactly how it works, also check out the [godocs](https://godoc.org/github.com/derekdowling/go-json-spec-handler) as linked above.
+- [jshapi](https://github.com/derekdowling/jsh-api) abstracts the full
+  serialization layer for JSON Spec APIs.
+
+There are lots of great examples in the tests themselves that show exactly how jsh works.
+The [godocs](https://godoc.org/github.com/derekdowling/go-json-spec-handler) as linked above
+have a number of examples in them as well.
