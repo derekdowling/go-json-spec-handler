@@ -2,7 +2,8 @@
 	"ImportPath": "github.com/derekdowling/go-json-spec-handler",
 	"GoVersion": "go1.5.1",
 	"Packages": [
-		"./..."
+		"github.com/derekdowling/go-json-spec-handler",
+		"github.com/derekdowling/go-json-spec-handler/client"
 	],
 	"Deps": [
 		{
