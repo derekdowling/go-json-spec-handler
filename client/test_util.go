@@ -1,7 +1,6 @@
 package jsc
 
 import (
-	"log"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -33,7 +32,6 @@ func mockObjectResponse(object *jsh.Object) (*Response, error) {
 func mockListResponse(list jsh.List) (*Response, error) {
 
 	url := &url.URL{Host: "test"}
-	log.Printf("list = %+v\n", list)
 	setPath(url, list[0].Type)
 
 	req, err := http.NewRequest("GET", url.String(), nil)
