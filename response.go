@@ -14,6 +14,8 @@ const JSONAPIVersion = "1.1"
 // Sendable implements functions that allows different response types
 // to produce a sendable JSON Response format
 type Sendable interface {
+	// Prepare allows a "raw" response type to perform specification assertions,
+	// and format any data before it is actually send
 	Prepare(r *http.Request, response bool) (*Response, SendableError)
 }
 
@@ -21,7 +23,6 @@ type Sendable interface {
 // and outgoing responses
 type Response struct {
 	HTTPStatus int         `json:"-"`
-	Validated  bool        `json:"-"`
 	Data       interface{} `json:"data,omitempty"`
 	Errors     interface{} `json:"errors,omitempty"`
 	Meta       interface{} `json:"meta,omitempty"`
