@@ -18,8 +18,11 @@ var DefaultErrorTitle = "Internal Server Error"
 // be sent as a JSON response
 type SendableError interface {
 	Sendable
+	// Error returns a safe for user error message
 	Error() string
-	String() string
+	// Internal returns a fully formatted error including any sensitive debugging
+	// information contained in the ISE field
+	Internal() string
 }
 
 // Error represents a JSON Specification Error. Error.Source.Pointer is used in 422
@@ -58,10 +61,10 @@ func (e *Error) Error() string {
 	return msg
 }
 
-// String is a convenience function that prints out the full error including the
+// Internal is a convenience function that prints out the full error including the
 // ISE which is useful when debugging, NOT to be used for returning errors to user,
 // use e.Error() for that
-func (e *Error) String() string {
+func (e *Error) Internal() string {
 	return fmt.Sprintf("%s ISE: %s", e.Error(), e.ISE)
 }
 
@@ -86,11 +89,11 @@ func (e *ErrorList) Error() string {
 	return err
 }
 
-// String prints a formatted error list including ISE's, useful for debugging
-func (e *ErrorList) String() string {
+// Internal prints a formatted error list including ISE's, useful for debugging
+func (e *ErrorList) Internal() string {
 	err := "Errors:"
 	for _, e := range e.Errors {
-		err = strings.Join([]string{err, fmt.Sprintf("%s;", e.String())}, "\n")
+		err = strings.Join([]string{err, fmt.Sprintf("%s;", e.Internal())}, "\n")
 	}
 	return err
 }
