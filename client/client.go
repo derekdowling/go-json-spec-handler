@@ -15,23 +15,13 @@ import (
 // ParseObject validates the HTTP response and parses out the JSON object from the
 // body if possible
 func ParseObject(response *http.Response) (*jsh.Object, *jsh.Error) {
-	obj, objErr := buildParser(response).GetObject()
-	if objErr != nil {
-		return nil, objErr.(*jsh.Error)
-	}
-
-	return obj, nil
+	return buildParser(response).GetObject()
 }
 
 // ParseList validates the HTTP response and parses out the JSON list from the
 // body if possible
 func ParseList(response *http.Response) (jsh.List, *jsh.Error) {
-	list, listErr := buildParser(response).GetList()
-	if listErr != nil {
-		return nil, listErr.(*jsh.Error)
-	}
-
-	return list, nil
+	return buildParser(response).GetList()
 }
 
 // DumpBody is a convenience function that parses the body of the response into a
