@@ -21,7 +21,8 @@ type SendableError interface {
 	// Error returns a safe for user error message
 	Error() string
 	// Internal returns a fully formatted error including any sensitive debugging
-	// information contained in the ISE field
+	// information contained in the ISE field. Really only useful when logging an
+	// outbound response
 	Internal() string
 }
 

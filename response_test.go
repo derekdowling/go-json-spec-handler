@@ -42,5 +42,12 @@ func TestSend(t *testing.T) {
 				})
 			})
 		})
+
+		Convey("->Ok()", func() {
+			ok := Ok()
+			err := Send(writer, request, ok)
+			So(err, ShouldBeNil)
+			So(writer.Code, ShouldEqual, http.StatusOK)
+		})
 	})
 }

@@ -46,8 +46,8 @@ func TestList(t *testing.T) {
 				req, reqErr := testRequest(writer.Body.Bytes())
 				So(reqErr, ShouldBeNil)
 
-				responseList, err := ParseList(req)
-				So(err, ShouldBeNil)
+				responseList, parseErr := ParseList(req)
+				So(parseErr, ShouldBeNil)
 				So(len(responseList), ShouldEqual, 1)
 			})
 		})
