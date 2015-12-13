@@ -1,6 +1,6 @@
 # JSH-API
 
-[![GoDoc](https://godoc.org/github.com/derekdowling/go-json-spec-handler?status.png)](https://godoc.org/github.com/derekdowling/jsh-api)
+[![GoDoc](https://godoc.org/github.com/derekdowling/go-json-spec-handler?status.png)](https://godoc.org/github.com/derekdowling/jsh-api) [![Build Status](https://travis-ci.org/derekdowling/jsh-api.svg?branch=master)](https://travis-ci.org/derekdowling/jsh-api)
 
 A [JSON Specification](http://jsonapi.org) API Build created on top of
 [jsh](http://github.com/derekdowling/go-json-spec-handler). Bring your own
@@ -12,25 +12,19 @@ rest.
 ```go
 import github.com/derekdowling/jsh-api
 
-// can specify an api prefix(/prefix/resources) or leave blank
 api := jshapi.New("<prefix>")
 
-// set a logger besides os.Stdout if you want
-api.Logger = yourLogger
-
-// implement the jshapi.Storage interface, then:
+// implement jshapi/store.CRUD interface, then:
 userStorage := &UserStorage{}
-resource := jshapi.NewResource("<prefix>", "user", userStorage)
-resource.Insert(yourUserMiddleware)
+resource := jshapi.NewCRUDResource("user", userStorage)
+resource.Use(yourUserMiddleware)
 
 // add resources to the API
 api.AddResource(resource)
 
 // API middleware
 api.Use(yourTopLevelAPIMiddleware)
-
-// add API to top level router
-yourRouter.Handle("<prefix>/*", api.ServeHTTP)
+http.ListenAndServe("localhost:8000", api)
 ```
 
 ## What It Handles
@@ -49,10 +43,10 @@ PATCH /resources/:id
 ## Implementing a Storage Driver with jsh
 
 Below is a simple example of how you might implement the required 
-[Storage Driver](https://godoc.org/github.com/derekdowling/jsh-api#Storage) for a
+[Storage Driver](https://godoc.org/github.com/derekdowling/jsh-api/store#CRUD) for a
 given resource using
 [jsh](https://godoc.org/github.com/derekdowling/go-json-spec-handler) for Save
-and Patch. This should give you a pretty good idea of how easy it is to
+and Update. This should give you a pretty good idea of how easy it is to
 implement the Storage driver with jsh.
 
 
@@ -62,7 +56,7 @@ type User struct {
     Name string `json:"name"`
 }
 
-func Save(object *jsh.Object) jsh.SendableError {
+func Save(ctx context.Context, object *jsh.Object) jsh.SendableError {
     user := &User{}
     err := object.Unmarshal("user", user)
     if err != nil {
@@ -76,7 +70,7 @@ func Save(object *jsh.Object) jsh.SendableError {
     return nil
 }
 
-func Patch(object *jsh.Object) jsh.SendableError {
+func Update(ctx context.Context, object *jsh.Object) jsh.SendableError {
     user := &User{}
     err := object.Unmarshal("user", user)
     if err != nil {

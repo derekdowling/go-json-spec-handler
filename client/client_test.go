@@ -55,9 +55,8 @@ func TestResponseParsing(t *testing.T) {
 			Convey("should parse successfully", func() {
 				respObj, err := ParseObject(response)
 				So(err, ShouldBeNil)
-				So(respObj, ShouldNotBeNil)
+				So(respObj.ID, ShouldEqual, "123")
 			})
-
 		})
 
 		Convey("->GetList()", func() {
@@ -71,9 +70,10 @@ func TestResponseParsing(t *testing.T) {
 			So(err, ShouldBeNil)
 
 			Convey("should parse successfully", func() {
-				respObj, err := ParseList(response)
+				list, err := ParseList(response)
 				So(err, ShouldBeNil)
-				So(respObj, ShouldNotBeNil)
+				So(list, ShouldNotBeNil)
+				So(list[0].ID, ShouldEqual, "123")
 			})
 		})
 	})

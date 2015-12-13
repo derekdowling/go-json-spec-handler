@@ -9,14 +9,12 @@ import (
 )
 
 func mockObjectResponse(object *jsh.Object) (*http.Response, error) {
-	object.ID = "1"
-
 	url := &url.URL{Host: "test"}
 	setIDPath(url, object.Type, object.ID)
 
-	req, err := http.NewRequest("GET", url.String(), nil)
-	if err != nil {
-		return nil, err
+	req, reqErr := http.NewRequest("GET", url.String(), nil)
+	if reqErr != nil {
+		return nil, reqErr
 	}
 
 	resp, err := object.Prepare(req, false)
@@ -34,9 +32,9 @@ func mockListResponse(list jsh.List) (*http.Response, error) {
 	url := &url.URL{Host: "test"}
 	setPath(url, list[0].Type)
 
-	req, err := http.NewRequest("GET", url.String(), nil)
-	if err != nil {
-		return nil, err
+	req, reqErr := http.NewRequest("GET", url.String(), nil)
+	if reqErr != nil {
+		return nil, reqErr
 	}
 
 	resp, err := list.Prepare(req, false)
