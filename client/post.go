@@ -14,11 +14,11 @@ import (
 //	resp, _ := jsh.Post("http://apiserver", obj)
 //	createdObj := resp.GetObject()
 //
-func Post(urlStr string, object *jsh.Object) (*Response, *jsh.Error) {
+func Post(urlStr string, object *jsh.Object) (*jsh.Object, *http.Response, *jsh.Error) {
 
 	u, err := url.Parse(urlStr)
 	if err != nil {
-		return nil, jsh.ISE(fmt.Sprintf("Error parsing URL: %s", err.Error()))
+		return nil, nil, jsh.ISE(fmt.Sprintf("Error parsing URL: %s", err.Error()))
 	}
 
 	// ghetto pluralization, fix when it becomes an issue
@@ -26,7 +26,7 @@ func Post(urlStr string, object *jsh.Object) (*Response, *jsh.Error) {
 
 	request, err := http.NewRequest("POST", u.String(), nil)
 	if err != nil {
-		return nil, jsh.ISE(fmt.Sprintf("Error building POST request: %s", err.Error()))
+		return nil, nil, jsh.ISE(fmt.Sprintf("Error building POST request: %s", err.Error()))
 	}
 
 	return sendObjectRequest(request, object)

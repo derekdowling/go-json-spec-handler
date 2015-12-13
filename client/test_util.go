@@ -8,7 +8,7 @@ import (
 	"github.com/derekdowling/go-json-spec-handler"
 )
 
-func mockObjectResponse(object *jsh.Object) (*Response, error) {
+func mockObjectResponse(object *jsh.Object) (*http.Response, error) {
 	object.ID = "1"
 
 	url := &url.URL{Host: "test"}
@@ -29,7 +29,7 @@ func mockObjectResponse(object *jsh.Object) (*Response, error) {
 	return recorderToResponse(recorder), nil
 }
 
-func mockListResponse(list jsh.List) (*Response, error) {
+func mockListResponse(list jsh.List) (*http.Response, error) {
 
 	url := &url.URL{Host: "test"}
 	setPath(url, list[0].Type)
@@ -49,10 +49,10 @@ func mockListResponse(list jsh.List) (*Response, error) {
 	return recorderToResponse(recorder), nil
 }
 
-func recorderToResponse(recorder *httptest.ResponseRecorder) *Response {
-	return &Response{&http.Response{
+func recorderToResponse(recorder *httptest.ResponseRecorder) *http.Response {
+	return &http.Response{
 		StatusCode: recorder.Code,
 		Body:       jsh.CreateReadCloser(recorder.Body.Bytes()),
 		Header:     recorder.Header(),
-	}}
+	}
 }

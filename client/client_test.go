@@ -41,11 +41,11 @@ func TestClientRequest(t *testing.T) {
 	})
 }
 
-func TestClientResponse(t *testing.T) {
+func TestResponseParsing(t *testing.T) {
 
-	Convey("Client Response Tests", t, func() {
+	Convey("Response Parsing Tests", t, func() {
 
-		Convey("->GetObject()", func() {
+		Convey("->ParseObject()", func() {
 
 			obj, objErr := jsh.NewObject("123", "test", map[string]string{"test": "test"})
 			So(objErr, ShouldBeNil)
@@ -53,7 +53,7 @@ func TestClientResponse(t *testing.T) {
 			So(err, ShouldBeNil)
 
 			Convey("should parse successfully", func() {
-				respObj, err := response.GetObject()
+				respObj, err := ParseObject(response)
 				So(err, ShouldBeNil)
 				So(respObj, ShouldNotBeNil)
 			})
@@ -71,7 +71,7 @@ func TestClientResponse(t *testing.T) {
 			So(err, ShouldBeNil)
 
 			Convey("should parse successfully", func() {
-				respObj, err := response.GetList()
+				respObj, err := ParseList(response)
 				So(err, ShouldBeNil)
 				So(respObj, ShouldNotBeNil)
 			})
