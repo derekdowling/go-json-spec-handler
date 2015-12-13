@@ -14,21 +14,21 @@ func GetObject(urlStr string, resourceType string, id string) (*jsh.Object, *htt
 		return nil, nil, jsh.SpecificationError("ID cannot be empty for GetObject request type")
 	}
 
-	u, err := url.Parse(urlStr)
-	if err != nil {
-		return nil, nil, jsh.ISE(fmt.Sprintf("Error parsing URL: %s", err.Error()))
+	u, urlErr := url.Parse(urlStr)
+	if urlErr != nil {
+		return nil, nil, jsh.ISE(fmt.Sprintf("Error parsing URL: %s", urlErr.Error()))
 	}
 
 	setIDPath(u, resourceType, id)
 
-	response, getErr := Get(u.String())
+	response, err := Get(u.String())
 	if err != nil {
-		return nil, nil, getErr
+		return nil, nil, err
 	}
 
-	object, objectErr := ParseObject(response)
-	if objectErr != nil {
-		return nil, response, objectErr
+	object, err := ParseObject(response)
+	if err != nil {
+		return nil, response, err
 	}
 
 	return object, response, nil
@@ -36,21 +36,21 @@ func GetObject(urlStr string, resourceType string, id string) (*jsh.Object, *htt
 
 // GetList prepares an outbound request for /resourceTypes expecting a list return value.
 func GetList(urlStr string, resourceType string) (jsh.List, *http.Response, *jsh.Error) {
-	u, err := url.Parse(urlStr)
-	if err != nil {
-		return nil, nil, jsh.ISE(fmt.Sprintf("Error parsing URL: %s", err.Error()))
+	u, urlErr := url.Parse(urlStr)
+	if urlErr != nil {
+		return nil, nil, jsh.ISE(fmt.Sprintf("Error parsing URL: %s", urlErr.Error()))
 	}
 
 	setPath(u, resourceType)
 
-	response, getErr := Get(u.String())
+	response, err := Get(u.String())
 	if err != nil {
-		return nil, nil, getErr
+		return nil, nil, err
 	}
 
-	list, listErr := ParseList(response)
-	if listErr != nil {
-		return nil, response, listErr
+	list, err := ParseList(response)
+	if err != nil {
+		return nil, response, err
 	}
 
 	return list, response, nil
