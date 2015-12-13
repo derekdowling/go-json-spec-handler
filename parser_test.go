@@ -13,15 +13,13 @@ func TestParsing(t *testing.T) {
 	Convey("Parse Tests", t, func() {
 
 		Convey("->validateHeaders()", func() {
-			req, err := http.NewRequest("GET", "", nil)
-			So(err, ShouldBeNil)
+			req, reqErr := http.NewRequest("GET", "", nil)
+			So(reqErr, ShouldBeNil)
 			req.Header.Set("Content-Type", "jpeg")
 
-			err = validateHeaders(req.Header)
+			err := validateHeaders(req.Header)
 			So(err, ShouldNotBeNil)
-
-			singleErr := err.(*Error)
-			So(singleErr.Status, ShouldEqual, http.StatusNotAcceptable)
+			So(err.Objects[0].Status, ShouldEqual, http.StatusNotAcceptable)
 		})
 
 		Convey("->prepareJSON()", func() {
@@ -59,11 +57,8 @@ func TestParsing(t *testing.T) {
 
 				_, err := ParseObject(req)
 				So(err, ShouldNotBeNil)
-
-				vErr, ok := err.(*Error)
-				So(ok, ShouldBeTrue)
-				So(vErr.Status, ShouldEqual, 422)
-				So(vErr.Source.Pointer, ShouldEqual, "/data/attributes/type")
+				So(err.Objects[0].Status, ShouldEqual, 422)
+				So(err.Objects[0].Source.Pointer, ShouldEqual, "/data/attributes/type")
 			})
 
 			Convey("should accept empty ID only for POST", func() {
@@ -119,11 +114,8 @@ func TestParsing(t *testing.T) {
 
 				_, err := ParseList(req)
 				So(err, ShouldNotBeNil)
-
-				vErr, ok := err.(*Error)
-				So(ok, ShouldBeTrue)
-				So(vErr.Status, ShouldEqual, 422)
-				So(vErr.Source.Pointer, ShouldEqual, "/data/attributes/id")
+				So(err.Objects[0].Status, ShouldEqual, 422)
+				So(err.Objects[0].Source.Pointer, ShouldEqual, "/data/attributes/id")
 			})
 		})
 	})

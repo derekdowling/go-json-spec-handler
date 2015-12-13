@@ -16,7 +16,7 @@ const JSONAPIVersion = "1.1"
 type Sendable interface {
 	// Prepare allows a "raw" response type to perform specification assertions,
 	// and format any data before it is actually send
-	Prepare(r *http.Request, response bool) (*Response, SendableError)
+	Prepare(r *http.Request, response bool) (*Response, *Error)
 }
 
 // Response represents the top level json format of incoming requests
@@ -41,7 +41,7 @@ type Response struct {
 }
 
 // Validate checks JSON Spec for the top level JSON document
-func (r *Response) Validate() SendableError {
+func (r *Response) Validate() *Error {
 
 	if !r.empty {
 		if r.Errors == nil && r.Data == nil {
@@ -76,7 +76,7 @@ func Send(w http.ResponseWriter, r *http.Request, payload Sendable) *Error {
 		response, err = err.Prepare(r, true)
 		if err != nil {
 			http.Error(w, DefaultErrorTitle, http.StatusInternalServerError)
-			return err.(*Error)
+			return err
 		}
 	}
 
@@ -101,7 +101,7 @@ func SendResponse(w http.ResponseWriter, r *http.Request, response *Response) *E
 		// If we ever hit this, something seriously wrong has happened
 		if prepErr != nil {
 			http.Error(w, DefaultErrorTitle, http.StatusInternalServerError)
-			return prepErr.(*Error)
+			return prepErr
 		}
 
 		// if we didn't error out, make this the new response
@@ -120,7 +120,7 @@ func SendResponse(w http.ResponseWriter, r *http.Request, response *Response) *E
 	w.Write(content)
 
 	if err != nil {
-		return err.(*Error)
+		return err
 	}
 
 	return nil
@@ -137,6 +137,6 @@ func Ok() *OkResponse {
 }
 
 // Prepare turns OkResponse into the normalized Response type
-func (o *OkResponse) Prepare(r *http.Request, response bool) (*Response, SendableError) {
+func (o *OkResponse) Prepare(r *http.Request, response bool) (*Response, *Error) {
 	return &Response{HTTPStatus: http.StatusOK, empty: true}, nil
 }

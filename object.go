@@ -19,10 +19,10 @@ type Object struct {
 
 // NewObject prepares a new JSON Object for an API response. Whatever is provided
 // as attributes will be marshalled to JSON.
-func NewObject(id string, objType string, attributes interface{}) (*Object, SendableError) {
+func NewObject(id string, resourceType string, attributes interface{}) (*Object, *Error) {
 	object := &Object{
 		ID:            id,
-		Type:          objType,
+		Type:          resourceType,
 		Links:         map[string]*Link{},
 		Relationships: map[string]*Object{},
 	}
@@ -36,8 +36,8 @@ func NewObject(id string, objType string, attributes interface{}) (*Object, Send
 	return object, nil
 }
 
-// Unmarshal puts an Object's Attributes into a more useful target type defined
-// by the user. A correct object type specified must also be provided otherwise
+// Unmarshal puts an Object's Attributes into a more useful target resourceType defined
+// by the user. A correct object resourceType specified must also be provided otherwise
 // an error is returned to prevent hard to track down situations.
 //
 // Optionally, used https://github.com/go-validator/validator for request input validation.
@@ -58,12 +58,12 @@ func NewObject(id string, objType string, attributes interface{}) (*Object, Send
 //		// log errors via error.ISE
 //		jsh.Send(w, r, errors)
 //	}
-func (o *Object) Unmarshal(objType string, target interface{}) SendableError {
+func (o *Object) Unmarshal(resourceType string, target interface{}) *Error {
 
-	if objType != o.Type {
+	if resourceType != o.Type {
 		return ISE(fmt.Sprintf(
 			"Expected type %s, when converting actual type: %s",
-			objType,
+			resourceType,
 			o.Type,
 		))
 	}
@@ -72,7 +72,7 @@ func (o *Object) Unmarshal(objType string, target interface{}) SendableError {
 	if jsonErr != nil {
 		return ISE(fmt.Sprintf(
 			"For type '%s' unable to marshal: %s\nError:%s",
-			objType,
+			resourceType,
 			string(o.Attributes),
 			jsonErr.Error(),
 		))
@@ -83,7 +83,7 @@ func (o *Object) Unmarshal(objType string, target interface{}) SendableError {
 
 // Marshal allows you to load a modified payload back into an object to preserve
 // all of the data it has
-func (o *Object) Marshal(attributes interface{}) SendableError {
+func (o *Object) Marshal(attributes interface{}) *Error {
 	raw, err := json.MarshalIndent(attributes, "", " ")
 	if err != nil {
 		return ISE(fmt.Sprintf("Error marshaling attrs while creating a new JSON Object: %s", err))
@@ -95,7 +95,7 @@ func (o *Object) Marshal(attributes interface{}) SendableError {
 
 // Prepare creates a new JSON single object response with an appropriate HTTP status
 // to match the request method type.
-func (o *Object) Prepare(r *http.Request, response bool) (*Response, SendableError) {
+func (o *Object) Prepare(r *http.Request, response bool) (*Response, *Error) {
 
 	if o.ID == "" {
 
@@ -132,26 +132,27 @@ func (o *Object) Prepare(r *http.Request, response bool) (*Response, SendableErr
 
 // validateInput runs go-validator on each attribute on the struct and returns all
 // errors that it picks up
-func validateInput(target interface{}) SendableError {
+func validateInput(target interface{}) *Error {
 
 	_, validationError := govalidator.ValidateStruct(target)
 	if validationError != nil {
 
-		manyErrors, isType := validationError.(govalidator.Errors)
+		errorList, isType := validationError.(govalidator.Errors)
 		if isType {
-			list := &ErrorList{}
-			for _, err := range manyErrors.Errors() {
-				singleErr, _ := err.(govalidator.Error)
-				list.Add(InputError(singleErr.Name, singleErr.Err.Error()))
+
+			err := &Error{}
+			for _, singleErr := range errorList.Errors() {
+
+				// parse out validation error
+				goValidErr, _ := singleErr.(govalidator.Error)
+				inputErr := InputError(goValidErr.Name, goValidErr.Err.Error())
+
+				// gross way to do this, but will require a refactor probably
+				// to achieve something more elegant
+				err.Add(inputErr.Objects[0])
 			}
 
-			// Don't send back a list if it's just a single error, govalidator
-			// seems to always return an error Array even for a single error
-			if len(list.Errors) == 1 {
-				return list.Errors[0]
-			}
-
-			return list
+			return err
 		}
 	}
 

@@ -46,7 +46,7 @@ const (
 //
 //		err := jsh.Send(w, r, object)
 //	}
-func ParseObject(r *http.Request) (*Object, SendableError) {
+func ParseObject(r *http.Request) (*Object, *Error) {
 
 	object, err := buildParser(r).GetObject()
 	if err != nil {
@@ -62,7 +62,7 @@ func ParseObject(r *http.Request) (*Object, SendableError) {
 
 // ParseList validates the HTTP request and returns a resulting list of objects
 // parsed from the request Body. Use just like ParseObject.
-func ParseList(r *http.Request) (List, SendableError) {
+func ParseList(r *http.Request) (List, *Error) {
 	return buildParser(r).GetList()
 }
 
@@ -84,7 +84,7 @@ func buildParser(request *http.Request) *Parser {
 }
 
 // GetObject returns a single JSON data object from the parser
-func (p *Parser) GetObject() (*Object, SendableError) {
+func (p *Parser) GetObject() (*Object, *Error) {
 	byteData, loadErr := prepareJSON(p.Headers, p.Payload)
 	if loadErr != nil {
 		return nil, loadErr
@@ -113,7 +113,7 @@ func (p *Parser) GetObject() (*Object, SendableError) {
 }
 
 // GetList returns a JSON data list from the parser
-func (p *Parser) GetList() (List, SendableError) {
+func (p *Parser) GetList() (List, *Error) {
 	byteData, loadErr := prepareJSON(p.Headers, p.Payload)
 	if loadErr != nil {
 		return nil, loadErr
@@ -147,7 +147,7 @@ func (p *Parser) GetList() (List, SendableError) {
 
 // prepareJSON ensures that the provide headers are JSON API compatible and then
 // reads and closes the closer
-func prepareJSON(headers http.Header, closer io.ReadCloser) ([]byte, SendableError) {
+func prepareJSON(headers http.Header, closer io.ReadCloser) ([]byte, *Error) {
 	defer closeReader(closer)
 
 	validationErr := validateHeaders(headers)
@@ -170,7 +170,7 @@ func closeReader(reader io.ReadCloser) {
 	}
 }
 
-func validateHeaders(headers http.Header) SendableError {
+func validateHeaders(headers http.Header) *Error {
 
 	reqContentType := headers.Get("Content-Type")
 	if reqContentType != ContentType {

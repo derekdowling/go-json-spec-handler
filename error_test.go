@@ -16,7 +16,7 @@ func TestError(t *testing.T) {
 		writer := httptest.NewRecorder()
 		request := &http.Request{}
 
-		testError := &Error{
+		testErrorObject := &ErrorObject{
 			Status: http.StatusBadRequest,
 			Title:  "Fail",
 			Detail: "So badly",
@@ -25,73 +25,67 @@ func TestError(t *testing.T) {
 		Convey("->validateError()", func() {
 
 			Convey("should not fail for a valid Error", func() {
-				validErr := ISE("Valid Error")
-				err := validateError(validErr)
+				err := validateError(testErrorObject)
 				So(err, ShouldBeNil)
 			})
 
 			Convey("422 Status Formatting", func() {
 
-				testError.Status = 422
+				testErrorObject.Status = 422
 
 				Convey("should accept a properly formatted 422 error", func() {
-					testError.Source.Pointer = "/data/attributes/test"
-					err := validateError(testError)
+					testErrorObject.Source.Pointer = "/data/attributes/test"
+					err := validateError(testErrorObject)
 					So(err, ShouldBeNil)
 				})
 
 				Convey("should error if Source.Pointer isn't set", func() {
-					err := validateError(testError)
+					err := validateError(testErrorObject)
 					So(err, ShouldNotBeNil)
 				})
 			})
 
 			Convey("should fail for an out of range HTTP error status", func() {
-				testError.Status = http.StatusOK
-				err := validateError(testError)
+				testErrorObject.Status = http.StatusOK
+				err := validateError(testErrorObject)
 				So(err, ShouldNotBeNil)
 			})
-		})
-
-		Convey("->Send()", func() {
-			Send(writer, request, testError)
-			So(writer.Code, ShouldEqual, http.StatusBadRequest)
 		})
 
 		Convey("Error List Tests", func() {
 
 			Convey("->Add()", func() {
 
-				list := &ErrorList{}
+				testError := &Error{}
 
 				Convey("should successfully add a valid error", func() {
-					err := list.Add(testError)
+					err := testError.Add(testErrorObject)
 					So(err, ShouldBeNil)
-					So(len(list.Errors), ShouldEqual, 1)
+					So(len(testError.Objects), ShouldEqual, 1)
 				})
 
 				Convey("should error if validation fails while adding an error", func() {
-					badError := &Error{
+					badError := &ErrorObject{
 						Title:  "Invalid",
 						Detail: "So badly",
 					}
 
-					err := list.Add(badError)
-					So(err.Status, ShouldEqual, 500)
-					So(list.Errors, ShouldBeEmpty)
+					err := testError.Add(badError)
+					So(err.Objects[0].Status, ShouldEqual, 500)
+					So(testError.Objects, ShouldBeEmpty)
 				})
 			})
 
-			Convey("->Send(ErrorList)", func() {
+			Convey("->Send()", func() {
 
-				testErrors := &ErrorList{Errors: []*Error{&Error{
+				testError := NewError(&ErrorObject{
 					Status: http.StatusForbidden,
 					Title:  "Forbidden",
 					Detail: "Can't Go Here",
-				}, testError}}
+				})
 
 				Convey("should send a properly formatted JSON error list", func() {
-					err := Send(writer, request, testErrors)
+					err := Send(writer, request, testError)
 					So(err, ShouldBeNil)
 					So(writer.Code, ShouldEqual, http.StatusForbidden)
 

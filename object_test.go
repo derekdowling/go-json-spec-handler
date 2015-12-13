@@ -73,12 +73,9 @@ func TestObject(t *testing.T) {
 						Foo string `valid:"ipv4,required" json:"foo"`
 					}{}
 
-					unmarshalErr := testObject.Unmarshal("testObject", &testValidation)
-					So(unmarshalErr, ShouldNotBeNil)
-
-					e, ok := unmarshalErr.(*Error)
-					So(ok, ShouldBeTrue)
-					So(e.Source.Pointer, ShouldEqual, "/data/attributes/foo")
+					err := testObject.Unmarshal("testObject", &testValidation)
+					So(err, ShouldNotBeNil)
+					So(err.Objects[0].Source.Pointer, ShouldEqual, "/data/attributes/foo")
 				})
 
 				Convey("should return a 422 Error correctly for multiple validation failures", func() {
@@ -94,15 +91,12 @@ func TestObject(t *testing.T) {
 						Baz string `valid:"alpha,required" json:"baz"`
 					}{}
 
-					unmarshalErr := testManyObject.Unmarshal("testObject", &testManyValidations)
-					So(unmarshalErr, ShouldNotBeNil)
+					err := testManyObject.Unmarshal("testObject", &testManyValidations)
+					So(err, ShouldNotBeNil)
 
-					errorList, ok := unmarshalErr.(*ErrorList)
-					So(ok, ShouldBeTrue)
-					So(errorList.Errors[0].Source.Pointer, ShouldEqual, "/data/attributes/foo")
-					So(errorList.Errors[1].Source.Pointer, ShouldEqual, "/data/attributes/baz")
+					So(err.Objects[0].Source.Pointer, ShouldEqual, "/data/attributes/foo")
+					So(err.Objects[1].Source.Pointer, ShouldEqual, "/data/attributes/baz")
 				})
-
 			})
 		})
 

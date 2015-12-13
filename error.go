@@ -14,26 +14,9 @@ var DefaultErrorDetail = "Request failed, something went wrong."
 // DefaultTitle can be customized to provide a more customized ISE Title
 var DefaultErrorTitle = "Internal Server Error"
 
-// SendableError conforms to a standard error format for logging, but can also
-// be sent as a JSON response
-type SendableError interface {
-	Sendable
-	// Error returns a safe for user error message
-	Error() string
-	// Internal returns a fully formatted error including any sensitive debugging
-	// information contained in the ISE field. Really only useful when logging an
-	// outbound response
-	Internal() string
-}
-
-// Error represents a JSON Specification Error. Error.Source.Pointer is used in 422
-// status responses to indicate validation errors on a JSON Object attribute.
-//
-// ISE (internal server error) captures the server error internally to help with
-// logging/troubleshooting, but is never returned in a response.
-//
-// Once a jsh.Error is returned, and you have logged/handled it accordingly, you
-// can simply return it using jsh.Send():
+// ErrorObject consists of a number of contextual attributes to make conveying
+// certain error type simpler as per the JSON API specification:
+// http://jsonapi.org/format/#error-objects
 //
 //	error := &jsh.Error{
 //		Title: "Authentication Failure",
@@ -43,7 +26,7 @@ type SendableError interface {
 //
 //	jsh.Send(w, r, error)
 //
-type Error struct {
+type ErrorObject struct {
 	Title  string `json:"title"`
 	Detail string `json:"detail"`
 	Status int    `json:"status"`
@@ -54,7 +37,7 @@ type Error struct {
 }
 
 // Error is a safe for public consumption error message
-func (e *Error) Error() string {
+func (e *ErrorObject) Error() string {
 	msg := fmt.Sprintf("%s: %s", e.Title, e.Detail)
 	if e.Source.Pointer != "" {
 		msg += fmt.Sprintf("Source.Pointer: %s", e.Source.Pointer)
@@ -65,62 +48,62 @@ func (e *Error) Error() string {
 // Internal is a convenience function that prints out the full error including the
 // ISE which is useful when debugging, NOT to be used for returning errors to user,
 // use e.Error() for that
-func (e *Error) Internal() string {
+func (e *ErrorObject) Internal() string {
 	return fmt.Sprintf("%s ISE: %s", e.Error(), e.ISE)
 }
 
-// Prepare returns a response containing a prepared error list since the JSON
-// API specification requires that errors are returned as a list
-func (e *Error) Prepare(req *http.Request, response bool) (*Response, SendableError) {
-	list := &ErrorList{Errors: []*Error{e}}
-	return list.Prepare(req, response)
-}
-
-// ErrorList is just a wrapped error array that implements Sendable
-type ErrorList struct {
-	Errors []*Error
+// Error is a Sendable type consistenting of one or more error messages. Error
+// implements Sendable and as such, when encountered, can simply be sent via
+// jsh:
+//
+//	object, err := ParseObject(request)
+//	if err != nil {
+//		err := jsh.Send(err, w, request)
+//	}
+type Error struct {
+	Objects []*ErrorObject
 }
 
 // Error allows ErrorList to conform to the default Go error interface
-func (e *ErrorList) Error() string {
+func (e *Error) Error() string {
 	err := "Errors: "
-	for _, e := range e.Errors {
-		err = strings.Join([]string{err, fmt.Sprintf("%s;", e.Error())}, "\n")
+	for _, m := range e.Objects {
+		err = strings.Join([]string{err, fmt.Sprintf("%s;", m.Error())}, "\n")
 	}
 	return err
 }
 
 // Internal prints a formatted error list including ISE's, useful for debugging
-func (e *ErrorList) Internal() string {
+func (e *Error) Internal() string {
 	err := "Errors:"
-	for _, e := range e.Errors {
-		err = strings.Join([]string{err, fmt.Sprintf("%s;", e.Internal())}, "\n")
+	for _, m := range e.Objects {
+		err = strings.Join([]string{err, fmt.Sprintf("%s;", m.Internal())}, "\n")
 	}
 	return err
 }
 
 // Add first validates the error, and then appends it to the ErrorList
-func (e *ErrorList) Add(newError *Error) *Error {
-	err := validateError(newError)
+func (e *Error) Add(object *ErrorObject) *Error {
+	err := validateError(object)
 	if err != nil {
 		return err
 	}
 
-	e.Errors = append(e.Errors, newError)
+	e.Objects = append(e.Objects, object)
 	return nil
 }
 
 // Prepare first validates the errors, and then returns an appropriate response
-func (e *ErrorList) Prepare(req *http.Request, response bool) (*Response, SendableError) {
-	if len(e.Errors) == 0 {
+func (e *Error) Prepare(req *http.Request, response bool) (*Response, *Error) {
+	if len(e.Objects) == 0 {
 		return nil, ISE("No errors provided for attempted error response.")
 	}
 
-	return &Response{Errors: e.Errors, HTTPStatus: e.Errors[0].Status}, nil
+	return &Response{Errors: e.Objects, HTTPStatus: e.Objects[0].Status}, nil
 }
 
 // validateError ensures that the error is ready for a response in it's current state
-func validateError(err *Error) *Error {
+func validateError(err *ErrorObject) *Error {
 
 	if err.Status < 400 || err.Status > 600 {
 		return ISE(fmt.Sprintf("Invalid HTTP Status for error %+v\n", err))
@@ -131,38 +114,64 @@ func validateError(err *Error) *Error {
 	return nil
 }
 
+// NewError is a convenience function that makes creating a Sendable Error from a
+// Error Object simple. Because ErrorObjects are validated agains the JSON API
+// Specification before being added, there is a chance that a ISE error might be
+// returned in your new error's place.
+func NewError(object *ErrorObject) *Error {
+	newError := &Error{}
+
+	err := newError.Add(object)
+	if err != nil {
+		return err
+	}
+
+	return newError
+}
+
 // ISE is a convenience function for creating a ready-to-go Internal Service Error
-// response. As previously mentioned, the Error.ISE field is for logging only, and
-// won't be returned to the end user.
-func ISE(err string) *Error {
-	return &Error{
+// response. The message you pass in is set to the ErrorObject.ISE attribute so you
+// can gracefully log ISE's internally before sending them
+func ISE(internalMessage string) *Error {
+	return NewError(&ErrorObject{
 		Title:  DefaultErrorTitle,
 		Detail: DefaultErrorDetail,
 		Status: http.StatusInternalServerError,
-		ISE:    err,
-	}
+		ISE:    internalMessage,
+	})
 }
 
 // InputError creates a properly formatted Status 422 error with an appropriate
 // user facing message, and a Status Pointer to the first attribute that
 func InputError(attribute string, detail string) *Error {
-	err := &Error{
+	message := &ErrorObject{
 		Title:  "Invalid Attribute",
 		Detail: detail,
 		Status: 422,
 	}
 
 	// Assign this after the fact, easier to do
-	err.Source.Pointer = fmt.Sprintf("/data/attributes/%s", strings.ToLower(attribute))
+	message.Source.Pointer = fmt.Sprintf("/data/attributes/%s", strings.ToLower(attribute))
 
+	err := &Error{}
+	err.Add(message)
 	return err
 }
 
 // SpecificationError is used whenever the Client violates the JSON API Spec
 func SpecificationError(detail string) *Error {
-	return &Error{
-		Title:  "API Specification Error",
+	return NewError(&ErrorObject{
+		Title:  "JSON API Specification Error",
 		Detail: detail,
 		Status: http.StatusNotAcceptable,
-	}
+	})
+}
+
+// NotFound returns a 404 formatted error
+func NotFound(resourceType string, id string) *Error {
+	return NewError(&ErrorObject{
+		Title:  "Not Found",
+		Detail: fmt.Sprintf("No resource of type '%s' exists for ID: %s", resourceType, id),
+		Status: http.StatusNotFound,
+	})
 }
