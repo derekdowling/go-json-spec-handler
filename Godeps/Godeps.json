@@ -1,9 +1,8 @@
 {
-	"ImportPath": "github.com/derekdowling/jsh-api",
+	"ImportPath": "github.com/derekdowling/go-json-spec-handler",
 	"GoVersion": "go1.5.1",
 	"Packages": [
-		"github.com/derekdowling/jsh-api",
-		"github.com/derekdowling/jsh-api/store"
+		"./..."
 	],
 	"Deps": [
 		{
@@ -12,9 +11,9 @@
 			"Rev": "edd46cdac249b001c7b7d88c6d43993ea875e8d8"
 		},
 		{
-			"ImportPath": "github.com/derekdowling/go-json-spec-handler",
-			"Comment": "0.6.1-2-g5e8d72a",
-			"Rev": "5e8d72a55f2ec253c28795b7b3aa16ed57a7b303"
+			"ImportPath": "github.com/derekdowling/jsh-api",
+			"Comment": "0.1.3-19-g09d7d01",
+			"Rev": "09d7d010bc2489648b8e9eeb86425301b72bf8de"
 		},
 		{
 			"ImportPath": "github.com/jtolds/gls",
