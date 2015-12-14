@@ -14,4 +14,4 @@ install:
   - godep restore
 
 script:
-  - godep go test $(go list ./... | grep -v /vendor/)
+  - go test $(go list ./... | grep -v /vendor/)
