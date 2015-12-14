@@ -1,6 +1,10 @@
 language: go
 go:
   - tip
+  - 1.5
+
+env:
+  - GO15VENDOREXPERIMENT=1
 
 install:
   - go get github.com/tools/godep
