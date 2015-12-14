@@ -1,0 +1,58 @@
+hash: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+updated: 2015-12-14T14:25:42.152977607-08:00
+imports:
+- name: bytes
+  version: ""
+- name: encoding/json
+  version: ""
+- name: fmt
+  version: ""
+- name: github.com/asaskevich/govalidator
+  version: edd46cdac249b001c7b7d88c6d43993ea875e8d8
+- name: github.com/derekdowling/go-json-spec-handler
+  version: ""
+- name: github.com/derekdowling/jsh-api
+  version: cbfed619dffa9f867a28234e68a735064b297ec1
+- name: github.com/goji/param
+  version: da86c81e3e3c23b1948bc7a003d381250a032aa7
+  repo: https://github.com/goji/param
+- name: github.com/jtolds/gls
+  version: 9a4a02dbe491bef4bab3c24fd9f3087d6c4c6690
+- name: github.com/smartystreets/assertions
+  version: 507a61adbdc8674907f6e491b559d600a4127dc0
+- name: github.com/smartystreets/goconvey
+  version: ab7641a0db76b0e88765294b1377b026ec01f26b
+  subpackages:
+  - convey
+- name: github.com/zenazn/goji
+  version: bf843a174a08e846246b8945f8a9a853d84a256a
+  subpackages:
+  - web
+- name: goji.io
+  version: 9f8871d62a1b65a39bd029cd2c1bf457cbc1d2f6
+- name: golang.org/x/crypto
+  version: 7b85b097bf7527677d54d3220065e966a0e3b613
+- name: golang.org/x/net
+  version: 195180cfebf7362bd243a52477697895128c8777
+  subpackages:
+  - context
+- name: golang.org/x/text
+  version: 92ca7bbb695e2e9675f1d731fa85760f95d2c0df
+  repo: https://golang.org/x/text
+- name: io
+  version: ""
+  subpackages:
+  - ioutil
+- name: log
+  version: ""
+- name: net/http
+  version: ""
+  subpackages:
+  - httptest
+- name: net/url
+  version: ""
+- name: strconv
+  version: ""
+- name: strings
+  version: ""
+devImports: []
