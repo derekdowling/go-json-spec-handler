@@ -6,3 +6,8 @@
 //
 // For a full http.Handler API builder see jshapi: https://godoc.org/github.com/derekdowling/jsh-api
 package jsh
+
+const (
+	// ContentType is the data encoding of choice for HTTP Request and Response Headers
+	ContentType = "application/vnd.api+json"
+)

@@ -12,16 +12,16 @@ import (
 	"github.com/derekdowling/go-json-spec-handler"
 )
 
-// ParseObject validates the HTTP response and parses out the JSON object from the
-// body if possible
-func ParseObject(response *http.Response) (*jsh.Object, *jsh.Error) {
-	return buildParser(response).GetObject()
-}
+// Parse validates the HTTP response and attempts to parse a JSON API compatible
+// Document from the response body before closing it
+func Parse(response *http.Response) (*jsh.JSON, *jsh.Error) {
+	document, err := buildParser(response).GetJSON()
+	if err != nil {
+		return nil, err
+	}
 
-// ParseList validates the HTTP response and parses out the JSON list from the
-// body if possible
-func ParseList(response *http.Response) (jsh.List, *jsh.Error) {
-	return buildParser(response).GetList()
+	document.HTTPStatus = response.StatusCode
+	return document, nil
 }
 
 // DumpBody is a convenience function that parses the body of the response into a
@@ -84,7 +84,7 @@ func objectToPayload(request *http.Request, object *jsh.Object) ([]byte, *jsh.Er
 
 // sendPayloadRequest is required for sending JSON payload related requests
 // because by default the http package does not set Content-Length headers
-func sendObjectRequest(request *http.Request, object *jsh.Object) (*jsh.Object, *http.Response, *jsh.Error) {
+func doObjectRequest(request *http.Request, object *jsh.Object) (*jsh.JSON, *http.Response, *jsh.Error) {
 
 	payload, err := objectToPayload(request, object)
 	if err != nil {
@@ -94,10 +94,13 @@ func sendObjectRequest(request *http.Request, object *jsh.Object) (*jsh.Object, 
 	// prepare payload and corresponding headers
 	request.Body = jsh.CreateReadCloser(payload)
 	request.Header.Add("Content-Type", jsh.ContentType)
-	request.Header.Set("Content-Length", strconv.Itoa(len(payload)))
+
+	contentLength := strconv.Itoa(len(payload))
+	request.ContentLength = int64(contentLength)
+	request.Header.Set("Content-Length", contentLength)
 
 	client := &http.Client{}
-	response, clientErr := client.Do(request)
+	httpResponse, clientErr := client.Do(request)
 
 	if clientErr != nil {
 		return nil, nil, jsh.ISE(fmt.Sprintf(
@@ -105,10 +108,10 @@ func sendObjectRequest(request *http.Request, object *jsh.Object) (*jsh.Object, 
 		))
 	}
 
-	object, objErr := ParseObject(response)
-	if objErr != nil {
-		return nil, response, objErr
+	document, err := Parse(httpResponse)
+	if err != nil {
+		return nil, httpResponse, err
 	}
 
-	return object, response, nil
+	return document, httpResponse, nil
 }

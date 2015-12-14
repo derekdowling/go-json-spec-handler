@@ -9,11 +9,6 @@ import (
 	"net/http"
 )
 
-const (
-	// ContentType is the data encoding of choice for HTTP Request and Response Headers
-	ContentType = "application/vnd.api+json"
-)
-
 // ParseObject validates the HTTP request and returns a JSON object for a given
 // io.ReadCloser containing a raw JSON payload. Here's an example of how to use it
 // as part of your full flow.
@@ -48,7 +43,7 @@ const (
 //	}
 func ParseObject(r *http.Request) (*Object, *Error) {
 
-	object, err := buildParser(r).GetObject()
+	object, err := NewParser(r).GetObject()
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +58,7 @@ func ParseObject(r *http.Request) (*Object, *Error) {
 // ParseList validates the HTTP request and returns a resulting list of objects
 // parsed from the request Body. Use just like ParseObject.
 func ParseList(r *http.Request) (List, *Error) {
-	return buildParser(r).GetList()
+	return NewParser(r).GetList()
 }
 
 // Parser is an abstraction layer to support parsing JSON payload from many types
@@ -71,21 +66,39 @@ func ParseList(r *http.Request) (List, *Error) {
 type Parser struct {
 	Method  string
 	Headers http.Header
-	Payload io.ReadCloser
 }
 
-// BuildParser creates a parser from an http.Request
-func buildParser(request *http.Request) *Parser {
+// NewParser creates a parser from an http.Request
+func NewParser(request *http.Request) *Parser {
 	return &Parser{
 		Method:  request.Method,
 		Headers: request.Header,
-		Payload: request.Body,
 	}
 }
 
+// GetJSON parses out a top level JSON Document.
+func (p *Parser) GetJSON(payload io.ReadCloser) (*JSON, *Error) {
+	byteData, err := prepareJSON(p.Headers, payload)
+	if err != nil {
+		return nil, err
+	}
+
+	jsonDocument := &JSON{}
+
+	jsonError := json.Unmarshal(byteData, jsonDocument)
+	if jsonError != nil {
+		return nil, ISE(fmt.Sprintf("Error parsing JSON Document: \n%s\nError:%s",
+			string(byteData),
+			jsonError.Error(),
+		))
+	}
+
+	return jsonDocument, nil
+}
+
 // GetObject returns a single JSON data object from the parser
-func (p *Parser) GetObject() (*Object, *Error) {
-	byteData, loadErr := prepareJSON(p.Headers, p.Payload)
+func (p *Parser) GetObject(payload io.ReadCloser) (*Object, *Error) {
+	byteData, loadErr := prepareJSON(p.Headers, payload)
 	if loadErr != nil {
 		return nil, loadErr
 	}
@@ -114,7 +127,7 @@ func (p *Parser) GetObject() (*Object, *Error) {
 
 // GetList returns a JSON data list from the parser
 func (p *Parser) GetList() (List, *Error) {
-	byteData, loadErr := prepareJSON(p.Headers, p.Payload)
+	byteData, loadErr := prepareJSON(p.Headers, payload)
 	if loadErr != nil {
 		return nil, loadErr
 	}

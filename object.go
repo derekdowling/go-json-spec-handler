@@ -95,7 +95,7 @@ func (o *Object) Marshal(attributes interface{}) *Error {
 
 // Prepare creates a new JSON single object response with an appropriate HTTP status
 // to match the request method type.
-func (o *Object) Prepare(r *http.Request, response bool) (*Response, *Error) {
+func (o *Object) Prepare(r *http.Request, response bool) (*JSON, *Error) {
 
 	if o.ID == "" {
 
@@ -127,7 +127,7 @@ func (o *Object) Prepare(r *http.Request, response bool) (*Response, *Error) {
 		)).Prepare(r, response)
 	}
 
-	return &Response{HTTPStatus: status, Data: o}, nil
+	return &JSON{HTTPStatus: status, Data: o}, nil
 }
 
 // validateInput runs go-validator on each attribute on the struct and returns all

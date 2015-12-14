@@ -26,12 +26,12 @@ func GetObject(urlStr string, resourceType string, id string) (*jsh.Object, *htt
 		return nil, nil, err
 	}
 
-	object, err := ParseObject(response)
+	doc, err := Parse(response)
 	if err != nil {
 		return nil, response, err
 	}
 
-	return object, response, nil
+	return doc, response, nil
 }
 
 // GetList prepares an outbound request for /resourceTypes expecting a list return value.

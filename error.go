@@ -94,12 +94,12 @@ func (e *Error) Add(object *ErrorObject) *Error {
 }
 
 // Prepare first validates the errors, and then returns an appropriate response
-func (e *Error) Prepare(req *http.Request, response bool) (*Response, *Error) {
+func (e *Error) Prepare(req *http.Request, response bool) (*JSON, *Error) {
 	if len(e.Objects) == 0 {
 		return nil, ISE("No errors provided for attempted error response.")
 	}
 
-	return &Response{Errors: e.Objects, HTTPStatus: e.Objects[0].Status}, nil
+	return &JSON{Errors: e, HTTPStatus: e.Objects[0].Status}, nil
 }
 
 // validateError ensures that the error is ready for a response in it's current state

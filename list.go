@@ -6,6 +6,6 @@ import "net/http"
 type List []*Object
 
 // Prepare returns a success status response
-func (list List) Prepare(r *http.Request, response bool) (*Response, *Error) {
-	return &Response{Data: list, HTTPStatus: http.StatusOK}, nil
+func (list List) Prepare(r *http.Request, response bool) (*JSON, *Error) {
+	return &JSON{Data: list, HTTPStatus: http.StatusOK}, nil
 }
