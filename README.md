@@ -12,11 +12,38 @@ APIs. Great for Ember.js!
 
 ### jsh - JSON Specification Handler
 
+Perfect middleware, or input/output handling for a new, or existing API server.
+
 ```go
 import github.com/derekdowling/go-json-spec-handler
+
+type User struct {
+  // valid from github.com/asaskevich/govalidator gives us input validation
+  // from object.Unmarshal
+  Name string `json:"name" valid:"alphanum"`
+}
+
+user := &User{}
+
+// performs Specification checks against the request
+object, _ := jsh.ParseObject(*http.Request)
+object.ID = "newID"
+
+// unmarshal data into relevant internal types if govalidator passes, otherwise
+// return the pre-formatted HTTP 422 error to signify how the input failed
+err := object.Unmarshal("user", user)
+if err != nil {
+  jsh.Send(w, r, err)
+  return
+}
+
+// modify, re-package, and send the object
+user.Name = "Bob"
+_ := object.Marshal(user)
+
+jsh.Send(w, r, object)
 ```
 
-Perfect middleware, or input/output handling for a new, or existing API server.
 
 ### jsc - JSON Specification Client
 

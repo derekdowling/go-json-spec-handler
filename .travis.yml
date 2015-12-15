@@ -9,8 +9,6 @@ env:
 install:
   - go get github.com/tools/godep
   - go get github.com/smartystreets/goconvey
-  - go get github.com/kisielk/errcheck
-  - go get -u github.com/golang/lint/golint
   - godep restore
 
 script:
