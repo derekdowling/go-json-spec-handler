@@ -12,46 +12,61 @@ APIs. Great for Ember.js!
 
 ### jsh - JSON Specification Handler
 
-Perfect middleware, or input/output handling for a new, or existing API server.
+Streamlined JSON input/output handling for a new, or existing API server:
 
 ```go
 import github.com/derekdowling/go-json-spec-handler
 
 type User struct {
   // valid from github.com/asaskevich/govalidator gives us input validation
-  // from object.Unmarshal
+  // when object.Unmarshal() is invoked on this type
   Name string `json:"name" valid:"alphanum"`
 }
 
-user := &User{}
+func PatchUser(w http.ResponseWriter, r *http.Request) {
+  user := &User{}
 
-// performs Specification checks against the request
-object, _ := jsh.ParseObject(*http.Request)
-object.ID = "newID"
+  // performs Specification checks against the request
+  object, err := jsh.ParseObject(*http.Request)
+  if err != nil {
+    jsh.Send(w, r, err)
+    return
+  }
 
-// unmarshal data into relevant internal types if govalidator passes, otherwise
-// return the pre-formatted HTTP 422 error to signify how the input failed
-err := object.Unmarshal("user", user)
-if err != nil {
-  jsh.Send(w, r, err)
-  return
+  // use object.ID to look up user/do business logic
+
+  // unmarshal data into relevant internal types if govalidator passes, otherwise
+  // return the pre-formatted HTTP 422 error to signify how the input failed
+  err := object.Unmarshal("user", user)
+  if err != nil {
+    jsh.Send(w, r, err)
+    return
+  }
+
+  // modify, re-package, and send the object
+  user.Name = "Bob"
+  err := object.Marshal(user)
+  if err != nil {
+    jsh.Send(w, r, err)
+  }
+
+  jsh.Send(w, r, object)
 }
-
-// modify, re-package, and send the object
-user.Name = "Bob"
-_ := object.Marshal(user)
-
-jsh.Send(w, r, object)
 ```
 
 
 ### jsc - JSON Specification Client
 
+HTTP JSON Client for interacting with JSON APIs. Built on top of http.Client
+and jsh.
+
 ```go
 import github.com/derekdowling/go-json-spec-handler/client
+
+// GET http://your.api/users/1
+object, response, err := jsc.GetObject("http://your.api/", "user", "1")
 ```
 
-HTTP Client for interacting with JSON APIs.
 
 ### Features 
 
