@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 )
@@ -42,12 +41,16 @@ import (
 //		err := jsh.Send(w, r, object)
 //	}
 func ParseObject(r *http.Request) (*Object, *Error) {
-
-	object, err := NewParser(r).GetObject()
+	document, err := ParseJSON(r)
 	if err != nil {
 		return nil, err
 	}
 
+	if !document.HasData() {
+		return nil, nil
+	}
+
+	object := document.First()
 	if r.Method != "POST" && object.ID == "" {
 		return nil, InputError("id", "Missing mandatory object attribute")
 	}
@@ -58,7 +61,17 @@ func ParseObject(r *http.Request) (*Object, *Error) {
 // ParseList validates the HTTP request and returns a resulting list of objects
 // parsed from the request Body. Use just like ParseObject.
 func ParseList(r *http.Request) (List, *Error) {
-	return NewParser(r).GetList()
+	document, err := ParseJSON(r)
+	if err != nil {
+		return nil, err
+	}
+
+	return document.Data.List, nil
+}
+
+// ParseJSON is a convenience function that returns a top level jsh.JSON document
+func ParseJSON(r *http.Request) (*JSON, *Error) {
+	return NewParser(r).JSON(r.Body)
 }
 
 // Parser is an abstraction layer to support parsing JSON payload from many types
@@ -76,104 +89,38 @@ func NewParser(request *http.Request) *Parser {
 	}
 }
 
-// GetJSON parses out a top level JSON Document.
-func (p *Parser) GetJSON(payload io.ReadCloser) (*JSON, *Error) {
-	byteData, err := prepareJSON(p.Headers, payload)
+// JSON returns a single JSON data object from the parser
+func (p *Parser) JSON(payload io.ReadCloser) (*JSON, *Error) {
+	defer closeReader(payload)
+
+	err := validateHeaders(p.Headers)
 	if err != nil {
 		return nil, err
 	}
 
-	jsonDocument := &JSON{}
-
-	jsonError := json.Unmarshal(byteData, jsonDocument)
-	if jsonError != nil {
-		return nil, ISE(fmt.Sprintf("Error parsing JSON Document: \n%s\nError:%s",
-			string(byteData),
-			jsonError.Error(),
-		))
+	document := &JSON{Data: &Data{List{}}}
+	decodeErr := json.NewDecoder(payload).Decode(document)
+	if decodeErr != nil {
+		return nil, ISE(fmt.Sprintf("Error parsing JSON Document: %s", decodeErr.Error()))
 	}
+	log.Printf("document = %+v\n", document.Data)
 
-	return jsonDocument, nil
-}
+	if document.HasData() {
+		for _, object := range document.Data.List {
+			inputErr := validateInput(object)
+			if inputErr != nil {
+				return nil, inputErr
+			}
 
-// GetObject returns a single JSON data object from the parser
-func (p *Parser) GetObject(payload io.ReadCloser) (*Object, *Error) {
-	byteData, loadErr := prepareJSON(p.Headers, payload)
-	if loadErr != nil {
-		return nil, loadErr
-	}
-
-	data := struct {
-		Object *Object `json:"data"`
-	}{}
-
-	err := json.Unmarshal(byteData, &data)
-	if err != nil {
-		return nil, ISE(fmt.Sprintf("Unable to parse json: \n%s\nError:%s",
-			string(byteData),
-			err.Error(),
-		))
-	}
-
-	object := data.Object
-
-	inputErr := validateInput(object)
-	if inputErr != nil {
-		return nil, inputErr
-	}
-
-	return object, nil
-}
-
-// GetList returns a JSON data list from the parser
-func (p *Parser) GetList() (List, *Error) {
-	byteData, loadErr := prepareJSON(p.Headers, payload)
-	if loadErr != nil {
-		return nil, loadErr
-	}
-
-	data := struct {
-		List List `json:"data"`
-	}{List{}}
-
-	err := json.Unmarshal(byteData, &data)
-	if err != nil {
-		return nil, ISE(fmt.Sprintf("Unable to parse json: \n%s\nError:%s",
-			string(byteData),
-			err.Error(),
-		))
-	}
-
-	for _, object := range data.List {
-		err := validateInput(object)
-		if err != nil {
-			return nil, err
-		}
-
-		if object.ID == "" {
-			return nil, InputError("id", "Object without ID present in list")
+			// if we have a list, then all resource objects should have IDs, will
+			// cross the bridge of bulk creation if and when there is a use case
+			if len(document.Data.List) > 1 && object.ID == "" {
+				return nil, InputError("id", "Object without ID present in list")
+			}
 		}
 	}
 
-	return data.List, nil
-}
-
-// prepareJSON ensures that the provide headers are JSON API compatible and then
-// reads and closes the closer
-func prepareJSON(headers http.Header, closer io.ReadCloser) ([]byte, *Error) {
-	defer closeReader(closer)
-
-	validationErr := validateHeaders(headers)
-	if validationErr != nil {
-		return nil, validationErr
-	}
-
-	byteData, err := ioutil.ReadAll(closer)
-	if err != nil {
-		return nil, ISE(fmt.Sprintf("Error attempting to read request body: %s", err))
-	}
-
-	return byteData, nil
+	return document, nil
 }
 
 func closeReader(reader io.ReadCloser) {

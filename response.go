@@ -60,7 +60,7 @@ func SendJSON(w http.ResponseWriter, r *http.Request, response *JSON) *Error {
 		response = errResp
 	}
 
-	content, jsonErr := json.MarshalIndent(response, "", "  ")
+	content, jsonErr := json.MarshalIndent(response, "", " ")
 	if jsonErr != nil {
 		http.Error(w, DefaultErrorTitle, http.StatusInternalServerError)
 		return ISE(fmt.Sprintf("Unable to marshal JSON payload: %s", jsonErr.Error()))
@@ -71,11 +71,7 @@ func SendJSON(w http.ResponseWriter, r *http.Request, response *JSON) *Error {
 	w.WriteHeader(response.HTTPStatus)
 	w.Write(content)
 
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
 
 // OkResponse fulfills the Sendable interface for a simple success response

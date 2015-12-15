@@ -127,7 +127,10 @@ func (o *Object) Prepare(r *http.Request, response bool) (*JSON, *Error) {
 		)).Prepare(r, response)
 	}
 
-	return &JSON{HTTPStatus: status, Data: o}, nil
+	return &JSON{
+		HTTPStatus: status,
+		Data:       &Data{List{o}},
+	}, nil
 }
 
 // validateInput runs go-validator on each attribute on the struct and returns all

@@ -11,12 +11,13 @@ import (
 // Post allows a user to make an outbound POST /resources request:
 //
 //	obj, _ := jsh.NewObject("123", "user", payload)
-//	object, resp, err := jsh.Post("http://apiserver", obj)
-func Post(urlStr string, object *jsh.Object) (*jsh.Object, *http.Response, *jsh.Error) {
+//	// does POST http://apiserver/user/123
+//	json, resp, err := jsh.Post("http://apiserver", obj)
+func Post(baseURL string, object *jsh.Object) (*jsh.JSON, *http.Response, error) {
 
-	u, err := url.Parse(urlStr)
+	u, err := url.Parse(baseURL)
 	if err != nil {
-		return nil, nil, jsh.ISE(fmt.Sprintf("Error parsing URL: %s", err.Error()))
+		return nil, nil, fmt.Errorf("Error parsing URL: %s", err.Error())
 	}
 
 	// ghetto pluralization, fix when it becomes an issue
@@ -24,8 +25,8 @@ func Post(urlStr string, object *jsh.Object) (*jsh.Object, *http.Response, *jsh.
 
 	request, err := http.NewRequest("POST", u.String(), nil)
 	if err != nil {
-		return nil, nil, jsh.ISE(fmt.Sprintf("Error building POST request: %s", err.Error()))
+		return nil, nil, fmt.Errorf("Error building POST request: %s", err.Error())
 	}
 
-	return sendObjectRequest(request, object)
+	return doObjectRequest(request, object)
 }

@@ -8,8 +8,8 @@ import (
 	"github.com/derekdowling/go-json-spec-handler"
 )
 
-// GetObject allows a user to make an outbound GET /resourceTypes/:id
-func GetObject(urlStr string, resourceType string, id string) (*jsh.Object, *http.Response, *jsh.Error) {
+// Fetch performs an outbound GET /resourceTypes/:id request
+func Fetch(urlStr string, resourceType string, id string) (*jsh.JSON, *http.Response, *jsh.Error) {
 	if id == "" {
 		return nil, nil, jsh.SpecificationError("ID cannot be empty for GetObject request type")
 	}
@@ -21,21 +21,11 @@ func GetObject(urlStr string, resourceType string, id string) (*jsh.Object, *htt
 
 	setIDPath(u, resourceType, id)
 
-	response, err := Get(u.String())
-	if err != nil {
-		return nil, nil, err
-	}
-
-	doc, err := Parse(response)
-	if err != nil {
-		return nil, response, err
-	}
-
-	return doc, response, nil
+	return Get(u.String())
 }
 
-// GetList prepares an outbound request for /resourceTypes expecting a list return value.
-func GetList(urlStr string, resourceType string) (jsh.List, *http.Response, *jsh.Error) {
+// List prepares an outbound GET /resourceTypes request
+func List(urlStr string, resourceType string) (*jsh.JSON, *http.Response, *jsh.Error) {
 	u, urlErr := url.Parse(urlStr)
 	if urlErr != nil {
 		return nil, nil, jsh.ISE(fmt.Sprintf("Error parsing URL: %s", urlErr.Error()))
@@ -43,25 +33,21 @@ func GetList(urlStr string, resourceType string) (jsh.List, *http.Response, *jsh
 
 	setPath(u, resourceType)
 
-	response, err := Get(u.String())
+	return Get(u.String())
+}
+
+// Get performs a generic GET request for a given URL and attempts to parse the
+// response into a JSON API Format
+func Get(urlStr string) (*jsh.JSON, *http.Response, *jsh.Error) {
+	response, httpErr := http.Get(urlStr)
+	if httpErr != nil {
+		return nil, nil, jsh.ISE(fmt.Sprintf("Error performing GET request: %s", httpErr.Error()))
+	}
+
+	json, err := JSON(response)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	list, err := ParseList(response)
-	if err != nil {
-		return nil, response, err
-	}
-
-	return list, response, nil
-}
-
-// Get performs a Get request for a given URL and returns a basic Response type
-func Get(urlStr string) (*http.Response, *jsh.Error) {
-	response, err := http.Get(urlStr)
-	if err != nil {
-		return nil, jsh.ISE(fmt.Sprintf("Error performing GET request: %s", err.Error()))
-	}
-
-	return response, nil
+	return json, response, nil
 }

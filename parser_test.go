@@ -22,14 +22,23 @@ func TestParsing(t *testing.T) {
 			So(err.Objects[0].Status, ShouldEqual, http.StatusNotAcceptable)
 		})
 
-		Convey("->prepareJSON()", func() {
-			req, err := http.NewRequest("GET", "", CreateReadCloser([]byte("1234")))
-			So(err, ShouldBeNil)
-			req.Header.Set("Content-Type", ContentType)
+		Convey("->dataIsArray()", func() {
 
-			bytes, err := prepareJSON(req.Header, req.Body)
-			So(err, ShouldBeNil)
-			So(string(bytes), ShouldEqual, "1234")
+			Convey("should detect an array successfully", func() {
+				data := `[1,2,3,4]`
+				isArray, err := dataIsArray([]byte(data))
+
+				So(err, ShouldBeNil)
+				So(isArray, ShouldBeTrue)
+			})
+
+			Convey("should reject a non-array successfully", func() {
+				data := `{"foo":"bar"}`
+				isArray, err := dataIsArray([]byte(data))
+
+				So(err, ShouldBeNil)
+				So(isArray, ShouldBeFalse)
+			})
 		})
 
 		Convey("->ParseObject()", func() {
@@ -37,11 +46,11 @@ func TestParsing(t *testing.T) {
 			Convey("should parse a valid object", func() {
 
 				objectJSON := `{"data": {"type": "user", "id": "sweetID123", "attributes": {"ID":"123"}}}`
-
 				req, reqErr := testRequest([]byte(objectJSON))
 				So(reqErr, ShouldBeNil)
 
 				object, err := ParseObject(req)
+
 				So(err, ShouldBeNil)
 				So(object, ShouldNotBeEmpty)
 				So(object.Type, ShouldEqual, "user")
@@ -86,9 +95,9 @@ func TestParsing(t *testing.T) {
 
 				listJSON :=
 					`{"data": [
-	{"type": "user", "id": "sweetID123", "attributes": {"ID":"123"}},
-	{"type": "user", "id": "sweetID456", "attributes": {"ID":"456"}}
-]}`
+		{"type": "user", "id": "sweetID123", "attributes": {"ID":"123"}},
+		{"type": "user", "id": "sweetID456", "attributes": {"ID":"456"}}
+		]}`
 				req, reqErr := testRequest([]byte(listJSON))
 				So(reqErr, ShouldBeNil)
 
@@ -105,9 +114,9 @@ func TestParsing(t *testing.T) {
 			Convey("should error for an invalid list", func() {
 				listJSON :=
 					`{"data": [
-	{"type": "user", "id": "sweetID123", "attributes": {"ID":"123"}},
-	{"type": "user", "attributes": {"ID":"456"}}
-]}`
+		{"type": "user", "id": "sweetID123", "attributes": {"ID":"123"}},
+		{"type": "user", "attributes": {"ID":"456"}}
+		]}`
 
 				req, reqErr := testRequest([]byte(listJSON))
 				So(reqErr, ShouldBeNil)

@@ -16,15 +16,16 @@ func TestPost(t *testing.T) {
 		"foo": "bar",
 	}
 
-	mock := jshapi.NewMockResource("", "test", 0, attrs)
+	mock := jshapi.NewMockResource("test", 0, attrs)
 	server := httptest.NewServer(mock)
 	baseURL := server.URL
 
 	Convey("Post Tests", t, func() {
 		testObject, err := jsh.NewObject("", "test", attrs)
-
-		_, resp, err := Post(baseURL, testObject)
 		So(err, ShouldBeNil)
+
+		_, resp, postErr := Post(baseURL, testObject)
+		So(postErr, ShouldBeNil)
 		So(resp.StatusCode, ShouldEqual, http.StatusCreated)
 	})
 }

@@ -12,10 +12,10 @@ import (
 	"github.com/derekdowling/go-json-spec-handler"
 )
 
-// Parse validates the HTTP response and attempts to parse a JSON API compatible
+// JSON validates the HTTP response and attempts to parse a JSON API compatible
 // Document from the response body before closing it
-func Parse(response *http.Response) (*jsh.JSON, *jsh.Error) {
-	document, err := buildParser(response).GetJSON()
+func JSON(response *http.Response) (*jsh.JSON, *jsh.Error) {
+	document, err := buildParser(response).JSON(response.Body)
 	if err != nil {
 		return nil, err
 	}
@@ -40,7 +40,6 @@ func buildParser(response *http.Response) *jsh.Parser {
 	return &jsh.Parser{
 		Method:  "",
 		Headers: response.Header,
-		Payload: response.Body,
 	}
 }
 
@@ -96,7 +95,7 @@ func doObjectRequest(request *http.Request, object *jsh.Object) (*jsh.JSON, *htt
 	request.Header.Add("Content-Type", jsh.ContentType)
 
 	contentLength := strconv.Itoa(len(payload))
-	request.ContentLength = int64(contentLength)
+	request.ContentLength = int64(len(payload))
 	request.Header.Set("Content-Length", contentLength)
 
 	client := &http.Client{}
@@ -108,7 +107,7 @@ func doObjectRequest(request *http.Request, object *jsh.Object) (*jsh.JSON, *htt
 		))
 	}
 
-	document, err := Parse(httpResponse)
+	document, err := JSON(httpResponse)
 	if err != nil {
 		return nil, httpResponse, err
 	}

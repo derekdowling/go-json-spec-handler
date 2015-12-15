@@ -7,5 +7,5 @@ type List []*Object
 
 // Prepare returns a success status response
 func (list List) Prepare(r *http.Request, response bool) (*JSON, *Error) {
-	return &JSON{Data: list, HTTPStatus: http.StatusOK}, nil
+	return &JSON{Data: &Data{list}, HTTPStatus: http.StatusOK}, nil
 }
