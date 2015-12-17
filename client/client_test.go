@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/derekdowling/go-json-spec-handler"
+	"github.com/derekdowling/jsh-api"
 	. "github.com/smartystreets/goconvey/convey"
 )
 
@@ -77,4 +78,14 @@ func TestResponseParsing(t *testing.T) {
 			})
 		})
 	})
+}
+
+// not a great for this, would much rather have it in test_util, but it causes an
+// import cycle wit jsh-api
+func testAPI() *jshapi.API {
+	resource := jshapi.NewMockResource("test", 1, nil)
+	api := jshapi.New("", nil)
+	api.Add(resource)
+
+	return api
 }

@@ -6,16 +6,7 @@ import (
 	"net/url"
 
 	"github.com/derekdowling/go-json-spec-handler"
-	"github.com/derekdowling/jsh-api"
 )
-
-func testAPI() *jshapi.API {
-	resource := jshapi.NewMockResource("test", 1, nil)
-	api := jshapi.New("", nil)
-	api.Add(resource)
-
-	return api
-}
 
 func mockObjectResponse(object *jsh.Object) (*http.Response, error) {
 	url := &url.URL{Host: "test"}
