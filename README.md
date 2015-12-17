@@ -2,6 +2,7 @@ Go JSON API Specification Handler
 ---
 
 [![GoDoc](https://godoc.org/github.com/derekdowling/go-json-spec-handler?status.png)](https://godoc.org/github.com/derekdowling/go-json-spec-handler)
+[![Build Status](https://travis-ci.org/derekdowling/go-json-spec-handler.svg?branch=master)](https://travis-ci.org/derekdowling/go-json-spec-handler)
 [![Go Report Card](http://goreportcard.com/badge/manyminds/api2go)](http://goreportcard.com/report/derekdowling/go-json-spec-handler)
 [TestCoverage](http://gocover.io/github.com/derekdowling/go-json-spec-handler?version=1.5rc1)
 
