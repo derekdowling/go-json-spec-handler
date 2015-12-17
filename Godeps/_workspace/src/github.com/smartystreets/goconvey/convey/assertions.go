@@ -1,6 +1,6 @@
 package convey
 
-import "github.com/derekdowling/go-json-spec-handler/Godeps/_workspace/src/github.com/smartystreets/assertions"
+import "github.com/smartystreets/assertions"
 
 var (
 	ShouldEqual          = assertions.ShouldEqual

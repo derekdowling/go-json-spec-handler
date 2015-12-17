@@ -1,0 +1,22 @@
+{
+	"ImportPath": "github.com/derekdowling/goji2-logger",
+	"GoVersion": "go1.5.1",
+	"Packages": [
+		"github.com/derekdowling/goji2-logger"
+	],
+	"Deps": [
+		{
+			"ImportPath": "github.com/zenazn/goji/web/mutil",
+			"Comment": "v0.9.0-34-gbf843a1",
+			"Rev": "bf843a174a08e846246b8945f8a9a853d84a256a"
+		},
+		{
+			"ImportPath": "goji.io",
+			"Rev": "9f8871d62a1b65a39bd029cd2c1bf457cbc1d2f6"
+		},
+		{
+			"ImportPath": "golang.org/x/net/context",
+			"Rev": "195180cfebf7362bd243a52477697895128c8777"
+		}
+	]
+}

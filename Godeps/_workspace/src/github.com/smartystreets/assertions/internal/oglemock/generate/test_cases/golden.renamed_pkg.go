@@ -8,8 +8,8 @@ package some_pkg
 
 import (
 	fmt "fmt"
-	oglemock "github.com/derekdowling/go-json-spec-handler/Godeps/_workspace/src/github.com/smartystreets/assertions/internal/oglemock"
-	tony "github.com/derekdowling/go-json-spec-handler/Godeps/_workspace/src/github.com/smartystreets/assertions/internal/oglemock/generate/test_cases/renamed_pkg"
+	oglemock "github.com/smartystreets/assertions/internal/oglemock"
+	tony "github.com/smartystreets/assertions/internal/oglemock/generate/test_cases/renamed_pkg"
 	runtime "runtime"
 	unsafe "unsafe"
 )

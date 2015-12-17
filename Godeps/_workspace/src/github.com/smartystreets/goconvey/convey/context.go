@@ -3,8 +3,8 @@ package convey
 import (
 	"fmt"
 
-	"github.com/derekdowling/go-json-spec-handler/Godeps/_workspace/src/github.com/jtolds/gls"
-	"github.com/derekdowling/go-json-spec-handler/Godeps/_workspace/src/github.com/smartystreets/goconvey/convey/reporting"
+	"github.com/jtolds/gls"
+	"github.com/smartystreets/goconvey/convey/reporting"
 )
 
 type conveyErr struct {

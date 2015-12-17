@@ -20,8 +20,8 @@ import (
 	"log"
 	"testing"
 
-	. "github.com/derekdowling/go-json-spec-handler/Godeps/_workspace/src/github.com/smartystreets/assertions/internal/oglematchers"
-	. "github.com/derekdowling/go-json-spec-handler/Godeps/_workspace/src/github.com/smartystreets/assertions/internal/ogletest"
+	. "github.com/smartystreets/assertions/internal/oglematchers"
+	. "github.com/smartystreets/assertions/internal/ogletest"
 )
 
 func TestPanickingTest(t *testing.T) { RunTests(t) }

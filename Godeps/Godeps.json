@@ -1,11 +1,24 @@
 {
 	"ImportPath": "github.com/derekdowling/go-json-spec-handler",
 	"GoVersion": "go1.5.1",
+	"Packages": [
+		"./..."
+	],
 	"Deps": [
 		{
 			"ImportPath": "github.com/asaskevich/govalidator",
 			"Comment": "v2-37-gedd46cd",
 			"Rev": "edd46cdac249b001c7b7d88c6d43993ea875e8d8"
+		},
+		{
+			"ImportPath": "github.com/derekdowling/goji2-logger",
+			"Comment": "0.1-1-g4aa7280",
+			"Rev": "4aa7280e21d798c64d5a13f28e0a3a49f48d9813"
+		},
+		{
+			"ImportPath": "github.com/derekdowling/jsh-api",
+			"Comment": "0.3.7-7-gd18b643",
+			"Rev": "d18b643c36718e73f7003ace7f46f4a4cd5d592f"
 		},
 		{
 			"ImportPath": "github.com/jtolds/gls",
@@ -20,6 +33,19 @@
 			"ImportPath": "github.com/smartystreets/goconvey/convey",
 			"Comment": "1.5.0-398-gab7641a",
 			"Rev": "ab7641a0db76b0e88765294b1377b026ec01f26b"
+		},
+		{
+			"ImportPath": "github.com/zenazn/goji/web/mutil",
+			"Comment": "v0.9.0-34-gbf843a1",
+			"Rev": "bf843a174a08e846246b8945f8a9a853d84a256a"
+		},
+		{
+			"ImportPath": "goji.io",
+			"Rev": "9f8871d62a1b65a39bd029cd2c1bf457cbc1d2f6"
+		},
+		{
+			"ImportPath": "golang.org/x/net/context",
+			"Rev": "195180cfebf7362bd243a52477697895128c8777"
 		}
 	]
 }

@@ -7,7 +7,7 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/derekdowling/go-json-spec-handler/Godeps/_workspace/src/github.com/smartystreets/assertions/internal/oglematchers"
+	"github.com/smartystreets/assertions/internal/oglematchers"
 )
 
 // default acceptable delta for ShouldAlmostEqual

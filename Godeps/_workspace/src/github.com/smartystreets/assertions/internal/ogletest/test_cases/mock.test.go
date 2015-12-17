@@ -16,10 +16,10 @@
 package oglematchers_test
 
 import (
-	. "github.com/derekdowling/go-json-spec-handler/Godeps/_workspace/src/github.com/smartystreets/assertions/internal/oglematchers"
-	"github.com/derekdowling/go-json-spec-handler/Godeps/_workspace/src/github.com/smartystreets/assertions/internal/oglemock"
-	. "github.com/derekdowling/go-json-spec-handler/Godeps/_workspace/src/github.com/smartystreets/assertions/internal/ogletest"
-	"github.com/derekdowling/go-json-spec-handler/Godeps/_workspace/src/github.com/smartystreets/assertions/internal/ogletest/test_cases/mock_image"
+	. "github.com/smartystreets/assertions/internal/oglematchers"
+	"github.com/smartystreets/assertions/internal/oglemock"
+	. "github.com/smartystreets/assertions/internal/ogletest"
+	"github.com/smartystreets/assertions/internal/ogletest/test_cases/mock_image"
 	"image/color"
 	"testing"
 )

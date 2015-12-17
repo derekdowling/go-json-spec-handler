@@ -28,7 +28,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/derekdowling/go-json-spec-handler/Godeps/_workspace/src/github.com/smartystreets/assertions/internal/reqtrace"
+	"github.com/smartystreets/assertions/internal/reqtrace"
 )
 
 var fTestFilter = flag.String(

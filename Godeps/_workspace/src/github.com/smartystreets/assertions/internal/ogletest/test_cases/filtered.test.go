@@ -17,8 +17,8 @@ package oglematchers_test
 
 import (
 	"fmt"
-	. "github.com/derekdowling/go-json-spec-handler/Godeps/_workspace/src/github.com/smartystreets/assertions/internal/oglematchers"
-	. "github.com/derekdowling/go-json-spec-handler/Godeps/_workspace/src/github.com/smartystreets/assertions/internal/ogletest"
+	. "github.com/smartystreets/assertions/internal/oglematchers"
+	. "github.com/smartystreets/assertions/internal/ogletest"
 	"testing"
 )
 

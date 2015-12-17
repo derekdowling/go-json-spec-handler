@@ -8,7 +8,7 @@ package mock_io
 
 import (
 	fmt "fmt"
-	oglemock "github.com/derekdowling/go-json-spec-handler/Godeps/_workspace/src/github.com/smartystreets/assertions/internal/oglemock"
+	oglemock "github.com/smartystreets/assertions/internal/oglemock"
 	io "io"
 	runtime "runtime"
 	unsafe "unsafe"

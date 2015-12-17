@@ -15,7 +15,7 @@
 
 package ogletest
 
-import "github.com/derekdowling/go-json-spec-handler/Godeps/_workspace/src/github.com/smartystreets/assertions/internal/oglematchers"
+import "github.com/smartystreets/assertions/internal/oglematchers"
 
 // ExpectEq(e, a) is equivalent to ExpectThat(a, oglematchers.Equals(e)).
 func ExpectEq(expected, actual interface{}, errorParts ...interface{}) {

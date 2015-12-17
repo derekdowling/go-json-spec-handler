@@ -16,7 +16,7 @@
 package ogletest
 
 import (
-	"github.com/derekdowling/go-json-spec-handler/Godeps/_workspace/src/github.com/smartystreets/assertions/internal/oglemock"
+	"github.com/smartystreets/assertions/internal/oglemock"
 	"runtime"
 )
 
