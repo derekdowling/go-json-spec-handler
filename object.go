@@ -130,6 +130,16 @@ func (o *Object) Prepare(r *http.Request, response bool) (*Response, *Error) {
 	return &Response{HTTPStatus: status, Data: o}, nil
 }
 
+// String prints a formatted string representation of the object
+func (o *Object) String() string {
+	raw, err := json.MarshalIndent(o, "", " ")
+	if err != nil {
+		return err.Error()
+	}
+
+	return string(raw)
+}
+
 // validateInput runs go-validator on each attribute on the struct and returns all
 // errors that it picks up
 func validateInput(target interface{}) *Error {
