@@ -3,13 +3,10 @@ go:
   - tip
   - 1.5
 
-env:
-  - GO15VENDOREXPERIMENT=1
-
 install:
   - go get github.com/tools/godep
   - go get github.com/smartystreets/goconvey
   - godep restore
 
 script:
-  - go test $(go list ./... | grep -v /vendor/)
+  - godep go test ./...
