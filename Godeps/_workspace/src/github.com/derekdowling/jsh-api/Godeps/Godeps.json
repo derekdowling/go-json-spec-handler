@@ -12,13 +12,17 @@
 		},
 		{
 			"ImportPath": "github.com/derekdowling/go-json-spec-handler",
-			"Comment": "0.6.2-8-g1810b92",
-			"Rev": "1810b9219b1de517a8a2668187bc56d308be7c9f"
+			"Comment": "0.6.2-9-gfb1cf99",
+			"Rev": "fb1cf99a55b13ec79dddc5f0fe295a7f23f712d9"
 		},
 		{
 			"ImportPath": "github.com/derekdowling/goji2-logger",
-			"Comment": "0.1-1-g4aa7280",
-			"Rev": "4aa7280e21d798c64d5a13f28e0a3a49f48d9813"
+			"Comment": "0.1-3-ga2d31a1",
+			"Rev": "a2d31a121cab4d54abdf7485f6e77880db42ff38"
+		},
+		{
+			"ImportPath": "github.com/goji/goji",
+			"Rev": "9f8871d62a1b65a39bd029cd2c1bf457cbc1d2f6"
 		},
 		{
 			"ImportPath": "github.com/jtolds/gls",
@@ -40,7 +44,11 @@
 			"Rev": "bf843a174a08e846246b8945f8a9a853d84a256a"
 		},
 		{
-			"ImportPath": "goji.io",
+			"ImportPath": "goji.io/internal",
+			"Rev": "9f8871d62a1b65a39bd029cd2c1bf457cbc1d2f6"
+		},
+		{
+			"ImportPath": "goji.io/pattern",
 			"Rev": "9f8871d62a1b65a39bd029cd2c1bf457cbc1d2f6"
 		},
 		{

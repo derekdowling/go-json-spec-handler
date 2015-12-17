@@ -2,7 +2,7 @@
 	"ImportPath": "github.com/derekdowling/goji2-logger",
 	"GoVersion": "go1.5.1",
 	"Packages": [
-		"github.com/derekdowling/goji2-logger"
+		"./..."
 	],
 	"Deps": [
 		{

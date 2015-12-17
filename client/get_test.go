@@ -1,6 +1,7 @@
 package jsc
 
 import (
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -13,9 +14,10 @@ func TestGet(t *testing.T) {
 
 	Convey("Get Tests", t, func() {
 
-		resource := jshapi.NewMockResource("", "test", 1, nil)
+		resource := jshapi.NewMockResource("test", 1, nil)
 		server := httptest.NewServer(resource)
 		baseURL := server.URL
+		log.Printf("resource = %+v\n", resource.RouteTree())
 
 		Convey("->Get()", func() {
 			resp, err := Get(baseURL + "/tests/1")

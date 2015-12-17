@@ -12,13 +12,13 @@
 		},
 		{
 			"ImportPath": "github.com/derekdowling/goji2-logger",
-			"Comment": "0.1-1-g4aa7280",
-			"Rev": "4aa7280e21d798c64d5a13f28e0a3a49f48d9813"
+			"Comment": "0.1-7-gad5b694",
+			"Rev": "ad5b6943fe2fd4c97356f8ec627207c5fcb5ec85"
 		},
 		{
 			"ImportPath": "github.com/derekdowling/jsh-api",
-			"Comment": "0.3.7-7-gd18b643",
-			"Rev": "d18b643c36718e73f7003ace7f46f4a4cd5d592f"
+			"Comment": "0.3.7-9-g96910b3",
+			"Rev": "96910b3051b71e2df9a76b2f11025936413dea5a"
 		},
 		{
 			"ImportPath": "github.com/jtolds/gls",
@@ -45,7 +45,7 @@
 		},
 		{
 			"ImportPath": "golang.org/x/net/context",
-			"Rev": "195180cfebf7362bd243a52477697895128c8777"
+			"Rev": "28273ec927bee3bea305f112fc28ceee575ea893"
 		}
 	]
 }

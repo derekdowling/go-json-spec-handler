@@ -16,7 +16,7 @@ func TestPost(t *testing.T) {
 		"foo": "bar",
 	}
 
-	mock := jshapi.NewMockResource("", "test", 0, attrs)
+	mock := jshapi.NewMockResource("test", 0, attrs)
 	server := httptest.NewServer(mock)
 	baseURL := server.URL
 

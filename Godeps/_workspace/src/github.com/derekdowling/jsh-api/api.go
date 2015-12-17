@@ -7,10 +7,10 @@ import (
 	"path"
 	"strings"
 
-	"github.com/derekdowling/goji2-logger"
-
 	"goji.io"
 	"goji.io/pat"
+
+	"github.com/derekdowling/goji2-logger"
 )
 
 // Logger is the default logging interface used in JSH API

@@ -7,9 +7,9 @@ import (
 	"os"
 	"time"
 
-	"golang.org/x/net/context"
-
 	"goji.io"
+
+	"golang.org/x/net/context"
 
 	"github.com/zenazn/goji/web/mutil"
 )
