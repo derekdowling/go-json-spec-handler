@@ -21,10 +21,6 @@
 			"Rev": "a2d31a121cab4d54abdf7485f6e77880db42ff38"
 		},
 		{
-			"ImportPath": "github.com/goji/goji",
-			"Rev": "9f8871d62a1b65a39bd029cd2c1bf457cbc1d2f6"
-		},
-		{
 			"ImportPath": "github.com/jtolds/gls",
 			"Rev": "9a4a02dbe491bef4bab3c24fd9f3087d6c4c6690"
 		},
@@ -44,11 +40,7 @@
 			"Rev": "bf843a174a08e846246b8945f8a9a853d84a256a"
 		},
 		{
-			"ImportPath": "goji.io/internal",
-			"Rev": "9f8871d62a1b65a39bd029cd2c1bf457cbc1d2f6"
-		},
-		{
-			"ImportPath": "goji.io/pattern",
+			"ImportPath": "goji.io",
 			"Rev": "9f8871d62a1b65a39bd029cd2c1bf457cbc1d2f6"
 		},
 		{

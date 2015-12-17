@@ -3,6 +3,7 @@
 package goji
 
 import (
+	"log"
 	"net/http"
 	"sort"
 	"strings"
@@ -87,9 +88,12 @@ func (rt *router) route(ctx context.Context, r *http.Request) context.Context {
 		path = path[len(tn.children[i].prefix):]
 		tn = tn.children[i].node
 	}
+	log.Printf("routes = %+v\n", routes)
 	sort.Ints(routes)
+
 	for _, i := range routes {
 		if ctx := rt.routes[i].Match(ctx, r); ctx != nil {
+			log.Printf("rt = %+v\n", rt.routes[i].Pattern)
 			return &match{ctx, rt.routes[i].Pattern, rt.routes[i].Handler}
 		}
 	}
