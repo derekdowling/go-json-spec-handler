@@ -73,6 +73,15 @@ func (e *Error) Error() string {
 	return err
 }
 
+// Status returns the HTTP Code of the first Error Object, or 0 if none
+func (e *Error) Status() int {
+	if len(e.Objects) > 0 {
+		return e.Objects[0].Status
+	}
+
+	return 0
+}
+
 // Internal prints a formatted error list including ISE's, useful for debugging
 func (e *Error) Internal() string {
 	err := "Errors:"

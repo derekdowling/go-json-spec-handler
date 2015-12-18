@@ -52,48 +52,69 @@ func TestError(t *testing.T) {
 			})
 		})
 
-		Convey("Error List Tests", func() {
+		Convey("->Status()", func() {
+			err := &Error{}
 
-			Convey("->Add()", func() {
-
-				testError := &Error{}
-
-				Convey("should successfully add a valid error", func() {
-					err := testError.Add(testErrorObject)
-					So(err, ShouldBeNil)
-					So(len(testError.Objects), ShouldEqual, 1)
-				})
-
-				Convey("should error if validation fails while adding an error", func() {
-					badError := &ErrorObject{
-						Title:  "Invalid",
-						Detail: "So badly",
-					}
-
-					err := testError.Add(badError)
-					So(err.Objects[0].Status, ShouldEqual, 500)
-					So(testError.Objects, ShouldBeEmpty)
-				})
+			Convey("should return 0 if no error objects are present", func() {
+				code := err.Status()
+				So(code, ShouldEqual, 0)
 			})
 
-			Convey("->Send()", func() {
-
-				testError := NewError(&ErrorObject{
-					Status: http.StatusForbidden,
-					Title:  "Forbidden",
-					Detail: "Can't Go Here",
+			Convey("should return the first code if error has objects", func() {
+				addErr := err.Add(&ErrorObject{
+					Status: 400,
 				})
+				So(addErr, ShouldBeNil)
 
-				Convey("should send a properly formatted JSON error list", func() {
-					err := Send(writer, request, testError)
-					So(err, ShouldBeNil)
-					So(writer.Code, ShouldEqual, http.StatusForbidden)
-
-					contentLength, convErr := strconv.Atoi(writer.HeaderMap.Get("Content-Length"))
-					So(convErr, ShouldBeNil)
-					So(contentLength, ShouldBeGreaterThan, 0)
-					So(writer.HeaderMap.Get("Content-Type"), ShouldEqual, ContentType)
+				addErr = err.Add(&ErrorObject{
+					Status: 500,
 				})
+				So(addErr, ShouldBeNil)
+
+				code := err.Status()
+				So(code, ShouldEqual, 400)
+			})
+		})
+
+		Convey("->Add()", func() {
+
+			testError := &Error{}
+
+			Convey("should successfully add a valid error", func() {
+				err := testError.Add(testErrorObject)
+				So(err, ShouldBeNil)
+				So(len(testError.Objects), ShouldEqual, 1)
+			})
+
+			Convey("should error if validation fails while adding an error", func() {
+				badError := &ErrorObject{
+					Title:  "Invalid",
+					Detail: "So badly",
+				}
+
+				err := testError.Add(badError)
+				So(err.Objects[0].Status, ShouldEqual, 500)
+				So(testError.Objects, ShouldBeEmpty)
+			})
+		})
+
+		Convey("->Send()", func() {
+
+			testError := NewError(&ErrorObject{
+				Status: http.StatusForbidden,
+				Title:  "Forbidden",
+				Detail: "Can't Go Here",
+			})
+
+			Convey("should send a properly formatted JSON error list", func() {
+				err := Send(writer, request, testError)
+				So(err, ShouldBeNil)
+				So(writer.Code, ShouldEqual, http.StatusForbidden)
+
+				contentLength, convErr := strconv.Atoi(writer.HeaderMap.Get("Content-Length"))
+				So(convErr, ShouldBeNil)
+				So(contentLength, ShouldBeGreaterThan, 0)
+				So(writer.HeaderMap.Get("Content-Type"), ShouldEqual, ContentType)
 			})
 		})
 	})
