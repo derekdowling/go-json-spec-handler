@@ -139,8 +139,8 @@ func TestObject(t *testing.T) {
 			Convey("should return a formatted Error for an unsupported method Type", func() {
 				request.Method = "PUT"
 				err := testObject.Validate(request, true)
-				So(err, ShouldBeNil)
-				So(testObject.Status, ShouldEqual, http.StatusNotAcceptable)
+				So(err, ShouldNotBeNil)
+				So(err.Status, ShouldEqual, http.StatusNotAcceptable)
 			})
 		})
 

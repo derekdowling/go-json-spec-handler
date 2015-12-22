@@ -54,7 +54,7 @@ func ParseObject(r *http.Request) (*Object, *Error) {
 
 	object := document.First()
 	if r.Method != "POST" && object.ID == "" {
-		return nil, InputError("id", "Missing mandatory object attribute")
+		return nil, InputError("Missing mandatory object attribute", "id")
 	}
 
 	return object, nil
@@ -121,7 +121,7 @@ func (p *Parser) Document(payload io.ReadCloser) (*Document, *Error) {
 			// if we have a list, then all resource objects should have IDs, will
 			// cross the bridge of bulk creation if and when there is a use case
 			if len(document.Data) > 1 && object.ID == "" {
-				return nil, InputError("id", "Object without ID present in list")
+				return nil, InputError("Object without ID present in list", "id")
 			}
 		}
 	}

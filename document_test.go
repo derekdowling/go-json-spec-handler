@@ -18,7 +18,7 @@ func TestDocument(t *testing.T) {
 		})
 
 		Convey("->HasErrors()", func() {
-			err := &Error{}
+			err := &Error{Status: 400}
 			addErr := doc.AddError(err)
 			So(addErr, ShouldBeNil)
 
@@ -38,7 +38,7 @@ func TestDocument(t *testing.T) {
 		})
 
 		Convey("->AddError()", func() {
-			testError := &Error{}
+			testError := &Error{Status: 400}
 
 			Convey("should successfully add a valid error", func() {
 				err := doc.AddError(testError)
@@ -74,7 +74,7 @@ func TestDocument(t *testing.T) {
 				list := List{testObject}
 				doc := Build(list)
 
-				So(doc.Data, ShouldEqual, list)
+				So(doc.Data, ShouldResemble, list)
 				So(doc.Status, ShouldEqual, http.StatusOK)
 			})
 

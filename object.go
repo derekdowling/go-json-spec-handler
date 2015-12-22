@@ -101,7 +101,8 @@ func (o *Object) Marshal(attributes interface{}) *Error {
 }
 
 /*
-Validate ensures that an object is JSON API compatible.
+Validate ensures that an object is JSON API compatible. Has a side effect of also
+setting the Object's Status attribute to be used as the Response HTTP Code.
 */
 func (o *Object) Validate(r *http.Request, response bool) *Error {
 
@@ -152,7 +153,7 @@ func validateInput(target interface{}) []*Error {
 
 				// parse out validation error
 				goValidErr, _ := singleErr.(govalidator.Error)
-				inputErr := InputError(goValidErr.Name, goValidErr.Err.Error())
+				inputErr := InputError(goValidErr.Err.Error(), goValidErr.Name)
 
 				errors = append(errors, inputErr)
 			}

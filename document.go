@@ -25,19 +25,15 @@ type Document struct {
 	// empty is used to signify that the response shouldn't contain a json payload
 	// in the case that we only want to return an HTTP Status Code in order to bypass
 	// validation steps.
-	empty bool
+	empty     bool
+	validated bool
 }
 
 /*
 New instantiates a new JSON Document object.
 */
 func New() *Document {
-	json := &Document{
-		Included: []*Object{},
-		Errors:   []*Error{},
-		Data:     List{},
-	}
-
+	json := &Document{}
 	json.JSONAPI.Version = JSONAPIVersion
 
 	return json
@@ -45,10 +41,12 @@ func New() *Document {
 
 /*
 Build creates a Sendable Document with the provided sendable payload, either Data or
-errors. Build also assumes you've already validated your data with .Validate()
+errors. Build also assumes you've already validated your data with .Validate() so
+it should be used carefully.
 */
 func Build(payload Sendable) *Document {
 	document := New()
+	document.validated = true
 
 	object, isObject := payload.(*Object)
 	if isObject {
@@ -74,21 +72,42 @@ func Build(payload Sendable) *Document {
 /*
 Validate checks JSON Spec for the top level JSON document
 */
-func (d *Document) Validate() *Error {
+func (d *Document) Validate(r *http.Request, response bool) *Error {
 
-	if !d.empty {
-		if !d.HasErrors() && !d.HasData() {
-			return ISE("Both `errors` and `data` cannot be blank for a JSON response")
-		}
-		if d.HasErrors() && d.HasData() {
-			return ISE("Both `errors` and `data` cannot be set for a JSON response")
-		}
-		if d.HasData() && d.Included != nil {
-			return ISE("'included' should only be set for a response if 'data' is as well")
-		}
-	}
 	if d.Status < 100 || d.Status > 600 {
 		return ISE("Response HTTP Status is outside of valid range")
+	}
+
+	// if empty is set, skip all validations below
+	if d.empty {
+		return nil
+	}
+
+	if !d.HasErrors() && !d.HasData() {
+		return ISE("Both `errors` and `data` cannot be blank for a JSON response")
+	}
+	if d.HasErrors() && d.HasData() {
+		return ISE("Both `errors` and `data` cannot be set for a JSON response")
+	}
+	if d.HasData() && d.Included != nil {
+		return ISE("'included' should only be set for a response if 'data' is as well")
+	}
+
+	// if fields have already been validated, skip this part
+	if d.validated {
+		return nil
+	}
+
+	err := d.Data.Validate(r, response)
+	if err != nil {
+		return err
+	}
+
+	for _, docErr := range d.Errors {
+		err := docErr.Validate(r, response)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -105,7 +124,11 @@ func (d *Document) AddObject(object *Object) *Error {
 		d.Status = object.Status
 	}
 
-	d.Data = append(d.Data, object)
+	if d.Data == nil {
+		d.Data = List{object}
+	} else {
+		d.Data = append(d.Data, object)
+	}
 
 	return nil
 }
@@ -117,11 +140,19 @@ func (d *Document) AddError(newErr *Error) *Error {
 		return ISE("Cannot add an error to a document already possessing data")
 	}
 
+	if newErr.Status == 0 {
+		return SpecificationError("Status code must be set for an error")
+	}
+
 	if d.Status == 0 {
 		d.Status = newErr.Status
 	}
 
-	d.Errors = append(d.Errors, newErr)
+	if d.Errors == nil {
+		d.Errors = []*Error{newErr}
+	} else {
+		d.Errors = append(d.Errors, newErr)
+	}
 
 	return nil
 }

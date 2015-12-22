@@ -22,7 +22,7 @@ func TestList(t *testing.T) {
 		}
 
 		testList := List{testObject}
-		req := &http.Request{}
+		req := &http.Request{Method: "GET"}
 
 		Convey("->Validate()", func() {
 			err := testList.Validate(req, true)

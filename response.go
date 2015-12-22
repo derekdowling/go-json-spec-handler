@@ -3,6 +3,7 @@ package jsh
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 )
@@ -21,20 +22,22 @@ type Sendable interface {
 // fails, it will send an appropriate error to the requestor and will return the error
 func Send(w http.ResponseWriter, r *http.Request, payload Sendable) *Error {
 
-	err := payload.Validate(r, true)
-	if err != nil {
+	validationErr := payload.Validate(r, true)
+	if validationErr != nil {
 
 		// use the prepared error as the new response, unless something went horribly
 		// wrong
-		err = err.Validate(r, true)
+		err := validationErr.Validate(r, true)
 		if err != nil {
 			http.Error(w, DefaultErrorTitle, http.StatusInternalServerError)
 			return err
 		}
 
-		payload = err
+		log.Printf("validationErr = %+v\n", validationErr)
+		payload = validationErr
 	}
 
+	log.Printf("payload = %+v\n", payload)
 	return SendDocument(w, r, Build(payload))
 }
 
@@ -48,9 +51,9 @@ Error.
 */
 func SendDocument(w http.ResponseWriter, r *http.Request, document *Document) *Error {
 
-	err := document.Validate()
-	if err != nil {
-		prepErr := err.Validate(r, true)
+	validationErr := document.Validate(r, true)
+	if validationErr != nil {
+		prepErr := validationErr.Validate(r, true)
 
 		// If we ever hit this, something seriously wrong has happened
 		if prepErr != nil {
@@ -59,7 +62,7 @@ func SendDocument(w http.ResponseWriter, r *http.Request, document *Document) *E
 		}
 
 		// if we didn't error out, make this the new response
-		document = Build(prepErr)
+		document = Build(validationErr)
 	}
 
 	content, jsonErr := json.MarshalIndent(document, "", " ")
@@ -73,7 +76,7 @@ func SendDocument(w http.ResponseWriter, r *http.Request, document *Document) *E
 	w.WriteHeader(document.Status)
 	w.Write(content)
 
-	return err
+	return validationErr
 }
 
 // Ok makes it simple to return a 200 OK response via jsh:
