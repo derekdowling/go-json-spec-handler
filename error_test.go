@@ -2,6 +2,7 @@ package jsh
 
 import (
 	"net/http"
+	"net/http/httptest"
 	"strconv"
 	"testing"
 
@@ -13,6 +14,7 @@ func TestError(t *testing.T) {
 	Convey("Error Tests", t, func() {
 
 		request := &http.Request{}
+		writer := httptest.NewRecorder()
 
 		testErrorObject := &Error{
 			Status: http.StatusBadRequest,

@@ -109,7 +109,6 @@ func (p *Parser) Document(payload io.ReadCloser) (*Document, *Error) {
 	if decodeErr != nil {
 		return nil, ISE(fmt.Sprintf("Error parsing JSON Document: %s", decodeErr.Error()))
 	}
-	log.Printf("document = %+v\n", document.Data)
 
 	if document.HasData() {
 		for _, object := range document.Data {
@@ -132,7 +131,7 @@ func (p *Parser) Document(payload io.ReadCloser) (*Document, *Error) {
 func closeReader(reader io.ReadCloser) {
 	err := reader.Close()
 	if err != nil {
-		log.Println("Unabled to close request Body")
+		log.Println("Unable to close request Body")
 	}
 }
 

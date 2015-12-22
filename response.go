@@ -3,7 +3,6 @@ package jsh
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
 )
@@ -33,11 +32,9 @@ func Send(w http.ResponseWriter, r *http.Request, payload Sendable) *Error {
 			return err
 		}
 
-		log.Printf("validationErr = %+v\n", validationErr)
 		payload = validationErr
 	}
 
-	log.Printf("payload = %+v\n", payload)
 	return SendDocument(w, r, Build(payload))
 }
 

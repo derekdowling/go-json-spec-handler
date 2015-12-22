@@ -34,7 +34,12 @@ func TestDocument(t *testing.T) {
 		})
 
 		Convey("->AddObject()", func() {
+			obj, err := NewObject("1", "user", nil)
+			So(err, ShouldBeNil)
 
+			err = doc.AddObject(obj)
+			So(err, ShouldBeNil)
+			So(len(doc.Data), ShouldEqual, 1)
 		})
 
 		Convey("->AddError()", func() {
@@ -61,15 +66,16 @@ func TestDocument(t *testing.T) {
 		Convey("->Build()", func() {
 
 			testObject := &Object{
-				ID:   "1",
-				Type: "Test",
+				ID:     "1",
+				Type:   "Test",
+				Status: http.StatusAccepted,
 			}
 
 			Convey("should accept an object", func() {
 				doc := Build(testObject)
 
-				So(doc.Data, ShouldResemble, list)
-				So(doc.Status, ShouldEqual, http.StatusOK)
+				So(doc.Data, ShouldResemble, List{testObject})
+				So(doc.Status, ShouldEqual, http.StatusAccepted)
 			})
 
 			Convey("should accept a list", func() {
