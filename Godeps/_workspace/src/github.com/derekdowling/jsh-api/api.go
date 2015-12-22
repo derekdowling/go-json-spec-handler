@@ -2,8 +2,6 @@ package jshapi
 
 import (
 	"fmt"
-	"log"
-	"os"
 	"path"
 	"strings"
 
@@ -13,36 +11,26 @@ import (
 	"github.com/derekdowling/goji2-logger"
 )
 
-// Logger is the default logging interface used in JSH API
-type Logger gojilogger.Logger
-
 // API is used to direct HTTP requests to resources
 type API struct {
 	*goji.Mux
 	prefix    string
 	Resources map[string]*Resource
-	Logger    Logger
 }
 
 // New initializes a new top level API Resource Handler. The most basic implementation
 // is:
 //
-//	api := New("", nil)
+//	// optionally, set your own logger
+//	jshapi.Logger = yourLogger
 //
-// But also supports prefixing(/<api_prefix>/<routes>) and custom logging via
-// log.Logger https://godoc.org/log#Logger:
-//
-//	api := New("v1", log.New(os.Stdout, "apiV1: ", log.Ldate|log.Ltime|log.Lshortfile))
-//
-func New(prefix string, logger Logger) *API {
+//	// create a new API
+//	api := jshapi.New("<prefix>", nil)
+func New(prefix string) *API {
 
 	// ensure that our top level prefix is "/" prefixed
 	if !strings.HasPrefix(prefix, "/") {
 		prefix = fmt.Sprintf("/%s", prefix)
-	}
-
-	if logger == nil {
-		logger = log.New(os.Stdout, "jshapi: ", log.Ldate|log.Ltime|log.Lshortfile)
 	}
 
 	// create our new logger
@@ -50,11 +38,10 @@ func New(prefix string, logger Logger) *API {
 		Mux:       goji.NewMux(),
 		prefix:    prefix,
 		Resources: map[string]*Resource{},
-		Logger:    logger,
 	}
 
 	// register default middleware
-	gojilogger.SetLogger(logger)
+	gojilogger.SetLogger(Logger)
 	api.UseC(gojilogger.Middleware)
 
 	return api
@@ -63,9 +50,6 @@ func New(prefix string, logger Logger) *API {
 // Add implements mux support for a given resource which is effectively handled as:
 // pat.New("/(prefix/)resource.Plu*)
 func (a *API) Add(resource *Resource) {
-
-	// ensure the resource is properly prefixed, and has access to the API logger
-	resource.Logger = a.Logger
 
 	// track our associated resources, will enable auto-generation docs later
 	a.Resources[resource.Type] = resource

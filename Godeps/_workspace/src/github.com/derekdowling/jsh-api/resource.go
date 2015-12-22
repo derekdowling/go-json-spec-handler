@@ -49,8 +49,6 @@ type Resource struct {
 	*goji.Mux
 	// The singular name of the resource type("user", "post", etc)
 	Type string
-	// An implementation of Go's standard logger
-	Logger Logger
 	// Prefix is set if the resource is not the top level of URI, "/prefix/resources
 	Routes []string
 	// Map of relationships
@@ -238,17 +236,17 @@ func (res *Resource) Mutate(actionName string, storage store.Get) {
 func (res *Resource) postHandler(ctx context.Context, w http.ResponseWriter, r *http.Request, storage store.Save) {
 	parsedObject, err := jsh.ParseObject(r)
 	if err != nil {
-		res.SendAndLog(ctx, w, r, err)
+		SendAndLog(ctx, w, r, err)
 		return
 	}
 
 	object, err := storage(ctx, parsedObject)
 	if err != nil {
-		res.SendAndLog(ctx, w, r, err)
+		SendAndLog(ctx, w, r, err)
 		return
 	}
 
-	res.SendAndLog(ctx, w, r, object)
+	SendAndLog(ctx, w, r, object)
 }
 
 // GET /resources/:id
@@ -257,22 +255,22 @@ func (res *Resource) getHandler(ctx context.Context, w http.ResponseWriter, r *h
 
 	object, err := storage(ctx, id)
 	if err != nil {
-		res.SendAndLog(ctx, w, r, err)
+		SendAndLog(ctx, w, r, err)
 		return
 	}
 
-	res.SendAndLog(ctx, w, r, object)
+	SendAndLog(ctx, w, r, object)
 }
 
 // GET /resources
 func (res *Resource) listHandler(ctx context.Context, w http.ResponseWriter, r *http.Request, storage store.List) {
 	list, err := storage(ctx)
 	if err != nil {
-		res.SendAndLog(ctx, w, r, err)
+		SendAndLog(ctx, w, r, err)
 		return
 	}
 
-	res.SendAndLog(ctx, w, r, list)
+	SendAndLog(ctx, w, r, list)
 }
 
 // DELETE /resources/:id
@@ -281,7 +279,7 @@ func (res *Resource) deleteHandler(ctx context.Context, w http.ResponseWriter, r
 
 	err := storage(ctx, id)
 	if err != nil {
-		res.SendAndLog(ctx, w, r, err)
+		SendAndLog(ctx, w, r, err)
 		return
 	}
 
@@ -292,17 +290,17 @@ func (res *Resource) deleteHandler(ctx context.Context, w http.ResponseWriter, r
 func (res *Resource) patchHandler(ctx context.Context, w http.ResponseWriter, r *http.Request, storage store.Update) {
 	parsedObject, err := jsh.ParseObject(r)
 	if err != nil {
-		res.SendAndLog(ctx, w, r, err)
+		SendAndLog(ctx, w, r, err)
 		return
 	}
 
 	object, err := storage(ctx, parsedObject)
 	if err != nil {
-		res.SendAndLog(ctx, w, r, err)
+		SendAndLog(ctx, w, r, err)
 		return
 	}
 
-	res.SendAndLog(ctx, w, r, object)
+	SendAndLog(ctx, w, r, object)
 }
 
 // GET /resources/:id/(relationships/)<resourceType>s
@@ -311,11 +309,11 @@ func (res *Resource) toManyHandler(ctx context.Context, w http.ResponseWriter, r
 
 	list, err := storage(ctx, id)
 	if err != nil {
-		res.SendAndLog(ctx, w, r, err)
+		SendAndLog(ctx, w, r, err)
 		return
 	}
 
-	res.SendAndLog(ctx, w, r, list)
+	SendAndLog(ctx, w, r, list)
 }
 
 // All HTTP Methods for /resources/:id/<mutate>
@@ -324,25 +322,11 @@ func (res *Resource) mutateHandler(ctx context.Context, w http.ResponseWriter, r
 
 	response, err := storage(ctx, id)
 	if err != nil {
-		res.SendAndLog(ctx, w, r, err)
+		SendAndLog(ctx, w, r, err)
 		return
 	}
 
-	res.SendAndLog(ctx, w, r, response)
-}
-
-// SendAndLog is a jsh wrapper function that handles logging 500 errors and
-// ensures that any errors that leak out of JSH are also captured
-func (res *Resource) SendAndLog(ctx context.Context, w http.ResponseWriter, r *http.Request, sendable jsh.Sendable) {
-	response, err := sendable.Prepare(r, true)
-	if err != nil && response.HTTPStatus == http.StatusInternalServerError {
-		res.Logger.Printf("Error: %s", err.Internal())
-	}
-
-	sendErr := jsh.SendResponse(w, r, response)
-	if sendErr != nil {
-		res.Logger.Print(err.Error())
-	}
+	SendAndLog(ctx, w, r, response)
 }
 
 // PluralType returns the resource's name, but pluralized
