@@ -56,7 +56,6 @@ func TestDocument(t *testing.T) {
 				So(err, ShouldNotBeNil)
 				So(doc.Errors, ShouldBeEmpty)
 			})
-
 		})
 
 		Convey("->Build()", func() {
@@ -67,7 +66,10 @@ func TestDocument(t *testing.T) {
 			}
 
 			Convey("should accept an object", func() {
+				doc := Build(testObject)
 
+				So(doc.Data, ShouldResemble, list)
+				So(doc.Status, ShouldEqual, http.StatusOK)
 			})
 
 			Convey("should accept a list", func() {
@@ -79,7 +81,11 @@ func TestDocument(t *testing.T) {
 			})
 
 			Convey("should accept an error", func() {
+				err := &Error{Status: 500}
+				doc := Build(err)
 
+				So(doc.Errors, ShouldNotBeEmpty)
+				So(doc.Status, ShouldEqual, err.Status)
 			})
 		})
 

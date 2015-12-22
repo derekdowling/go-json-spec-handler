@@ -5,17 +5,18 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/derekdowling/jsh-api"
 	. "github.com/smartystreets/goconvey/convey"
 )
 
 func TestGet(t *testing.T) {
 
-	Convey("Get Tests", t, func() {
+	api := testAPI()
+	server := httptest.NewServer(api)
+	defer server.Close()
 
-		resource := jshapi.NewMockResource("test", 1, nil)
-		server := httptest.NewServer(resource)
-		baseURL := server.URL
+	baseURL := server.URL
+
+	Convey("Get Tests", t, func() {
 
 		Convey("->Get()", func() {
 			json, resp, err := Get(baseURL + "/tests/1")

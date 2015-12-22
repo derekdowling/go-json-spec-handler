@@ -46,7 +46,7 @@ to the end user, use err.SafeError() instead.
 */
 func (e *Error) Error() string {
 	if e.ISE != "" {
-		return e.ISE
+		return fmt.Sprintf("HTTP %d - %s", e.Status, e.ISE)
 	}
 
 	return e.SafeError()
@@ -57,7 +57,7 @@ SafeError is a formatted error string that does not include an associated intern
 server error such that it is safe to return this error message to an end user.
 */
 func (e *Error) SafeError() string {
-	msg := fmt.Sprintf("%s: %s", e.Title, e.Detail)
+	msg := fmt.Sprintf("HTTP %d: %s - %s", e.Status, e.Title, e.Detail)
 	if e.Source.Pointer != "" {
 		msg += fmt.Sprintf("Source.Pointer: %s", e.Source.Pointer)
 	}

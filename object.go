@@ -102,7 +102,8 @@ func (o *Object) Marshal(attributes interface{}) *Error {
 
 /*
 Validate ensures that an object is JSON API compatible. Has a side effect of also
-setting the Object's Status attribute to be used as the Response HTTP Code.
+setting the Object's Status attribute to be used as the Response HTTP Code if one
+has not already been set.
 */
 func (o *Object) Validate(r *http.Request, response bool) *Error {
 
@@ -121,11 +122,32 @@ func (o *Object) Validate(r *http.Request, response bool) *Error {
 
 	switch r.Method {
 	case "POST":
+		acceptable := map[int]bool{201: true, 202: true, 204: true}
+
+		if o.Status != 0 {
+			if _, validCode := acceptable[o.Status]; !validCode {
+				return SpecificationError("POST Status must be one of 201, 202, or 204.")
+			}
+			break
+		}
+
 		o.Status = http.StatusCreated
+		break
 	case "PATCH":
+		acceptable := map[int]bool{200: true, 202: true, 204: true}
+
+		if o.Status != 0 {
+			if _, validCode := acceptable[o.Status]; !validCode {
+				return SpecificationError("PATCH Status must be one of 200, 202, or 204.")
+			}
+			break
+		}
+
 		o.Status = http.StatusOK
+		break
 	case "GET":
 		o.Status = http.StatusOK
+		break
 	// If we hit this it means someone is attempting to use an unsupported HTTP
 	// method. Return a 406 error instead
 	default:
@@ -136,6 +158,16 @@ func (o *Object) Validate(r *http.Request, response bool) *Error {
 	}
 
 	return nil
+}
+
+// String prints a formatted string representation of the object
+func (o *Object) String() string {
+	raw, err := json.MarshalIndent(o, "", " ")
+	if err != nil {
+		return err.Error()
+	}
+
+	return string(raw)
 }
 
 // validateInput runs go-validator on each attribute on the struct and returns all

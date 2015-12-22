@@ -2,6 +2,7 @@ package jsh
 
 import (
 	"net/http"
+	"strconv"
 	"testing"
 
 	. "github.com/smartystreets/goconvey/convey"
@@ -46,6 +47,26 @@ func TestError(t *testing.T) {
 				testErrorObject.Status = http.StatusOK
 				err := testErrorObject.Validate(request, true)
 				So(err, ShouldNotBeNil)
+			})
+		})
+
+		Convey("->Send()", func() {
+
+			testError := &Error{
+				Status: http.StatusForbidden,
+				Title:  "Forbidden",
+				Detail: "Can't Go Here",
+			}
+
+			Convey("should send a properly formatted JSON error", func() {
+				err := Send(writer, request, testError)
+				So(err, ShouldBeNil)
+				So(writer.Code, ShouldEqual, http.StatusForbidden)
+
+				contentLength, convErr := strconv.Atoi(writer.HeaderMap.Get("Content-Length"))
+				So(convErr, ShouldBeNil)
+				So(contentLength, ShouldBeGreaterThan, 0)
+				So(writer.HeaderMap.Get("Content-Type"), ShouldEqual, ContentType)
 			})
 		})
 	})
