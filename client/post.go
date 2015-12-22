@@ -13,7 +13,7 @@ import (
 //	obj, _ := jsh.NewObject("123", "user", payload)
 //	// does POST http://apiserver/user/123
 //	json, resp, err := jsh.Post("http://apiserver", obj)
-func Post(baseURL string, object *jsh.Object) (*jsh.JSON, *http.Response, error) {
+func Post(baseURL string, object *jsh.Object) (*jsh.Document, *http.Response, error) {
 
 	u, err := url.Parse(baseURL)
 	if err != nil {

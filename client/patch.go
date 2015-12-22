@@ -16,7 +16,7 @@ import (
 //  json, resp, err := jsc.Patch("http://postap.com/api/", obj)
 //	updatedObj := json.First()
 //
-func Patch(baseURL string, object *jsh.Object) (*jsh.JSON, *http.Response, error) {
+func Patch(baseURL string, object *jsh.Object) (*jsh.Document, *http.Response, error) {
 	u, err := url.Parse(baseURL)
 	if err != nil {
 		return nil, nil, fmt.Errorf("Error parsing URL: %s", err.Error())

@@ -17,13 +17,13 @@ func mockObjectResponse(object *jsh.Object) (*http.Response, error) {
 		return nil, reqErr
 	}
 
-	resp, err := object.Prepare(req, false)
+	err := object.Validate(req, false)
 	if err != nil {
 		return nil, err
 	}
 
 	recorder := httptest.NewRecorder()
-	jsh.SendJSON(recorder, req, resp)
+	jsh.Send(recorder, req, object)
 	return recorderToResponse(recorder), nil
 }
 
@@ -37,13 +37,13 @@ func mockListResponse(list jsh.List) (*http.Response, error) {
 		return nil, reqErr
 	}
 
-	json, err := list.Prepare(req, false)
+	err := list.Validate(req, false)
 	if err != nil {
 		return nil, err
 	}
 
 	recorder := httptest.NewRecorder()
-	jsh.SendJSON(recorder, req, json)
+	jsh.Send(recorder, req, list)
 	return recorderToResponse(recorder), nil
 }
 

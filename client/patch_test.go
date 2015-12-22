@@ -1,20 +1,23 @@
 package jsc
 
 import (
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/derekdowling/go-json-spec-handler"
-	"github.com/derekdowling/jsh-api"
 	. "github.com/smartystreets/goconvey/convey"
 )
 
 func TestPatch(t *testing.T) {
 
 	Convey("Patch Tests", t, func() {
-		resource := jshapi.NewMockResource("test", 1, nil)
-		server := httptest.NewServer(resource)
+
+		api := testAPI()
+		server := httptest.NewServer(api)
+		defer server.Close()
+
 		baseURL := server.URL
 
 		Convey("->Patch()", func() {
@@ -22,9 +25,10 @@ func TestPatch(t *testing.T) {
 			So(err, ShouldBeNil)
 
 			json, resp, patchErr := Patch(baseURL, object)
+			log.Printf("resp.Request = %+v\n", resp.Request)
 
-			So(patchErr, ShouldBeNil)
 			So(resp.StatusCode, ShouldEqual, http.StatusOK)
+			So(patchErr, ShouldBeNil)
 			So(json.HasErrors(), ShouldBeFalse)
 			So(json.HasData(), ShouldBeTrue)
 		})

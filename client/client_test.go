@@ -1,7 +1,6 @@
 package jsc
 
 import (
-	"log"
 	"net/url"
 	"testing"
 
@@ -51,12 +50,12 @@ func TestResponseParsing(t *testing.T) {
 
 			obj, objErr := jsh.NewObject("123", "test", map[string]string{"test": "test"})
 			So(objErr, ShouldBeNil)
+
 			response, err := mockObjectResponse(obj)
-			log.Printf("response = %+v\n", response)
 			So(err, ShouldBeNil)
 
 			Convey("should parse successfully", func() {
-				doc, err := JSON(response)
+				doc, err := Document(response)
 
 				So(err, ShouldBeNil)
 				So(doc.HasData(), ShouldBeTrue)
@@ -75,11 +74,11 @@ func TestResponseParsing(t *testing.T) {
 			So(err, ShouldBeNil)
 
 			Convey("should parse successfully", func() {
-				json, err := JSON(response)
+				doc, err := Document(response)
 
 				So(err, ShouldBeNil)
-				So(json.HasData(), ShouldBeTrue)
-				So(json.Data.List[0].ID, ShouldEqual, "123")
+				So(doc.HasData(), ShouldBeTrue)
+				So(doc.First().ID, ShouldEqual, "123")
 			})
 		})
 	})
@@ -89,7 +88,7 @@ func TestResponseParsing(t *testing.T) {
 // import cycle wit jsh-api
 func testAPI() *jshapi.API {
 	resource := jshapi.NewMockResource("test", 1, nil)
-	api := jshapi.New("", nil)
+	api := jshapi.New("")
 	api.Add(resource)
 
 	return api
