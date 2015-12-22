@@ -19,26 +19,7 @@ func TestParsing(t *testing.T) {
 
 			err := validateHeaders(req.Header)
 			So(err, ShouldNotBeNil)
-			So(err.Objects[0].Status, ShouldEqual, http.StatusNotAcceptable)
-		})
-
-		Convey("->dataIsArray()", func() {
-
-			Convey("should detect an array successfully", func() {
-				data := `[1,2,3,4]`
-				isArray, err := dataIsArray([]byte(data))
-
-				So(err, ShouldBeNil)
-				So(isArray, ShouldBeTrue)
-			})
-
-			Convey("should reject a non-array successfully", func() {
-				data := `{"foo":"bar"}`
-				isArray, err := dataIsArray([]byte(data))
-
-				So(err, ShouldBeNil)
-				So(isArray, ShouldBeFalse)
-			})
+			So(err.Status, ShouldEqual, http.StatusNotAcceptable)
 		})
 
 		Convey("->ParseObject()", func() {
@@ -66,8 +47,8 @@ func TestParsing(t *testing.T) {
 
 				_, err := ParseObject(req)
 				So(err, ShouldNotBeNil)
-				So(err.Objects[0].Status, ShouldEqual, 422)
-				So(err.Objects[0].Source.Pointer, ShouldEqual, "/data/attributes/type")
+				So(err.Status, ShouldEqual, 422)
+				So(err.Source.Pointer, ShouldEqual, "/data/attributes/type")
 			})
 
 			Convey("should accept empty ID only for POST", func() {
@@ -123,8 +104,8 @@ func TestParsing(t *testing.T) {
 
 				_, err := ParseList(req)
 				So(err, ShouldNotBeNil)
-				So(err.Objects[0].Status, ShouldEqual, 422)
-				So(err.Objects[0].Source.Pointer, ShouldEqual, "/data/attributes/id")
+				So(err.Status, ShouldEqual, 422)
+				So(err.Source.Pointer, ShouldEqual, "/data/attributes/id")
 			})
 		})
 	})

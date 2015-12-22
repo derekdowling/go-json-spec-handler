@@ -8,38 +8,40 @@ import (
 	"net/http"
 )
 
-// ParseObject validates the HTTP request and returns a JSON object for a given
-// io.ReadCloser containing a raw JSON payload. Here's an example of how to use it
-// as part of your full flow.
-//
-//	func Handler(w http.ResponseWriter, r *http.Request) {
-//		obj, error := jsh.ParseObject(r)
-//		if error != nil {
-//			// log your error
-//			err := jsh.Send(w, r, error)
-//			return
-//		}
-//
-//		yourType := &YourType{}
-//
-//		err := object.Unmarshal("yourtype", &yourType)
-//		if err != nil {
-//			err := jsh.Send(w, r, err)
-//			return
-//		}
-//
-//		yourType.ID = obj.ID
-//		// do business logic
-//
-//		err := object.Marshal(yourType)
-//		if err != nil {
-//			// log error
-//			err := jsh.Send(w, r, err)
-//			return
-//		}
-//
-//		err := jsh.Send(w, r, object)
-//	}
+/*
+ParseObject validates the HTTP request and returns a JSON object for a given
+io.ReadCloser containing a raw JSON payload. Here's an example of how to use it
+as part of your full flow.
+
+	func Handler(w http.ResponseWriter, r *http.Request) {
+		obj, error := jsh.ParseObject(r)
+		if error != nil {
+			// log your error
+			err := jsh.Send(w, r, error)
+			return
+		}
+
+		yourType := &YourType{}
+
+		err := object.Unmarshal("yourtype", &yourType)
+		if err != nil {
+			err := jsh.Send(w, r, err)
+			return
+		}
+
+		yourType.ID = obj.ID
+		// do business logic
+
+		err := object.Marshal(yourType)
+		if err != nil {
+			// log error
+			err := jsh.Send(w, r, err)
+			return
+		}
+
+		err := jsh.Send(w, r, object)
+	}
+*/
 func ParseObject(r *http.Request) (*Object, *Error) {
 	document, err := ParseJSON(r)
 	if err != nil {
@@ -58,20 +60,22 @@ func ParseObject(r *http.Request) (*Object, *Error) {
 	return object, nil
 }
 
-// ParseList validates the HTTP request and returns a resulting list of objects
-// parsed from the request Body. Use just like ParseObject.
+/*
+ParseList validates the HTTP request and returns a resulting list of objects
+parsed from the request Body. Use just like ParseObject.
+*/
 func ParseList(r *http.Request) (List, *Error) {
 	document, err := ParseJSON(r)
 	if err != nil {
 		return nil, err
 	}
 
-	return document.Data.List, nil
+	return document.Data, nil
 }
 
 // ParseJSON is a convenience function that returns a top level jsh.JSON document
-func ParseJSON(r *http.Request) (*JSON, *Error) {
-	return NewParser(r).JSON(r.Body)
+func ParseJSON(r *http.Request) (*Document, *Error) {
+	return NewParser(r).Document(r.Body)
 }
 
 // Parser is an abstraction layer to support parsing JSON payload from many types
@@ -89,8 +93,10 @@ func NewParser(request *http.Request) *Parser {
 	}
 }
 
-// JSON returns a single JSON data object from the parser
-func (p *Parser) JSON(payload io.ReadCloser) (*JSON, *Error) {
+/*
+Document returns a single JSON data object from the parser.
+*/
+func (p *Parser) Document(payload io.ReadCloser) (*Document, *Error) {
 	defer closeReader(payload)
 
 	err := validateHeaders(p.Headers)
@@ -98,7 +104,7 @@ func (p *Parser) JSON(payload io.ReadCloser) (*JSON, *Error) {
 		return nil, err
 	}
 
-	document := &JSON{Data: &Data{List{}}}
+	document := &Document{Data: List{}}
 	decodeErr := json.NewDecoder(payload).Decode(document)
 	if decodeErr != nil {
 		return nil, ISE(fmt.Sprintf("Error parsing JSON Document: %s", decodeErr.Error()))
@@ -106,15 +112,15 @@ func (p *Parser) JSON(payload io.ReadCloser) (*JSON, *Error) {
 	log.Printf("document = %+v\n", document.Data)
 
 	if document.HasData() {
-		for _, object := range document.Data.List {
+		for _, object := range document.Data {
 			inputErr := validateInput(object)
 			if inputErr != nil {
-				return nil, inputErr
+				return nil, inputErr[0]
 			}
 
 			// if we have a list, then all resource objects should have IDs, will
 			// cross the bridge of bulk creation if and when there is a use case
-			if len(document.Data.List) > 1 && object.ID == "" {
+			if len(document.Data) > 1 && object.ID == "" {
 				return nil, InputError("id", "Object without ID present in list")
 			}
 		}

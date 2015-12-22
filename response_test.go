@@ -44,8 +44,8 @@ func TestSend(t *testing.T) {
 		})
 
 		Convey("->Ok()", func() {
-			ok := Ok()
-			err := Send(writer, request, ok)
+			doc := Ok()
+			err := SendDocument(writer, request, doc)
 			So(err, ShouldBeNil)
 			So(writer.Code, ShouldEqual, http.StatusOK)
 		})
