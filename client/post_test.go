@@ -23,9 +23,10 @@ func TestPost(t *testing.T) {
 
 	Convey("Post Tests", t, func() {
 		testObject, err := jsh.NewObject("", "test", attrs)
-
-		_, resp, err := Post(baseURL, testObject)
 		So(err, ShouldBeNil)
+
+		_, resp, postErr := Post(baseURL, testObject)
+		So(postErr, ShouldBeNil)
 		So(resp.StatusCode, ShouldEqual, http.StatusCreated)
 	})
 }

@@ -2,6 +2,7 @@ package jsh
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
@@ -21,12 +22,11 @@ func TestList(t *testing.T) {
 		}
 
 		testList := List{testObject}
-		req := &http.Request{}
+		req := &http.Request{Method: "GET"}
 
-		Convey("->Prepare()", func() {
-			response, err := testList.Prepare(req, true)
+		Convey("->Validate()", func() {
+			err := testList.Validate(req, true)
 			So(err, ShouldBeNil)
-			So(response.HTTPStatus, ShouldEqual, http.StatusOK)
 		})
 
 		Convey("->Send(list)", func() {
@@ -49,6 +49,29 @@ func TestList(t *testing.T) {
 				responseList, parseErr := ParseList(req)
 				So(parseErr, ShouldBeNil)
 				So(len(responseList), ShouldEqual, 1)
+			})
+		})
+
+		Convey("->UnmarshalJSON()", func() {
+
+			Convey("should handle a data object", func() {
+				jObj := `{"data": {"type": "user", "id": "sweetID123", "attributes": {"ID":"123"}}}`
+
+				l := List{}
+				err := l.UnmarshalJSON([]byte(jObj))
+				log.Printf("l = %+v\n", l)
+				So(err, ShouldBeNil)
+				So(l, ShouldNotBeEmpty)
+			})
+
+			Convey("should handle a data list", func() {
+				jList := `{"data": [{"type": "user", "id": "sweetID123", "attributes": {"ID":"123"}}]}`
+
+				l := List{}
+				err := l.UnmarshalJSON([]byte(jList))
+				log.Printf("l = %+v\n", l)
+				So(err, ShouldBeNil)
+				So(l, ShouldNotBeEmpty)
 			})
 		})
 	})

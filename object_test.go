@@ -75,7 +75,7 @@ func TestObject(t *testing.T) {
 
 					err := testObject.Unmarshal("testObject", &testValidation)
 					So(err, ShouldNotBeNil)
-					So(err.Objects[0].Source.Pointer, ShouldEqual, "/data/attributes/foo")
+					So(err[0].Source.Pointer, ShouldEqual, "/data/attributes/foo")
 				})
 
 				Convey("should return a 422 Error correctly for multiple validation failures", func() {
@@ -94,8 +94,8 @@ func TestObject(t *testing.T) {
 					err := testManyObject.Unmarshal("testObject", &testManyValidations)
 					So(err, ShouldNotBeNil)
 
-					So(err.Objects[0].Source.Pointer, ShouldEqual, "/data/attributes/foo")
-					So(err.Objects[1].Source.Pointer, ShouldEqual, "/data/attributes/baz")
+					So(err[0].Source.Pointer, ShouldEqual, "/data/attributes/foo")
+					So(err[1].Source.Pointer, ShouldEqual, "/data/attributes/baz")
 				})
 			})
 		})
@@ -113,34 +113,34 @@ func TestObject(t *testing.T) {
 			})
 		})
 
-		Convey("->Prepare()", func() {
+		Convey("->JSON()", func() {
 
 			Convey("should handle a POST response correctly", func() {
 				request.Method = "POST"
-				resp, err := testObject.Prepare(request, true)
+				err := testObject.Validate(request, true)
 				So(err, ShouldBeNil)
-				So(resp.HTTPStatus, ShouldEqual, http.StatusCreated)
+				So(testObject.Status, ShouldEqual, http.StatusCreated)
 			})
 
 			Convey("should handle a GET response correctly", func() {
 				request.Method = "GET"
-				resp, err := testObject.Prepare(request, true)
+				err := testObject.Validate(request, true)
 				So(err, ShouldBeNil)
-				So(resp.HTTPStatus, ShouldEqual, http.StatusOK)
+				So(testObject.Status, ShouldEqual, http.StatusOK)
 			})
 
 			Convey("should handle a PATCH response correctly", func() {
 				request.Method = "PATCH"
-				resp, err := testObject.Prepare(request, true)
+				err := testObject.Validate(request, true)
 				So(err, ShouldBeNil)
-				So(resp.HTTPStatus, ShouldEqual, http.StatusOK)
+				So(testObject.Status, ShouldEqual, http.StatusOK)
 			})
 
 			Convey("should return a formatted Error for an unsupported method Type", func() {
 				request.Method = "PUT"
-				resp, err := testObject.Prepare(request, true)
-				So(err, ShouldBeNil)
-				So(resp.HTTPStatus, ShouldEqual, http.StatusNotAcceptable)
+				err := testObject.Validate(request, true)
+				So(err, ShouldNotBeNil)
+				So(err.Status, ShouldEqual, http.StatusNotAcceptable)
 			})
 		})
 

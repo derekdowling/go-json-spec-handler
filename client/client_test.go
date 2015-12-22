@@ -1,6 +1,7 @@
 package jsc
 
 import (
+	"log"
 	"net/url"
 	"testing"
 
@@ -51,12 +52,15 @@ func TestResponseParsing(t *testing.T) {
 			obj, objErr := jsh.NewObject("123", "test", map[string]string{"test": "test"})
 			So(objErr, ShouldBeNil)
 			response, err := mockObjectResponse(obj)
+			log.Printf("response = %+v\n", response)
 			So(err, ShouldBeNil)
 
 			Convey("should parse successfully", func() {
-				respObj, err := ParseObject(response)
+				doc, err := JSON(response)
+
 				So(err, ShouldBeNil)
-				So(respObj.ID, ShouldEqual, "123")
+				So(doc.HasData(), ShouldBeTrue)
+				So(doc.First().ID, ShouldEqual, "123")
 			})
 		})
 
@@ -71,10 +75,11 @@ func TestResponseParsing(t *testing.T) {
 			So(err, ShouldBeNil)
 
 			Convey("should parse successfully", func() {
-				list, err := ParseList(response)
+				json, err := JSON(response)
+
 				So(err, ShouldBeNil)
-				So(list, ShouldNotBeNil)
-				So(list[0].ID, ShouldEqual, "123")
+				So(json.HasData(), ShouldBeTrue)
+				So(json.Data.List[0].ID, ShouldEqual, "123")
 			})
 		})
 	})

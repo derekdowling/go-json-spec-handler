@@ -4,66 +4,78 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 )
 
-const (
-	// ContentType is the data encoding of choice for HTTP Request and Response Headers
-	ContentType = "application/vnd.api+json"
-)
+/*
+ParseObject validates the HTTP request and returns a JSON object for a given
+io.ReadCloser containing a raw JSON payload. Here's an example of how to use it
+as part of your full flow.
 
-// ParseObject validates the HTTP request and returns a JSON object for a given
-// io.ReadCloser containing a raw JSON payload. Here's an example of how to use it
-// as part of your full flow.
-//
-//	func Handler(w http.ResponseWriter, r *http.Request) {
-//		obj, error := jsh.ParseObject(r)
-//		if error != nil {
-//			// log your error
-//			err := jsh.Send(w, r, error)
-//			return
-//		}
-//
-//		yourType := &YourType{}
-//
-//		err := object.Unmarshal("yourtype", &yourType)
-//		if err != nil {
-//			err := jsh.Send(w, r, err)
-//			return
-//		}
-//
-//		yourType.ID = obj.ID
-//		// do business logic
-//
-//		err := object.Marshal(yourType)
-//		if err != nil {
-//			// log error
-//			err := jsh.Send(w, r, err)
-//			return
-//		}
-//
-//		err := jsh.Send(w, r, object)
-//	}
+	func Handler(w http.ResponseWriter, r *http.Request) {
+		obj, error := jsh.ParseObject(r)
+		if error != nil {
+			// log your error
+			err := jsh.Send(w, r, error)
+			return
+		}
+
+		yourType := &YourType{}
+
+		err := object.Unmarshal("yourtype", &yourType)
+		if err != nil {
+			err := jsh.Send(w, r, err)
+			return
+		}
+
+		yourType.ID = obj.ID
+		// do business logic
+
+		err := object.Marshal(yourType)
+		if err != nil {
+			// log error
+			err := jsh.Send(w, r, err)
+			return
+		}
+
+		err := jsh.Send(w, r, object)
+	}
+*/
 func ParseObject(r *http.Request) (*Object, *Error) {
-
-	object, err := buildParser(r).GetObject()
+	document, err := ParseJSON(r)
 	if err != nil {
 		return nil, err
 	}
 
+	if !document.HasData() {
+		return nil, nil
+	}
+
+	object := document.First()
 	if r.Method != "POST" && object.ID == "" {
-		return nil, InputError("id", "Missing mandatory object attribute")
+		return nil, InputError("Missing mandatory object attribute", "id")
 	}
 
 	return object, nil
 }
 
-// ParseList validates the HTTP request and returns a resulting list of objects
-// parsed from the request Body. Use just like ParseObject.
+/*
+ParseList validates the HTTP request and returns a resulting list of objects
+parsed from the request Body. Use just like ParseObject.
+*/
 func ParseList(r *http.Request) (List, *Error) {
-	return buildParser(r).GetList()
+	document, err := ParseJSON(r)
+	if err != nil {
+		return nil, err
+	}
+
+	return document.Data, nil
+}
+
+// ParseJSON is a convenience function that returns a top level jsh.JSON document
+func ParseJSON(r *http.Request) (*Document, *Error) {
+	return NewParser(r).Document(r.Body)
 }
 
 // Parser is an abstraction layer to support parsing JSON payload from many types
@@ -71,102 +83,55 @@ func ParseList(r *http.Request) (List, *Error) {
 type Parser struct {
 	Method  string
 	Headers http.Header
-	Payload io.ReadCloser
 }
 
-// BuildParser creates a parser from an http.Request
-func buildParser(request *http.Request) *Parser {
+// NewParser creates a parser from an http.Request
+func NewParser(request *http.Request) *Parser {
 	return &Parser{
 		Method:  request.Method,
 		Headers: request.Header,
-		Payload: request.Body,
 	}
 }
 
-// GetObject returns a single JSON data object from the parser
-func (p *Parser) GetObject() (*Object, *Error) {
-	byteData, loadErr := prepareJSON(p.Headers, p.Payload)
-	if loadErr != nil {
-		return nil, loadErr
-	}
+/*
+Document returns a single JSON data object from the parser.
+*/
+func (p *Parser) Document(payload io.ReadCloser) (*Document, *Error) {
+	defer closeReader(payload)
 
-	data := struct {
-		Object *Object `json:"data"`
-	}{}
-
-	err := json.Unmarshal(byteData, &data)
+	err := validateHeaders(p.Headers)
 	if err != nil {
-		return nil, ISE(fmt.Sprintf("Unable to parse json: \n%s\nError:%s",
-			string(byteData),
-			err.Error(),
-		))
+		return nil, err
 	}
 
-	object := data.Object
-
-	inputErr := validateInput(object)
-	if inputErr != nil {
-		return nil, inputErr
+	document := &Document{Data: List{}}
+	decodeErr := json.NewDecoder(payload).Decode(document)
+	if decodeErr != nil {
+		return nil, ISE(fmt.Sprintf("Error parsing JSON Document: %s", decodeErr.Error()))
 	}
 
-	return object, nil
-}
+	if document.HasData() {
+		for _, object := range document.Data {
+			inputErr := validateInput(object)
+			if inputErr != nil {
+				return nil, inputErr[0]
+			}
 
-// GetList returns a JSON data list from the parser
-func (p *Parser) GetList() (List, *Error) {
-	byteData, loadErr := prepareJSON(p.Headers, p.Payload)
-	if loadErr != nil {
-		return nil, loadErr
-	}
-
-	data := struct {
-		List List `json:"data"`
-	}{List{}}
-
-	err := json.Unmarshal(byteData, &data)
-	if err != nil {
-		return nil, ISE(fmt.Sprintf("Unable to parse json: \n%s\nError:%s",
-			string(byteData),
-			err.Error(),
-		))
-	}
-
-	for _, object := range data.List {
-		err := validateInput(object)
-		if err != nil {
-			return nil, err
-		}
-
-		if object.ID == "" {
-			return nil, InputError("id", "Object without ID present in list")
+			// if we have a list, then all resource objects should have IDs, will
+			// cross the bridge of bulk creation if and when there is a use case
+			if len(document.Data) > 1 && object.ID == "" {
+				return nil, InputError("Object without ID present in list", "id")
+			}
 		}
 	}
 
-	return data.List, nil
-}
-
-// prepareJSON ensures that the provide headers are JSON API compatible and then
-// reads and closes the closer
-func prepareJSON(headers http.Header, closer io.ReadCloser) ([]byte, *Error) {
-	defer closeReader(closer)
-
-	validationErr := validateHeaders(headers)
-	if validationErr != nil {
-		return nil, validationErr
-	}
-
-	byteData, err := ioutil.ReadAll(closer)
-	if err != nil {
-		return nil, ISE(fmt.Sprintf("Error attempting to read request body: %s", err))
-	}
-
-	return byteData, nil
+	return document, nil
 }
 
 func closeReader(reader io.ReadCloser) {
 	err := reader.Close()
 	if err != nil {
-		log.Println("Unabled to close request Body")
+		log.Println("Unable to close request Body")
 	}
 }
 

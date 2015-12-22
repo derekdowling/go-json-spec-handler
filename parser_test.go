@@ -19,17 +19,7 @@ func TestParsing(t *testing.T) {
 
 			err := validateHeaders(req.Header)
 			So(err, ShouldNotBeNil)
-			So(err.Objects[0].Status, ShouldEqual, http.StatusNotAcceptable)
-		})
-
-		Convey("->prepareJSON()", func() {
-			req, err := http.NewRequest("GET", "", CreateReadCloser([]byte("1234")))
-			So(err, ShouldBeNil)
-			req.Header.Set("Content-Type", ContentType)
-
-			bytes, err := prepareJSON(req.Header, req.Body)
-			So(err, ShouldBeNil)
-			So(string(bytes), ShouldEqual, "1234")
+			So(err.Status, ShouldEqual, http.StatusNotAcceptable)
 		})
 
 		Convey("->ParseObject()", func() {
@@ -37,11 +27,11 @@ func TestParsing(t *testing.T) {
 			Convey("should parse a valid object", func() {
 
 				objectJSON := `{"data": {"type": "user", "id": "sweetID123", "attributes": {"ID":"123"}}}`
-
 				req, reqErr := testRequest([]byte(objectJSON))
 				So(reqErr, ShouldBeNil)
 
 				object, err := ParseObject(req)
+
 				So(err, ShouldBeNil)
 				So(object, ShouldNotBeEmpty)
 				So(object.Type, ShouldEqual, "user")
@@ -57,8 +47,8 @@ func TestParsing(t *testing.T) {
 
 				_, err := ParseObject(req)
 				So(err, ShouldNotBeNil)
-				So(err.Objects[0].Status, ShouldEqual, 422)
-				So(err.Objects[0].Source.Pointer, ShouldEqual, "/data/attributes/type")
+				So(err.Status, ShouldEqual, 422)
+				So(err.Source.Pointer, ShouldEqual, "/data/attributes/type")
 			})
 
 			Convey("should accept empty ID only for POST", func() {
@@ -86,9 +76,9 @@ func TestParsing(t *testing.T) {
 
 				listJSON :=
 					`{"data": [
-	{"type": "user", "id": "sweetID123", "attributes": {"ID":"123"}},
-	{"type": "user", "id": "sweetID456", "attributes": {"ID":"456"}}
-]}`
+		{"type": "user", "id": "sweetID123", "attributes": {"ID":"123"}},
+		{"type": "user", "id": "sweetID456", "attributes": {"ID":"456"}}
+		]}`
 				req, reqErr := testRequest([]byte(listJSON))
 				So(reqErr, ShouldBeNil)
 
@@ -105,17 +95,17 @@ func TestParsing(t *testing.T) {
 			Convey("should error for an invalid list", func() {
 				listJSON :=
 					`{"data": [
-	{"type": "user", "id": "sweetID123", "attributes": {"ID":"123"}},
-	{"type": "user", "attributes": {"ID":"456"}}
-]}`
+		{"type": "user", "id": "sweetID123", "attributes": {"ID":"123"}},
+		{"type": "user", "attributes": {"ID":"456"}}
+		]}`
 
 				req, reqErr := testRequest([]byte(listJSON))
 				So(reqErr, ShouldBeNil)
 
 				_, err := ParseList(req)
 				So(err, ShouldNotBeNil)
-				So(err.Objects[0].Status, ShouldEqual, 422)
-				So(err.Objects[0].Source.Pointer, ShouldEqual, "/data/attributes/id")
+				So(err.Status, ShouldEqual, 422)
+				So(err.Source.Pointer, ShouldEqual, "/data/attributes/id")
 			})
 		})
 	})
