@@ -94,7 +94,8 @@ func NewParser(request *http.Request) *Parser {
 }
 
 /*
-Document returns a single JSON data object from the parser.
+Document returns a single JSON data object from the parser. In the process it will also validate
+any data objects against the JSON API.
 */
 func (p *Parser) Document(payload io.ReadCloser) (*Document, *Error) {
 	defer closeReader(payload)
@@ -110,8 +111,15 @@ func (p *Parser) Document(payload io.ReadCloser) (*Document, *Error) {
 		return nil, ISE(fmt.Sprintf("Error parsing JSON Document: %s", decodeErr.Error()))
 	}
 
+	// If the document has data, validate against specification
 	if document.HasData() {
 		for _, object := range document.Data {
+			
+			// TODO: currently this doesn't really do any user input
+			// validation since it is validating against the jsh
+			// "Object" type. Figure out how to options pass the
+			// corressponding user object struct in to enable this
+			// without making the API super clumsy.
 			inputErr := validateInput(object)
 			if inputErr != nil {
 				return nil, inputErr[0]
@@ -128,6 +136,9 @@ func (p *Parser) Document(payload io.ReadCloser) (*Document, *Error) {
 	return document, nil
 }
 
+/*
+closeReader is a deferal helper function for closing a reader and logging any errors that might occur after the fact.
+*/
 func closeReader(reader io.ReadCloser) {
 	err := reader.Close()
 	if err != nil {
