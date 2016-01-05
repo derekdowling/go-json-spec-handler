@@ -72,49 +72,49 @@ func setIDPath(url *url.URL, resource string, id string) {
 	}
 }
 
-// objectToPayload first prepares/validates the object to ensure it is JSON
-// spec compatible, and then marshals it to JSON
-func objectToPayload(request *http.Request, object *jsh.Object) ([]byte, *jsh.Error) {
+// prepareBody first prepares/validates the object to ensure it is JSON
+// spec compatible, and then marshals it to JSON, sets the request body and
+// corresponding attributes
+func prepareBody(request *http.Request, object *jsh.Object) error {
 
 	err := object.Validate(request, false)
 	if err != nil {
-		return nil, jsh.ISE(fmt.Sprintf("Error preparing object: %s", err.Error()))
+		return fmt.Errorf("Error preparing object: %s", err.Error())
 	}
 
 	doc := jsh.Build(object)
 
-	jsonContent, jsonErr := json.MarshalIndent(doc, "", "  ")
+	jsonContent, jsonErr := json.MarshalIndent(doc, "", " ")
 	if jsonErr != nil {
-		return nil, jsh.ISE(fmt.Sprintf("Unable to prepare JSON content: %s", jsonErr))
+		return fmt.Errorf("Unable to prepare JSON content: %s", jsonErr.Error())
 	}
 
-	return jsonContent, nil
+	request.Body = jsh.CreateReadCloser(jsonContent)
+	request.ContentLength = int64(len(jsonContent))
+
+	return nil
 }
 
-// sendPayloadRequest is required for sending JSON payload related requests
-// because by default the http package does not set Content-Length headers
-func doObjectRequest(request *http.Request, object *jsh.Object) (*jsh.Document, *http.Response, *jsh.Error) {
+// Do sends a the specified request to a JSON API compatible endpoint and
+// returns the resulting JSON Document if possible along with the response,
+// and any errors that were encountered while sending, or parsing the
+// JSON Document.
+func Do(request *http.Request) (*jsh.Document, *http.Response, error) {
 
-	payload, err := objectToPayload(request, object)
-	if err != nil {
-		return nil, nil, jsh.ISE(fmt.Sprintf("Error converting object to JSON: %s", err.Error()))
-	}
-
-	// prepare payload and corresponding headers
-	request.Body = jsh.CreateReadCloser(payload)
-	request.Header.Add("Content-Type", jsh.ContentType)
-
-	contentLength := strconv.Itoa(len(payload))
-	request.ContentLength = int64(len(payload))
-	request.Header.Set("Content-Length", contentLength)
+	request.Header.Set("Content-Type", jsh.ContentType)
+	request.Header.Set("Content-Length", strconv.Itoa(int(request.ContentLength)))
 
 	client := &http.Client{}
 	httpResponse, clientErr := client.Do(request)
 
 	if clientErr != nil {
-		return nil, nil, jsh.ISE(fmt.Sprintf(
+		return nil, nil, fmt.Errorf(
 			"Error sending %s request: %s", request.Method, clientErr.Error(),
-		))
+		)
+	}
+
+	if request.Method == "DELETE" {
+		return nil, httpResponse, nil
 	}
 
 	document, err := Document(httpResponse)

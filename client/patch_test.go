@@ -1,7 +1,6 @@
 package jsc
 
 import (
-	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -25,7 +24,6 @@ func TestPatch(t *testing.T) {
 			So(err, ShouldBeNil)
 
 			json, resp, patchErr := Patch(baseURL, object)
-			log.Printf("resp.Request = %+v\n", resp.Request)
 
 			So(resp.StatusCode, ShouldEqual, http.StatusOK)
 			So(patchErr, ShouldBeNil)
