@@ -8,12 +8,28 @@ import (
 	"github.com/derekdowling/go-json-spec-handler"
 )
 
-// Delete allows a user to make an outbound DELETE /resources/:id request:
+// Delete allows a user to make an outbound "DELETE /resource/:id" request.
 //
 //	resp, err := jsh.Delete("http://apiserver", "user", "2")
 //
-func Delete(urlStr string, resourceType string, id string) (*http.Response, *jsh.Error) {
+func Delete(urlStr string, resourceType string, id string) (*http.Response, error) {
+	request, err := DeleteRequest(urlStr, resourceType, id)
+	if err != nil {
+		return nil, err
+	}
 
+	_, response, err := Do(request)
+	if err != nil {
+		return nil, err
+	}
+
+	return response, nil
+}
+
+// DeleteRequest returns a fully formatted request for performing a JSON API DELETE.
+// This is useful for if you need to set custom headers on the request. Otherwise
+// just use "jsc.Delete".
+func DeleteRequest(urlStr string, resourceType string, id string) (*http.Request, error) {
 	u, err := url.Parse(urlStr)
 	if err != nil {
 		return nil, jsh.ISE(fmt.Sprintf("Error parsing URL: %s", err.Error()))
@@ -27,11 +43,5 @@ func Delete(urlStr string, resourceType string, id string) (*http.Response, *jsh
 		return nil, jsh.ISE(fmt.Sprintf("Error creating DELETE request: %s", err.Error()))
 	}
 
-	client := &http.Client{}
-	response, err := client.Do(request)
-	if err != nil {
-		return nil, jsh.ISE(fmt.Sprintf("Error sending DELETE request: %s", err.Error()))
-	}
-
-	return response, nil
+	return request, nil
 }
