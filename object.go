@@ -63,7 +63,7 @@ specifying each struct attribute that failed. In this case, all you need to do i
 		jsh.Send(w, r, errors)
 	}
 */
-func (o *Object) Unmarshal(resourceType string, target interface{}) []*Error {
+func (o *Object) Unmarshal(resourceType string, target interface{}) ErrorList {
 
 	if resourceType != o.Type {
 		return []*Error{ISE(fmt.Sprintf(
@@ -172,7 +172,7 @@ func (o *Object) String() string {
 
 // validateInput runs go-validator on each attribute on the struct and returns all
 // errors that it picks up
-func validateInput(target interface{}) []*Error {
+func validateInput(target interface{}) ErrorList {
 
 	_, validationError := govalidator.ValidateStruct(target)
 	if validationError != nil {
@@ -180,7 +180,7 @@ func validateInput(target interface{}) []*Error {
 		errorList, isType := validationError.(govalidator.Errors)
 		if isType {
 
-			errors := []*Error{}
+			errors := ErrorList{}
 			for _, singleErr := range errorList.Errors() {
 
 				// parse out validation error

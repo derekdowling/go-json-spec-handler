@@ -16,6 +16,21 @@ var DefaultErrorDetail = "Request failed, something went wrong."
 // DefaultTitle can be customized to provide a more customized ISE Title
 var DefaultErrorTitle = "Internal Server Error"
 
+// ErrorList is wraps an Error Array so that it can implement Sendable
+type ErrorList []*Error
+
+// Validate checks all errors within the list to ensure that they are valid
+func (e ErrorList) Validate(r *http.Request, response bool) *Error {
+	for _, err := range e {
+		validationErr := err.Validate(r, response)
+		if validationErr != nil {
+			return validationErr
+		}
+	}
+
+	return nil
+}
+
 /*
 Error consists of a number of contextual attributes to make conveying
 certain error type simpler as per the JSON API specification:

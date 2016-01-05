@@ -70,6 +70,20 @@ func TestError(t *testing.T) {
 				So(contentLength, ShouldBeGreaterThan, 0)
 				So(writer.HeaderMap.Get("Content-Type"), ShouldEqual, ContentType)
 			})
+
+			Convey("should work for an ErrorList", func() {
+
+				errorList := ErrorList{testError}
+
+				err := Send(writer, request, errorList)
+				So(err, ShouldBeNil)
+				So(writer.Code, ShouldEqual, http.StatusForbidden)
+
+				contentLength, convErr := strconv.Atoi(writer.HeaderMap.Get("Content-Length"))
+				So(convErr, ShouldBeNil)
+				So(contentLength, ShouldBeGreaterThan, 0)
+				So(writer.HeaderMap.Get("Content-Type"), ShouldEqual, ContentType)
+			})
 		})
 	})
 }

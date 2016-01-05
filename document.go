@@ -13,7 +13,7 @@ of each attribute: http://jsonapi.org/format/#document-structure
 */
 type Document struct {
 	Data     List        `json:"data,omitempty"`
-	Errors   []*Error    `json:"errors,omitempty"`
+	Errors   ErrorList   `json:"errors,omitempty"`
 	Links    *Link       `json:"links,omitempty"`
 	Included []*Object   `json:"included,omitempty"`
 	Meta     interface{} `json:"meta,omitempty"`
@@ -62,8 +62,14 @@ func Build(payload Sendable) *Document {
 
 	err, isError := payload.(*Error)
 	if isError {
-		document.Errors = []*Error{err}
+		document.Errors = ErrorList{err}
 		document.Status = err.Status
+	}
+
+	errorList, isErrorList := payload.(ErrorList)
+	if isErrorList {
+		document.Errors = errorList
+		document.Status = errorList[0].Status
 	}
 
 	return document
@@ -103,11 +109,9 @@ func (d *Document) Validate(r *http.Request, response bool) *Error {
 		return err
 	}
 
-	for _, docErr := range d.Errors {
-		err := docErr.Validate(r, response)
-		if err != nil {
-			return err
-		}
+	err = d.Errors.Validate(r, response)
+	if err != nil {
+		return err
 	}
 
 	return nil
