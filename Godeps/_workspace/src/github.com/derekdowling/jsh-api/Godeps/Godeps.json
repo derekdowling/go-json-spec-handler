@@ -12,8 +12,8 @@
 		},
 		{
 			"ImportPath": "github.com/derekdowling/go-json-spec-handler",
-			"Comment": "0.7.0-1-gc3594ec",
-			"Rev": "c3594ec7dac8aec3b891caea1d0b24c0c260d072"
+			"Comment": "0.7.2",
+			"Rev": "9d1f0c0ff2a73894d132e2e174b82f2be9e83bd7"
 		},
 		{
 			"ImportPath": "github.com/derekdowling/go-stdlogger",
@@ -21,8 +21,8 @@
 		},
 		{
 			"ImportPath": "github.com/derekdowling/goji2-logger",
-			"Comment": "0.1-13-g9982348",
-			"Rev": "9982348405971feeb0cce7fd37755e9061f6ab02"
+			"Comment": "0.1-14-ga4a68c0",
+			"Rev": "a4a68c04bfa34438b7392c031ed6f7798770100d"
 		},
 		{
 			"ImportPath": "github.com/jtolds/gls",

@@ -25,26 +25,28 @@ const (
 	patRoot = ""
 )
 
-// Resource holds the necessary state for creating a REST API endpoint for a
-// given resource type. Will be accessible via `/(prefix/)types` where the
-// proceeding `prefix/` is only precent if it is not empty.
-//
-// Using NewCRUDResource you can generate a generic CRUD handler for a
-// JSON Specification Resource end point. If you wish to only implement a subset
-// of these endpoints that is also available through NewResource() and manually
-// registering storage handlers via .Post(), .Get(), .List(), .Patch(), and .Delete():
-//
-// Besides the built in registration helpers, it isn't recommended, but you can add
-// your own routes using the goji.Mux API:
-//
-//	func searchHandler(ctx context.Context, w http.ResponseWriter, r *http.Request) {
-//		name := pat.Param(ctx, "name")
-//		fmt.Fprintf(w, "Hello, %s!", name)
-//	}
-//
-//	resource := jshapi.NewCRUDResource("user", userStorage)
-//	// creates /users/search/:name
-//	resource.HandleC(pat.New("search/:name"), searchHandler)
+/*
+Resource holds the necessary state for creating a REST API endpoint for a
+given resource type. Will be accessible via `/(prefix/)types` where the
+proceeding `prefix/` is only precent if it is not empty.
+
+Using NewCRUDResource you can generate a generic CRUD handler for a
+JSON Specification Resource end point. If you wish to only implement a subset
+of these endpoints that is also available through NewResource() and manually
+registering storage handlers via .Post(), .Get(), .List(), .Patch(), and .Delete():
+
+Besides the built in registration helpers, it isn't recommended, but you can add
+your own routes using the goji.Mux API:
+
+	func searchHandler(ctx context.Context, w http.ResponseWriter, r *http.Request) {
+		name := pat.Param(ctx, "name")
+		fmt.Fprintf(w, "Hello, %s!", name)
+	}
+
+	resource := jshapi.NewCRUDResource("user", userStorage)
+	// creates /users/search/:name
+	resource.HandleC(pat.New("search/:name"), searchHandler)
+*/
 type Resource struct {
 	*goji.Mux
 	// The singular name of the resource type("user", "post", etc)
@@ -55,12 +57,19 @@ type Resource struct {
 	Relationships map[string]Relationship
 }
 
-// NewResource is a resource constructor that makes no assumptions about routes
-// that you'd like to implement, but still provides some basic utilities for
-// managing routes and handling API calls.
-//
-// The prefix parameter causes all routes created within the resource to be prefixed.
+/*
+NewResource is a resource constructor that makes no assumptions about routes
+that you'd like to implement, but still provides some basic utilities for
+managing routes and handling API calls.
+
+The prefix parameter causes all routes created within the resource to be prefixed.
+*/
 func NewResource(resourceType string) *Resource {
+
+	if strings.HasSuffix(resourceType, "s") {
+		resourceType = strings.TrimSuffix(resourceType, "s")
+	}
+
 	return &Resource{
 		Mux:           goji.NewMux(),
 		Type:          resourceType,
@@ -76,15 +85,17 @@ func NewCRUDResource(resourceType string, storage store.CRUD) *Resource {
 	return resource
 }
 
-// CRUD is syntactic sugar and a shortcut for registering all JSON API CRUD
-// routes for a compatible storage implementation:
-//
-// Registers handlers for:
-//	GET    /[prefix/]types
-//	POST   /[prefix/]types
-//	GET    /[prefix/]types/:id
-//	DELETE /[prefix/]types/:id
-//	PATCH  /[prefix/]types/:id
+/*
+CRUD is syntactic sugar and a shortcut for registering all JSON API CRUD
+routes for a compatible storage implementation:
+
+Registers handlers for:
+	GET    /[prefix/]types
+	POST   /[prefix/]types
+	GET    /[prefix/]types/:id
+	DELETE /[prefix/]types/:id
+	PATCH  /[prefix/]types/:id
+*/
 func (res *Resource) CRUD(storage store.CRUD) {
 	res.Get(storage.Get)
 	res.Patch(storage.Update)

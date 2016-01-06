@@ -6,6 +6,7 @@ go:
 install:
   - go get github.com/tools/godep
   - go get github.com/smartystreets/goconvey
+  - godep restore
 
 script:
   - godep go test ./...
