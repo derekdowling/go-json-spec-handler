@@ -16,6 +16,13 @@ var DefaultErrorDetail = "Request failed, something went wrong."
 // DefaultTitle can be customized to provide a more customized ISE Title
 var DefaultErrorTitle = "Internal Server Error"
 
+// ErrorType represents the common interface requirements that libraries may
+// specify if they would like to accept either a single error or a list
+type ErrorType interface {
+	Error() string
+	Validate(r *http.Request, response bool) *Error
+}
+
 // ErrorList is wraps an Error Array so that it can implement Sendable
 type ErrorList []*Error
 
@@ -29,6 +36,17 @@ func (e ErrorList) Validate(r *http.Request, response bool) *Error {
 	}
 
 	return nil
+}
+
+// Fulfills the default error interface
+func (e ErrorList) Error() string {
+	var msg string
+
+	for _, err := range e {
+		msg += fmt.Sprintf("%s\n", err.Error())
+	}
+
+	return msg
 }
 
 /*
@@ -60,21 +78,13 @@ format if not. As usual, err.Error() should not be considered safe for presentat
 to the end user, use err.SafeError() instead.
 */
 func (e *Error) Error() string {
-	if e.ISE != "" {
-		return fmt.Sprintf("HTTP %d - %s", e.Status, e.ISE)
+	msg := fmt.Sprintf("%d: %s - %s", e.Status, e.Title, e.Detail)
+	if e.Source.Pointer != "" {
+		msg += fmt.Sprintf("(Source.Pointer: %s)", e.Source.Pointer)
 	}
 
-	return e.SafeError()
-}
-
-/*
-SafeError is a formatted error string that does not include an associated internal
-server error such that it is safe to return this error message to an end user.
-*/
-func (e *Error) SafeError() string {
-	msg := fmt.Sprintf("HTTP %d: %s - %s", e.Status, e.Title, e.Detail)
-	if e.Source.Pointer != "" {
-		msg += fmt.Sprintf("Source.Pointer: %s", e.Source.Pointer)
+	if e.ISE != "" {
+		msg += fmt.Sprintf("\nInternal Error: %s", e.ISE)
 	}
 
 	return msg
