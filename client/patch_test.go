@@ -20,7 +20,7 @@ func TestPatch(t *testing.T) {
 		baseURL := server.URL
 
 		Convey("->Patch()", func() {
-			object, err := jsh.NewObject("2", "test", nil)
+			object, err := jsh.NewObject("2", "tests", nil)
 			So(err, ShouldBeNil)
 
 			json, resp, patchErr := Patch(baseURL, object)

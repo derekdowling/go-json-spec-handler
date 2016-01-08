@@ -22,7 +22,7 @@ func TestPost(t *testing.T) {
 	baseURL := server.URL
 
 	Convey("Post Tests", t, func() {
-		testObject, err := jsh.NewObject("", "test", attrs)
+		testObject, err := jsh.NewObject("", "tests", attrs)
 		So(err, ShouldBeNil)
 
 		_, resp, postErr := Post(baseURL, testObject)

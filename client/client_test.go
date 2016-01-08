@@ -19,14 +19,14 @@ func TestClientRequest(t *testing.T) {
 			url := &url.URL{Host: "test"}
 
 			Convey("should format properly", func() {
-				setPath(url, "test")
+				setPath(url, "tests")
 				So(url.String(), ShouldEqual, "//test/tests")
 			})
 
 			Convey("should respect an existing path", func() {
 				url.Path = "admin"
 				setPath(url, "test")
-				So(url.String(), ShouldEqual, "//test/admin/tests")
+				So(url.String(), ShouldEqual, "//test/admin/test")
 			})
 		})
 
@@ -34,7 +34,7 @@ func TestClientRequest(t *testing.T) {
 			url := &url.URL{Host: "test"}
 
 			Convey("should format properly an id url", func() {
-				setIDPath(url, "test", "1")
+				setIDPath(url, "tests", "1")
 				So(url.String(), ShouldEqual, "//test/tests/1")
 			})
 		})

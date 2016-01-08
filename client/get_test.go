@@ -30,7 +30,7 @@ func TestGet(t *testing.T) {
 		Convey("->GetList()", func() {
 
 			Convey("should handle an object listing request", func() {
-				json, resp, err := List(baseURL, "test")
+				json, resp, err := List(baseURL, "tests")
 
 				So(err, ShouldBeNil)
 				So(resp.StatusCode, ShouldEqual, http.StatusOK)
@@ -42,7 +42,7 @@ func TestGet(t *testing.T) {
 		Convey("->GetObject()", func() {
 
 			Convey("should handle a specific object request", func() {
-				json, resp, err := Fetch(baseURL, "test", "1")
+				json, resp, err := Fetch(baseURL, "tests", "1")
 
 				So(err, ShouldBeNil)
 				So(resp.StatusCode, ShouldEqual, http.StatusOK)

@@ -53,11 +53,13 @@ envolves concatting a pluralized resource name.
 */
 func setPath(url *url.URL, resource string) {
 
+	// ensure that path is "/" terminated before concatting resource
 	if url.Path != "" && !strings.HasSuffix(url.Path, "/") {
 		url.Path = url.Path + "/"
 	}
 
-	url.Path = fmt.Sprintf("%s%ss", url.Path, resource)
+	// don't pluralize resource automagically, JSON API spec is agnostic
+	url.Path = fmt.Sprintf("%s%s", url.Path, resource)
 }
 
 /*
@@ -67,6 +69,7 @@ ID specifier.
 func setIDPath(url *url.URL, resource string, id string) {
 	setPath(url, resource)
 
+	// concat "/:id" if not empty
 	if id != "" {
 		url.Path = strings.Join([]string{url.Path, id}, "/")
 	}
