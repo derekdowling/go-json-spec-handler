@@ -87,7 +87,7 @@ func TestResponseParsing(t *testing.T) {
 // not a great for this, would much rather have it in test_util, but it causes an
 // import cycle wit jsh-api
 func testAPI() *jshapi.API {
-	resource := jshapi.NewMockResource("test", 1, nil)
+	resource := jshapi.NewMockResource("tests", 1, nil)
 	api := jshapi.New("")
 	api.Add(resource)
 

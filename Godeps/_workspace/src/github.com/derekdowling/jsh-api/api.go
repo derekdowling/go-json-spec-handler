@@ -58,12 +58,12 @@ func (a *API) Add(resource *Resource) {
 	// https://godoc.org/github.com/goji/goji/pat#hdr-Prefix_Matches
 	// We need two separate routes,
 	// /(prefix/)resources
-	matcher := path.Join(a.prefix, resource.PluralType())
+	matcher := path.Join(a.prefix, resource.Type)
 	a.Mux.HandleC(pat.New(matcher), resource)
 
 	// And:
 	// /(prefix/)resources/*
-	idMatcher := path.Join(a.prefix, resource.PluralType(), "*")
+	idMatcher := path.Join(a.prefix, resource.Type, "*")
 	a.Mux.HandleC(pat.New(idMatcher), resource)
 }
 

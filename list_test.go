@@ -2,7 +2,6 @@ package jsh
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
@@ -59,7 +58,6 @@ func TestList(t *testing.T) {
 
 				l := List{}
 				err := l.UnmarshalJSON([]byte(jObj))
-				log.Printf("l = %+v\n", l)
 				So(err, ShouldBeNil)
 				So(l, ShouldNotBeEmpty)
 			})
@@ -69,7 +67,6 @@ func TestList(t *testing.T) {
 
 				l := List{}
 				err := l.UnmarshalJSON([]byte(jList))
-				log.Printf("l = %+v\n", l)
 				So(err, ShouldBeNil)
 				So(l, ShouldNotBeEmpty)
 			})

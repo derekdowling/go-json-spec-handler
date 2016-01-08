@@ -19,9 +19,24 @@ var Logger std.Logger = log.New(os.Stderr, "jshapi: ", log.LstdFlags)
 // and then handles logging 5XX errors that it encounters in the process.
 func SendAndLog(ctx context.Context, w http.ResponseWriter, r *http.Request, sendable jsh.Sendable) {
 
-	intentionalErr, isType := sendable.(*jsh.Error)
-	if isType && intentionalErr.Status >= 500 {
-		Logger.Printf("Returning ISE: %s\n", intentionalErr.Error())
+	intentionalErr, isType := sendable.(jsh.ErrorType)
+	if isType {
+		// determine error status before taking any additional actions
+		var status int
+
+		list, isList := intentionalErr.(jsh.ErrorList)
+		if isList {
+			status = list[0].Status
+		}
+
+		err, isErr := intentionalErr.(*jsh.Error)
+		if isErr {
+			status = err.Status
+		}
+
+		if status >= 500 {
+			Logger.Printf("Returning ISE: %s\n", intentionalErr.Error())
+		}
 	}
 
 	sendErr := jsh.Send(w, r, sendable)

@@ -83,7 +83,7 @@ type User struct {
     Name string `json:"name"`
 }
 
-func Save(ctx context.Context, object *jsh.Object) (*jsh.Object, jsh.SendableError) {
+func Save(ctx context.Context, object *jsh.Object) (*jsh.Object, jsh.ErrorType) {
     user := &User{}
     err := object.Unmarshal("user", user)
     if err != nil {
@@ -102,7 +102,7 @@ func Save(ctx context.Context, object *jsh.Object) (*jsh.Object, jsh.SendableErr
     return object, nil
 }
 
-func Update(ctx context.Context, object *jsh.Object) (*jsh.Object, jsh.SendableError) {
+func Update(ctx context.Context, object *jsh.Object) (*jsh.Object, jsh.ErrorType) {
     user := &User{}
     err := object.Unmarshal("user", user)
     if err != nil {
@@ -117,6 +117,6 @@ func Update(ctx context.Context, object *jsh.Object) (*jsh.Object, jsh.SendableE
     }
 
     // perform patch
-    return object, err
+    return object, nil
 }
 ```

@@ -22,7 +22,7 @@ func TestDelete(t *testing.T) {
 			resp, err := Delete(baseURL, "tests", "1")
 
 			So(err, ShouldBeNil)
-			So(resp.StatusCode, ShouldEqual, http.StatusOK)
+			So(resp.StatusCode, ShouldEqual, http.StatusNoContent)
 		})
 	})
 }

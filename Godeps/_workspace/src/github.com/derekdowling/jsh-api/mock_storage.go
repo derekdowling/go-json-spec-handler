@@ -21,29 +21,40 @@ type MockStorage struct {
 }
 
 // Save assigns a URL of 1 to the object
-func (m *MockStorage) Save(ctx context.Context, object *jsh.Object) (*jsh.Object, *jsh.Error) {
+func (m *MockStorage) Save(ctx context.Context, object *jsh.Object) (*jsh.Object, jsh.ErrorType) {
+	var err *jsh.Error
 	object.ID = "1"
-	return object, nil
+
+	return object, err
 }
 
 // Get returns a resource with ID as specified by the request
-func (m *MockStorage) Get(ctx context.Context, id string) (*jsh.Object, *jsh.Error) {
-	return m.SampleObject(id), nil
+func (m *MockStorage) Get(ctx context.Context, id string) (*jsh.Object, jsh.ErrorType) {
+	var err *jsh.Error
+
+	return m.SampleObject(id), err
 }
 
 // List returns a sample list
-func (m *MockStorage) List(ctx context.Context) (jsh.List, *jsh.Error) {
-	return m.SampleList(m.ListCount), nil
+func (m *MockStorage) List(ctx context.Context) (jsh.List, jsh.ErrorType) {
+	var err *jsh.Error
+
+	return m.SampleList(m.ListCount), err
 }
 
 // Update does nothing
-func (m *MockStorage) Update(ctx context.Context, object *jsh.Object) (*jsh.Object, *jsh.Error) {
-	return object, nil
+func (m *MockStorage) Update(ctx context.Context, object *jsh.Object) (*jsh.Object, jsh.ErrorType) {
+	var err jsh.ErrorList
+	err = nil
+
+	return object, err
 }
 
 // Delete does nothing
-func (m *MockStorage) Delete(ctx context.Context, id string) *jsh.Error {
-	return nil
+func (m *MockStorage) Delete(ctx context.Context, id string) jsh.ErrorType {
+	var err *jsh.Error
+
+	return err
 }
 
 // SampleObject builds an object based on provided resource specifications

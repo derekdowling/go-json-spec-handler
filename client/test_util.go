@@ -9,7 +9,7 @@ import (
 )
 
 func mockObjectResponse(object *jsh.Object) (*http.Response, error) {
-	url := &url.URL{Host: "test"}
+	url := &url.URL{Host: "tests"}
 	setIDPath(url, object.Type, object.ID)
 
 	req, reqErr := http.NewRequest("GET", url.String(), nil)
