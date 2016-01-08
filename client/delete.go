@@ -35,7 +35,6 @@ func DeleteRequest(urlStr string, resourceType string, id string) (*http.Request
 		return nil, jsh.ISE(fmt.Sprintf("Error parsing URL: %s", err.Error()))
 	}
 
-	// ghetto pluralization, fix when it becomes an issue
 	setIDPath(u, resourceType, id)
 
 	request, err := http.NewRequest("DELETE", u.String(), nil)

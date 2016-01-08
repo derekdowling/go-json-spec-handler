@@ -48,8 +48,7 @@ func buildParser(response *http.Response) *jsh.Parser {
 }
 
 /*
-setPath builds a JSON url.Path for a given resource type. Typically this just
-envolves concatting a pluralized resource name.
+setPath builds a JSON url.Path for a given resource type.
 */
 func setPath(url *url.URL, resource string) {
 

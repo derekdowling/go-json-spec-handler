@@ -31,7 +31,6 @@ func PostRequest(baseURL string, object *jsh.Object) (*http.Request, error) {
 		return nil, fmt.Errorf("Error parsing URL: %s", err.Error())
 	}
 
-	// ghetto pluralization, fix when it becomes an issue
 	setPath(u, object.Type)
 
 	request, err := http.NewRequest("POST", u.String(), nil)
