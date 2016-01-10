@@ -1,6 +1,7 @@
 package jsc
 
 import (
+	"net/http"
 	"net/url"
 	"testing"
 
@@ -42,11 +43,27 @@ func TestClientRequest(t *testing.T) {
 	})
 }
 
+func TestParseResponse(t *testing.T) {
+
+	Convey("ParseResponse", t, func() {
+
+		response := &http.Response{
+			StatusCode: http.StatusNotFound,
+		}
+
+		Convey("404 response parsing should not return a 406 error", func() {
+			doc, err := ParseResponse(response)
+			So(doc, ShouldBeNil)
+			So(err, ShouldBeNil)
+		})
+	})
+}
+
 func TestResponseParsing(t *testing.T) {
 
 	Convey("Response Parsing Tests", t, func() {
 
-		Convey("->ParseObject()", func() {
+		Convey("Parse Object", func() {
 
 			obj, objErr := jsh.NewObject("123", "test", map[string]string{"test": "test"})
 			So(objErr, ShouldBeNil)
@@ -63,7 +80,7 @@ func TestResponseParsing(t *testing.T) {
 			})
 		})
 
-		Convey("->GetList()", func() {
+		Convey("Parse List", func() {
 
 			obj, objErr := jsh.NewObject("123", "test", map[string]string{"test": "test"})
 			So(objErr, ShouldBeNil)
