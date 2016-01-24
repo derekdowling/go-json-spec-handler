@@ -74,9 +74,11 @@ func setIDPath(url *url.URL, resource string, id string) {
 	}
 }
 
-// prepareBody first prepares/validates the object to ensure it is JSON
-// spec compatible, and then marshals it to JSON, sets the request body and
-// corresponding attributes
+/*
+prepareBody first prepares/validates the object to ensure it is JSON
+spec compatible, and then marshals it to JSON, sets the request body and
+corresponding attributes.
+*/
 func prepareBody(request *http.Request, object *jsh.Object) error {
 
 	err := object.Validate(request, false)
@@ -97,10 +99,16 @@ func prepareBody(request *http.Request, object *jsh.Object) error {
 	return nil
 }
 
-// Do sends a the specified request to a JSON API compatible endpoint and
-// returns the resulting JSON Document if possible along with the response,
-// and any errors that were encountered while sending, or parsing the
-// JSON Document.
+/*
+Do sends a the specified request to a JSON API compatible endpoint and
+returns the resulting JSON Document if possible along with the response,
+and any errors that were encountered while sending, or parsing the
+JSON Document.
+
+Useful in conjunction with any of the method Request builders or
+for times when you want to send a request to a custom endpoint, but would still
+like a JSONAPI response.
+*/
 func Do(request *http.Request) (*jsh.Document, *http.Response, error) {
 
 	request.Header.Set("Content-Type", jsh.ContentType)

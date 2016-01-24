@@ -9,45 +9,51 @@ import (
 )
 
 // Fetch performs an outbound GET /resourceTypes/:id request
-func Fetch(urlStr string, resourceType string, id string) (*jsh.Document, *http.Response, *jsh.Error) {
-	if id == "" {
-		return nil, nil, jsh.SpecificationError("ID cannot be empty for GetObject request type")
-	}
-
-	u, urlErr := url.Parse(urlStr)
-	if urlErr != nil {
-		return nil, nil, jsh.ISE(fmt.Sprintf("Error parsing URL: %s", urlErr.Error()))
-	}
-
-	setIDPath(u, resourceType, id)
-
-	return Get(u.String())
-}
-
-// List prepares an outbound GET /resourceTypes request
-func List(urlStr string, resourceType string) (*jsh.Document, *http.Response, *jsh.Error) {
-	u, urlErr := url.Parse(urlStr)
-	if urlErr != nil {
-		return nil, nil, jsh.ISE(fmt.Sprintf("Error parsing URL: %s", urlErr.Error()))
-	}
-
-	setPath(u, resourceType)
-
-	return Get(u.String())
-}
-
-// Get performs a generic GET request for a given URL and attempts to parse the
-// response into a JSON API Format
-func Get(urlStr string) (*jsh.Document, *http.Response, *jsh.Error) {
-	response, httpErr := http.Get(urlStr)
-	if httpErr != nil {
-		return nil, nil, jsh.ISE(fmt.Sprintf("Error performing GET request: %s", httpErr.Error()))
-	}
-
-	doc, err := Document(response)
+func Fetch(baseURL string, resourceType string, id string) (*jsh.Document, *http.Response, error) {
+	request, err := FetchRequest(baseURL, resourceType, id)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	return doc, response, nil
+	return Do(request)
+}
+
+// FetchRequest returns a fully formatted JSONAPI Fetch request. Useful if you need to
+// set custom headers before proceeding. Otherwise just use "jsh.Fetch".
+func FetchRequest(baseURL string, resourceType, id string) (*http.Request, error) {
+	if id == "" {
+		return nil, jsh.SpecificationError("ID cannot be empty for GetObject request type")
+	}
+
+	u, urlErr := url.Parse(baseURL)
+	if urlErr != nil {
+		return nil, jsh.ISE(fmt.Sprintf("Error parsing URL: %s", urlErr.Error()))
+	}
+
+	setIDPath(u, resourceType, id)
+
+	return http.NewRequest("GET", u.String(), nil)
+}
+
+// List prepares an outbound GET /resourceTypes request
+func List(baseURL string, resourceType string) (*jsh.Document, *http.Response, error) {
+	request, err := ListRequest(baseURL, resourceType)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return Do(request)
+}
+
+// ListRequest returns a fully formatted JSONAPI List request. Useful if you need to
+// set custom headers before proceeding. Otherwise just use "jsh.List".
+func ListRequest(baseURL string, resourceType string) (*http.Request, error) {
+	u, urlErr := url.Parse(baseURL)
+	if urlErr != nil {
+		return nil, jsh.ISE(fmt.Sprintf("Error parsing URL: %s", urlErr.Error()))
+	}
+
+	setPath(u, resourceType)
+
+	return http.NewRequest("GET", u.String(), nil)
 }
