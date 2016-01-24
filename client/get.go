@@ -18,8 +18,10 @@ func Fetch(baseURL string, resourceType string, id string) (*jsh.Document, *http
 	return Do(request)
 }
 
-// FetchRequest returns a fully formatted JSONAPI Fetch request. Useful if you need to
-// set custom headers before proceeding. Otherwise just use "jsh.Fetch".
+/*
+FetchRequest returns a fully formatted JSONAPI Fetch request. Useful if you need to
+set custom headers before proceeding. Otherwise just use "jsh.Fetch".
+*/
 func FetchRequest(baseURL string, resourceType, id string) (*http.Request, error) {
 	if id == "" {
 		return nil, jsh.SpecificationError("ID cannot be empty for GetObject request type")
@@ -45,8 +47,10 @@ func List(baseURL string, resourceType string) (*jsh.Document, *http.Response, e
 	return Do(request)
 }
 
-// ListRequest returns a fully formatted JSONAPI List request. Useful if you need to
-// set custom headers before proceeding. Otherwise just use "jsh.List".
+/*
+ListRequest returns a fully formatted JSONAPI List request. Useful if you need to
+set custom headers before proceeding. Otherwise just use "jsh.List".
+*/
 func ListRequest(baseURL string, resourceType string) (*http.Request, error) {
 	u, urlErr := url.Parse(baseURL)
 	if urlErr != nil {

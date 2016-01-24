@@ -131,8 +131,10 @@ func Do(request *http.Request) (*jsh.Document, *http.Response, error) {
 	return doc, response, parseErr
 }
 
-// ParseResponse handles parsing an HTTP response into a JSON Document if
-// possible
+/*
+ParseResponse handles parsing an HTTP response into a JSON Document if
+possible.
+*/
 func ParseResponse(response *http.Response) (*jsh.Document, error) {
 
 	skipCodes := []int{
