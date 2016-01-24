@@ -115,7 +115,7 @@ func Do(request *http.Request) (*jsh.Document, *http.Response, error) {
 	request.Header.Set("Content-Length", strconv.Itoa(int(request.ContentLength)))
 
 	client := &http.Client{}
-	httpResponse, clientErr := client.Do(request)
+	response, clientErr := client.Do(request)
 
 	if clientErr != nil {
 		return nil, nil, fmt.Errorf(
@@ -123,14 +123,33 @@ func Do(request *http.Request) (*jsh.Document, *http.Response, error) {
 		)
 	}
 
-	if request.Method == "DELETE" {
-		return nil, httpResponse, nil
+	doc, parseErr := ParseResponse(response)
+	if parseErr != nil {
+		return nil, response, fmt.Errorf("Error parsing response: %s", parseErr.Error())
 	}
 
-	document, err := Document(httpResponse)
+	return doc, response, parseErr
+}
+
+// ParseResponse handles parsing an HTTP response into a JSON Document if
+// possible
+func ParseResponse(response *http.Response) (*jsh.Document, error) {
+
+	skipCodes := []int{
+		http.StatusNoContent,
+		http.StatusNotFound,
+	}
+
+	for _, code := range skipCodes {
+		if code == response.StatusCode {
+			return nil, nil
+		}
+	}
+
+	document, err := Document(response)
 	if err != nil {
-		return nil, httpResponse, err
+		return nil, err
 	}
 
-	return document, httpResponse, nil
+	return document, nil
 }
