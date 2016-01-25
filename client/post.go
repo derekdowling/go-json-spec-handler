@@ -33,7 +33,7 @@ func PostRequest(baseURL string, object *jsh.Object) (*http.Request, error) {
 
 	setPath(u, object.Type)
 
-	request, err := http.NewRequest("POST", u.String(), nil)
+	request, err := NewRequest("POST", u.String(), nil)
 	if err != nil {
 		return nil, fmt.Errorf("Error building POST request: %s", err.Error())
 	}

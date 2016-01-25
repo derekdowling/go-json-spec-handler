@@ -3,6 +3,7 @@ package jsc
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -111,9 +112,6 @@ like a JSONAPI response.
 */
 func Do(request *http.Request) (*jsh.Document, *http.Response, error) {
 
-	request.Header.Set("Content-Type", jsh.ContentType)
-	request.Header.Set("Content-Length", strconv.Itoa(int(request.ContentLength)))
-
 	client := &http.Client{}
 	response, clientErr := client.Do(request)
 
@@ -154,4 +152,18 @@ func ParseResponse(response *http.Response) (*jsh.Document, error) {
 	}
 
 	return document, nil
+}
+
+// NewRequest builds a basic request object with the necessary configurations to
+// achieve JSON API compatibility
+func NewRequest(method string, urlStr string, body io.Reader) (*http.Request, error) {
+	request, err := http.NewRequest(method, urlStr, body)
+	if err != nil {
+		return nil, err
+	}
+
+	request.Header.Set("Content-Type", jsh.ContentType)
+	request.Header.Set("Content-Length", strconv.Itoa(int(request.ContentLength)))
+
+	return request, err
 }

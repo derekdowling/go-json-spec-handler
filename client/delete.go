@@ -40,7 +40,7 @@ func DeleteRequest(urlStr string, resourceType string, id string) (*http.Request
 
 	setIDPath(u, resourceType, id)
 
-	request, err := http.NewRequest("DELETE", u.String(), nil)
+	request, err := NewRequest("DELETE", u.String(), nil)
 	if err != nil {
 		return nil, jsh.ISE(fmt.Sprintf("Error creating DELETE request: %s", err.Error()))
 	}

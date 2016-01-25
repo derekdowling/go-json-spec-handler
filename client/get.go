@@ -34,7 +34,7 @@ func FetchRequest(baseURL string, resourceType, id string) (*http.Request, error
 
 	setIDPath(u, resourceType, id)
 
-	return http.NewRequest("GET", u.String(), nil)
+	return NewRequest("GET", u.String(), nil)
 }
 
 // List prepares an outbound GET /resourceTypes request
@@ -59,5 +59,5 @@ func ListRequest(baseURL string, resourceType string) (*http.Request, error) {
 
 	setPath(u, resourceType)
 
-	return http.NewRequest("GET", u.String(), nil)
+	return NewRequest("GET", u.String(), nil)
 }

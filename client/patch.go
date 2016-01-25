@@ -36,7 +36,7 @@ func PatchRequest(baseURL string, object *jsh.Object) (*http.Request, error) {
 
 	setIDPath(u, object.Type, object.ID)
 
-	request, err := http.NewRequest("PATCH", u.String(), nil)
+	request, err := NewRequest("PATCH", u.String(), nil)
 	if err != nil {
 		return nil, fmt.Errorf("Error creating PATCH request: %s", err.Error())
 	}
