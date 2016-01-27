@@ -16,6 +16,7 @@ type API struct {
 	*goji.Mux
 	prefix    string
 	Resources map[string]*Resource
+	Debug     bool
 }
 
 // New initializes a new top level API Resource Handler. The most basic implementation
@@ -26,7 +27,7 @@ type API struct {
 //
 //	// create a new API
 //	api := jshapi.New("<prefix>", nil)
-func New(prefix string) *API {
+func New(prefix string, debug bool) *API {
 
 	// ensure that our top level prefix is "/" prefixed
 	if !strings.HasPrefix(prefix, "/") {
@@ -38,10 +39,11 @@ func New(prefix string) *API {
 		Mux:       goji.NewMux(),
 		prefix:    prefix,
 		Resources: map[string]*Resource{},
+		Debug:     debug,
 	}
 
-	// register default middleware
-	gojilogger.SetLogger(Logger)
+	// register logger middleware
+	gojilogger := gojilogger.New(Logger, debug)
 	api.UseC(gojilogger.Middleware)
 
 	return api

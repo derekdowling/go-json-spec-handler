@@ -1,9 +1,12 @@
 package jsc
 
 import (
+	"log"
 	"net/http"
 	"net/url"
 	"testing"
+
+	"golang.org/x/net/context"
 
 	"github.com/derekdowling/go-json-spec-handler"
 	"github.com/derekdowling/jsh-api"
@@ -104,8 +107,18 @@ func TestResponseParsing(t *testing.T) {
 // not a great for this, would much rather have it in test_util, but it causes an
 // import cycle wit jsh-api
 func testAPI() *jshapi.API {
+
 	resource := jshapi.NewMockResource("tests", 1, nil)
-	api := jshapi.New("")
+	resource.Mutate("testAction", func(ctx context.Context, id string) (*jsh.Object, jsh.ErrorType) {
+		object, err := jsh.NewObject("1", "tests", []string{"testAction"})
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+
+		return object, nil
+	})
+
+	api := jshapi.New("", true)
 	api.Add(resource)
 
 	return api

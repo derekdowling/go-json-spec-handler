@@ -159,9 +159,13 @@ func (res *Resource) Patch(storage store.Update) {
 	res.addRoute(patch, patID)
 }
 
-// ToOne handles the /resource/:id/(relationships/)<resourceType> route which
-// represents a One-To-One relationship between the resource and the
-// specified resourceType
+// ToOne registers a `GET /resource/:id/(relationships/)<resourceType>` route which
+// returns a "resourceType" in a One-To-One relationship between the parent resource
+// type and "resourceType" as specified here. The "/relationships/" uri component is
+// optional.
+//
+// CRUD actions on a specific relationship "resourceType" object should be performed
+// via it's own top level /<resourceType> jsh-api handler as per JSONAPI specification.
 func (res *Resource) ToOne(
 	resourceType string,
 	storage store.Get,
@@ -178,9 +182,12 @@ func (res *Resource) ToOne(
 	res.Relationships[resourceType] = ToOne
 }
 
-// ToMany handles the /resources/:id/(relationships/)<resourceType>s route which
-// represents a One-To-Many relationship between the resource and the
-// specified resourceType
+// ToMany registers a `GET /resource/:id/(relationships/)<resourceType>s` route which
+// returns a list of "resourceType"s in a One-To-Many relationship with the parent resource.
+// The "/relationships/" uri component is optional.
+//
+// CRUD actions on a specific relationship "resourceType" object should be performed
+// via it's own top level /<resourceType> jsh-api handler as per JSONAPI specification.
 func (res *Resource) ToMany(
 	resourceType string,
 	storage store.ToMany,
