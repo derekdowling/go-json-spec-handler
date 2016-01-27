@@ -1,6 +1,6 @@
 {
 	"ImportPath": "github.com/derekdowling/go-json-spec-handler",
-	"GoVersion": "go1.5.1",
+	"GoVersion": "go1.5.3",
 	"Packages": [
 		"./..."
 	],
@@ -16,13 +16,13 @@
 		},
 		{
 			"ImportPath": "github.com/derekdowling/goji2-logger",
-			"Comment": "0.1-7-gad5b694",
-			"Rev": "ad5b6943fe2fd4c97356f8ec627207c5fcb5ec85"
+			"Comment": "0.2-1-g148764a",
+			"Rev": "148764a2aea6cdd93a6776e20da13f6dfa38775f"
 		},
 		{
 			"ImportPath": "github.com/derekdowling/jsh-api",
-			"Comment": "0.4.2",
-			"Rev": "5dcb425457f03997a320526b78925876cc4cf460"
+			"Comment": "0.4.3",
+			"Rev": "ea83d210a98f4237f99d94fd94a2ca09b152b378"
 		},
 		{
 			"ImportPath": "github.com/jtolds/gls",

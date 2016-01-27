@@ -1,5 +1,7 @@
 package gojilogger
 
+// copy of https://github.com/zenazn/goji/blob/master/web/middleware/terminal.go
+
 import (
 	"bytes"
 	"fmt"
