@@ -13,7 +13,7 @@ compatible backends in Go. Works with [Ember-Data](https://github.com/emberjs/da
 
 ### jsh - JSON Specification Handler
 
-Streamlined JSON input/output handling for a new, or existing API server:
+For streamlined JSONAPI object serialization. Uses [govalidator](github.com/asaskevich/govalidator) for input validation.
 
 ```go
 import github.com/derekdowling/go-json-spec-handler
@@ -55,7 +55,7 @@ func PatchUser(w http.ResponseWriter, r *http.Request) {
 }
 ```
 
-### jsc - JSON Specification Client
+### [jsc - JSON Specification Client](https://godoc.org/github.com/derekdowling/go-json-spec-handler/client)
 
 HTTP JSON Client for interacting with JSON APIs. Built on top of http.Client
 and jsh.
