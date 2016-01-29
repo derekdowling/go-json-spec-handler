@@ -24,6 +24,7 @@ type User struct {
   Name string `json:"name" valid:"alphanum"`
 }
 
+// example http.HandlerFunc
 func PatchUser(w http.ResponseWriter, r *http.Request) {
   user := &User{}
 
@@ -38,15 +39,17 @@ func PatchUser(w http.ResponseWriter, r *http.Request) {
 
   // unmarshal data into relevant internal types if govalidator passes, otherwise
   // return the pre-formatted HTTP 422 error to signify how the input failed
-  err := object.Unmarshal("user", user)
+  err = object.Unmarshal("user", user)
   if err != nil {
     jsh.Send(w, r, err)
     return
   }
 
-  // modify, re-package, and send the object
+  // modify your internal type
   user.Name = "Bob"
-  err := object.Marshal(user)
+
+  // repackage and send the JSONAPI object
+  err = object.Marshal(user)
   if err != nil {
     jsh.Send(w, r, err)
   }
@@ -76,6 +79,8 @@ sending JSON API compatible responses. Currently `jsh` is getting fairly close
 to stable. It's undergone a number of large refactors to accomodate new
 aspects of the specification as I round out the expected feature set which is
 pretty well completed, including support for the HTTP client linked above.
+
+### JSH-API
 
 If you're looking for a good place to start with a new API, I've since created
 [jshapi](https://github.com/derekdowling/jsh-api) which builds on top of [Goji 2](https://goji.io/)
