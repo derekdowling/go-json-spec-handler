@@ -109,7 +109,7 @@ func TestResponseParsing(t *testing.T) {
 func testAPI() *jshapi.API {
 
 	resource := jshapi.NewMockResource("tests", 1, nil)
-	resource.Mutate("testAction", func(ctx context.Context, id string) (*jsh.Object, jsh.ErrorType) {
+	resource.Action("testAction", func(ctx context.Context, id string) (*jsh.Object, jsh.ErrorType) {
 		object, err := jsh.NewObject("1", "tests", []string{"testAction"})
 		if err != nil {
 			log.Fatal(err.Error())

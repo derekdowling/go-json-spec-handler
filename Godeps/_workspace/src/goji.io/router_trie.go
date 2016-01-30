@@ -88,7 +88,6 @@ func (rt *router) route(ctx context.Context, r *http.Request) context.Context {
 		tn = tn.children[i].node
 	}
 	sort.Ints(routes)
-
 	for _, i := range routes {
 		if ctx := rt.routes[i].Match(ctx, r); ctx != nil {
 			return &match{ctx, rt.routes[i].Pattern, rt.routes[i].Handler}

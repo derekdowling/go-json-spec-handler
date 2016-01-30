@@ -45,7 +45,7 @@
 		},
 		{
 			"ImportPath": "goji.io",
-			"Rev": "9f8871d62a1b65a39bd029cd2c1bf457cbc1d2f6"
+			"Rev": "8110ccbc05240c40d43ccb004e0542b3bcbf27da"
 		},
 		{
 			"ImportPath": "golang.org/x/net/context",
