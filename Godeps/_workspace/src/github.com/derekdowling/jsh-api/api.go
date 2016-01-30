@@ -2,6 +2,7 @@ package jshapi
 
 import (
 	"fmt"
+	"log"
 	"path"
 	"strings"
 
@@ -66,6 +67,7 @@ func (a *API) Add(resource *Resource) {
 	// And:
 	// /(prefix/)resources/*
 	idMatcher := path.Join(a.prefix, resource.Type, "*")
+	log.Printf("idMatcher = %+v\n", idMatcher)
 	a.Mux.HandleC(pat.New(idMatcher), resource)
 }
 

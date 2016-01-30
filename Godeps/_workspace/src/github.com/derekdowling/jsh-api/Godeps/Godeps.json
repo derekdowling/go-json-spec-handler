@@ -1,6 +1,6 @@
 {
 	"ImportPath": "github.com/derekdowling/jsh-api",
-	"GoVersion": "go1.5.1",
+	"GoVersion": "go1.5.3",
 	"Packages": [
 		"./..."
 	],
@@ -12,8 +12,8 @@
 		},
 		{
 			"ImportPath": "github.com/derekdowling/go-json-spec-handler",
-			"Comment": "0.7.5",
-			"Rev": "e3c1cc5cc7e6dde1ee9eadfdda0e234dd0ad7216"
+			"Comment": "0.7.8-5-g8498bdf",
+			"Rev": "8498bdf205b7b02a21771ea0b44df368cbd5201f"
 		},
 		{
 			"ImportPath": "github.com/derekdowling/go-stdlogger",
@@ -45,7 +45,7 @@
 		},
 		{
 			"ImportPath": "goji.io",
-			"Rev": "9f8871d62a1b65a39bd029cd2c1bf457cbc1d2f6"
+			"Rev": "8110ccbc05240c40d43ccb004e0542b3bcbf27da"
 		},
 		{
 			"ImportPath": "golang.org/x/net/context",

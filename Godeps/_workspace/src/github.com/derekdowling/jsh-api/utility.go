@@ -8,6 +8,10 @@ import (
 
 const testType = "test"
 
+var testObjAttrs = map[string]string{
+	"foo": "bar",
+}
+
 // NewMockResource builds a mock API endpoint that can perform basic CRUD actions:
 //
 //	GET    /types
