@@ -1,6 +1,6 @@
 {
 	"ImportPath": "github.com/derekdowling/jsh-api",
-	"GoVersion": "go1.5.3",
+	"GoVersion": "go1.5",
 	"Packages": [
 		"./..."
 	],
@@ -12,8 +12,8 @@
 		},
 		{
 			"ImportPath": "github.com/derekdowling/go-json-spec-handler",
-			"Comment": "0.7.8-5-g8498bdf",
-			"Rev": "8498bdf205b7b02a21771ea0b44df368cbd5201f"
+			"Comment": "0.7.8-6-g8313a41",
+			"Rev": "8313a41b0c71814f82b757ecaed646ab3988dd1e"
 		},
 		{
 			"ImportPath": "github.com/derekdowling/go-stdlogger",
@@ -30,13 +30,13 @@
 		},
 		{
 			"ImportPath": "github.com/smartystreets/assertions",
-			"Comment": "1.5.0-389-g507a61a",
-			"Rev": "507a61adbdc8674907f6e491b559d600a4127dc0"
+			"Comment": "1.5.0-409-g5de9043",
+			"Rev": "5de9043ec1a39cc97edc838ef7236538a55b30a4"
 		},
 		{
 			"ImportPath": "github.com/smartystreets/goconvey/convey",
-			"Comment": "1.5.0-398-gab7641a",
-			"Rev": "ab7641a0db76b0e88765294b1377b026ec01f26b"
+			"Comment": "1.6.0-10-g995f5b2",
+			"Rev": "995f5b2e021c69b8b028ba6d0b05c1dd500783db"
 		},
 		{
 			"ImportPath": "github.com/zenazn/goji/web/mutil",
@@ -49,7 +49,7 @@
 		},
 		{
 			"ImportPath": "golang.org/x/net/context",
-			"Rev": "195180cfebf7362bd243a52477697895128c8777"
+			"Rev": "04b9de9b512f58addf28c9853d50ebef61c3953e"
 		}
 	]
 }
