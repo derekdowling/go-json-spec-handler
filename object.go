@@ -10,7 +10,7 @@ import (
 
 // Object represents the default JSON spec for objects
 type Object struct {
-	Type          string             `json:"type" valid:"alpha,required"`
+	Type          string             `json:"type" valid:"required"`
 	ID            string             `json:"id"`
 	Attributes    json.RawMessage    `json:"attributes,omitempty"`
 	Links         map[string]*Link   `json:"links,omitempty"`
