@@ -26,7 +26,24 @@ func TestParsing(t *testing.T) {
 
 			Convey("should parse a valid object", func() {
 
-				objectJSON := `{"data": {"type": "user", "id": "sweetID123", "attributes": {"ID":"123"}}}`
+				objectJSON := `{
+					"data": {
+						"type": "user",
+						"id": "sweetID123",
+						"attributes": {"ID":"123"},
+						"relationships": {
+							"company": {
+								"data": { "type": "company", "id": "companyID123" }
+							},
+							"comments": {
+								"data": [
+									{ "type": "comments", "id": "commentID123" },
+									{ "type": "comments", "id": "commentID456" }
+								]
+							}
+						}
+					}
+				}`
 				req, reqErr := testRequest([]byte(objectJSON))
 				So(reqErr, ShouldBeNil)
 
@@ -37,6 +54,8 @@ func TestParsing(t *testing.T) {
 				So(object.Type, ShouldEqual, "user")
 				So(object.ID, ShouldEqual, "sweetID123")
 				So(object.Attributes, ShouldResemble, json.RawMessage(`{"ID":"123"}`))
+				So(object.Relationships["company"], ShouldResemble, &Relationship{Data: ResourceLinkage{&ResourceIdentifier{Type: "company", ID: "companyID123"}}})
+				So(object.Relationships["comments"], ShouldResemble, &Relationship{Data: ResourceLinkage{{Type: "comments", ID: "commentID123"}, {Type: "comments", ID: "commentID456"}}})
 			})
 
 			Convey("should reject an object with missing attributes", func() {
