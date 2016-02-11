@@ -107,14 +107,14 @@ develop your own projects.
     Not Implementing:
 
     * These features aren't handled because they are beyond the scope of what
-      this module is meant to be. See [jshapi](https://github.com/derekdowling/jsh-api)
-      if these are problems that you'd also like to have solved.
+      this module is meant to achieve. See [jshapi](https://github.com/derekdowling/jsh-api)
+      for a full-fledged API solution that solves many of these problems.
 
     - Routing
-    - Relationship management
     - Sorting
     - Pagination
     - Filtering
+    - ORM
 
 ## Examples
 
