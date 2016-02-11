@@ -1,4 +1,4 @@
-Go JSON API Specification Handler
+A Go JSONAPI Specification Handler
 ---
 
 [![GoDoc](https://img.shields.io/badge/godoc-reference-blue.svg?style=flat-square)](https://godoc.org/github.com/derekdowling/go-json-spec-handler)
@@ -6,10 +6,17 @@ Go JSON API Specification Handler
 [![Go Report Card](http://goreportcard.com/badge/manyminds/api2go)](http://goreportcard.com/report/derekdowling/go-json-spec-handler)
 [TestCoverage](http://gocover.io/github.com/derekdowling/go-json-spec-handler?version=1.5rc1)
 
-A server (de)serialization handler for creating [JSON API Specification](http://jsonapi.org/) 
-compatible backends in Go. Works with [Ember-Data](https://github.com/emberjs/data) too!
+A (de)serialization handler for writing [JSON API Specification](http://jsonapi.org/) 
+compatible software in Go. Works with [Ember/Ember-Data](https://github.com/emberjs/data) too!
 
-# Packages
+# Contents
+
+1. [JSH](#jsh-JSON-Specification-Handler)
+  * Philosophy
+  * Features
+  * Stability
+2. JSC
+3. JSH-API
 
 ### jsh - JSON Specification Handler
 
@@ -58,35 +65,12 @@ func PatchUser(w http.ResponseWriter, r *http.Request) {
 }
 ```
 
-### [jsc - JSON Specification Client](https://godoc.org/github.com/derekdowling/go-json-spec-handler/client)
-
-HTTP JSON Client for interacting with JSON APIs. Built on top of http.Client
-and jsh.
-
-```go
-import github.com/derekdowling/go-json-spec-handler/client
-
-// GET http://your.api/users/1
-object, response, err := jsc.GetObject("http://your.api/", "user", "1")
-```
-
-
 ### Philosophy Behind JSH
 
-In sticking with Go's philosophy of modules over frameworks, `jsh` was created
+JSH was written for tackling the issue of dealing with Ember-Data within a pre-existing
+API server. In sticking with Go's philosophy of modules over frameworks, it is intended
 to be a drop in serialization layer focusing only on parsing, validating, and
-sending JSON API compatible responses. Currently `jsh` is getting fairly close
-to stable. It's undergone a number of large refactors to accomodate new
-aspects of the specification as I round out the expected feature set which is
-pretty well completed, including support for the HTTP client linked above.
-
-### JSH-API
-
-If you're looking for a good place to start with a new API, I've since created
-[jshapi](https://github.com/derekdowling/jsh-api) which builds on top of [Goji 2](https://goji.io/)
-and `jsh` in order to handle the routing structure that JSON API requires as
-well as a number of other useful tools for testing and mocking APIs as you
-develop your own projects.
+sending JSONAPI compatible responses.
 
 ### Features 
 
@@ -115,6 +99,38 @@ develop your own projects.
     - Pagination
     - Filtering
     - ORM
+
+### Stability
+
+`jsh` has a mostly stabilized core data document model. At this point in time I am not yet
+ready to declare v1, but am actively trying to avoid breaking the public API. The areas most
+likely to receive improvement include relationship, link, and metadata management. At this
+point in time I can confidentally suggest you use `jsh` without risking major upgrade incompatibility
+going forward!
+
+
+### [jsc - JSON Specification Client](https://godoc.org/github.com/derekdowling/go-json-spec-handler/client)
+
+A HTTP JSONAPI Client for making outbound server requests. Built on top of http.Client and jsh:
+
+```go
+import github.com/derekdowling/go-json-spec-handler/client
+
+// GET http://your.api/users/1
+document, resp, err := jsc.Fetch("http://your.api/", "users", "1")
+object := doc.First()
+
+user := &yourUser{}
+err := object.Unmarshal("users", user)
+```
+
+### JSH-API
+
+If you're looking for a good place to start with a new API, I've since created
+[jshapi](https://github.com/derekdowling/jsh-api) which builds on top of [Goji 2](https://goji.io/)
+and `jsh` in order to handle the routing structure that JSON API requires as
+well as a number of other useful tools for testing and mocking APIs as you
+develop your own projects.
 
 ## Examples
 
