@@ -11,7 +11,7 @@ compatible software in Go. Works with [Ember/Ember-Data](https://github.com/embe
 
 # Contents
 
-1. [JSH](#jsh-JSON-Specification-Handler)
+1. [JSH](jsh---json-specification-handler)
   * Philosophy
   * Features
   * Stability
