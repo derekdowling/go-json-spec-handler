@@ -10,11 +10,11 @@ import (
 
 // Object represents the default JSON spec for objects
 type Object struct {
-	Type          string             `json:"type" valid:"required"`
-	ID            string             `json:"id"`
-	Attributes    json.RawMessage    `json:"attributes,omitempty"`
-	Links         map[string]*Link   `json:"links,omitempty"`
-	Relationships map[string]*Object `json:"relationships,omitempty"`
+	Type          string                   `json:"type" valid:"required"`
+	ID            string                   `json:"id"`
+	Attributes    json.RawMessage          `json:"attributes,omitempty"`
+	Links         map[string]*Link         `json:"links,omitempty"`
+	Relationships map[string]*Relationship `json:"relationships,omitempty"`
 	// Status is the HTTP Status Code that should be associated with the object
 	// when it is sent.
 	Status int `json:"-"`
@@ -27,7 +27,7 @@ func NewObject(id string, resourceType string, attributes interface{}) (*Object,
 		ID:            id,
 		Type:          resourceType,
 		Links:         map[string]*Link{},
-		Relationships: map[string]*Object{},
+		Relationships: map[string]*Relationship{},
 	}
 
 	rawJSON, err := json.MarshalIndent(attributes, "", " ")
