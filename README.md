@@ -124,7 +124,7 @@ user := &yourUser{}
 err := object.Unmarshal("users", user)
 ```
 
-### JSH-API
+### [JSH-API](https://github.com/derekdowling/jsh-api)
 
 If you're looking for a good place to start with a new API, I've since created
 [jshapi](https://github.com/derekdowling/jsh-api) which builds on top of [Goji 2](https://goji.io/)
