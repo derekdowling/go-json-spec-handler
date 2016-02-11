@@ -12,11 +12,11 @@ compatible software in Go. Works with [Ember/Ember-Data](https://github.com/embe
 # Contents
 
 1. [JSH](#jsh---json-specification-handler)
-  * Philosophy
-  * Features
-  * Stability
-2. JSC
-3. JSH-API
+  * [Motivation](#motivation-for-jsh)
+  * [Features](#features)
+  * [Stability](#stability)
+2. [JSC](#jsc---json-specification-client)
+3. [JSH-API](#jsh-api)
 
 ### jsh - JSON Specification Handler
 
@@ -65,7 +65,7 @@ func PatchUser(w http.ResponseWriter, r *http.Request) {
 }
 ```
 
-### Philosophy Behind JSH
+### Motivation for JSH
 
 JSH was written for tackling the issue of dealing with Ember-Data within a pre-existing
 API server. In sticking with Go's philosophy of modules over frameworks, it is intended
