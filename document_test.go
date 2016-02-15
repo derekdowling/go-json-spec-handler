@@ -95,7 +95,7 @@ func TestDocument(t *testing.T) {
 				So(validationErrors, ShouldNotBeNil)
 			})
 
-			Convey("should not accept  an object in data and an included object", func() {
+			Convey("should accept an object in data and an included object", func() {
 				doc := Build(testObject)
 				doc.Included = append(doc.Included, testObjectForInclusion)
 
