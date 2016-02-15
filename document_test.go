@@ -71,12 +71,43 @@ func TestDocument(t *testing.T) {
 				Status: http.StatusAccepted,
 			}
 
+			testObjectForInclusion := &Object{
+				ID: "1",
+				Type: "Included",
+			}
+
+			req := &http.Request{Method: "GET"}
+
 			Convey("should accept an object", func() {
 				doc := Build(testObject)
 
 				So(doc.Data, ShouldResemble, List{testObject})
 				So(doc.Status, ShouldEqual, http.StatusAccepted)
 			})
+
+			Convey("should not accept an included object without objects in data", func() {
+				doc := New()
+				doc.Included = append(doc.Included, testObjectForInclusion)
+				doc.Status = 200
+
+				validationErrors := doc.Validate(req, true)
+
+				So(validationErrors, ShouldNotBeNil)
+			})
+
+			Convey("should accept an object in data and an included object", func() {
+				doc := Build(testObject)
+				doc.Included = append(doc.Included, testObjectForInclusion)
+
+				validationErrors := doc.Validate(req, true)
+
+				So(validationErrors, ShouldBeNil)
+				So(doc.Data, ShouldResemble, List{testObject})
+				So(doc.Included, ShouldNotBeEmpty)
+				So(doc.Included[0], ShouldResemble, testObjectForInclusion)
+				So(doc.Status, ShouldEqual, http.StatusAccepted)
+			})
+
 
 			Convey("should accept a list", func() {
 				list := List{testObject}
