@@ -95,7 +95,7 @@ func (d *Document) Validate(r *http.Request, response bool) *Error {
 	if d.HasErrors() && d.HasData() {
 		return ISE("Both `errors` and `data` cannot be set for a JSON response")
 	}
-	if d.HasData() && d.Included != nil {
+	if !d.HasData() && d.Included != nil {
 		return ISE("'included' should only be set for a response if 'data' is as well")
 	}
 
