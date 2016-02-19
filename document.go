@@ -12,7 +12,7 @@ Refer to the JSON API Specification for a full descriptor
 of each attribute: http://jsonapi.org/format/#document-structure
 */
 type Document struct {
-	Data     List        `json:"data,omitempty"`
+	Data     List        `json:"data"`
 	Errors   ErrorList   `json:"errors,omitempty"`
 	Links    *Link       `json:"links,omitempty"`
 	Included []*Object   `json:"included,omitempty"`
@@ -89,10 +89,10 @@ func (d *Document) Validate(r *http.Request, response bool) *Error {
 		return nil
 	}
 
-	if !d.HasErrors() && !d.HasData() {
+	if !d.HasErrors() && d.Data == nil {
 		return ISE("Both `errors` and `data` cannot be blank for a JSON response")
 	}
-	if d.HasErrors() && d.HasData() {
+	if d.HasErrors() && d.Data != nil {
 		return ISE("Both `errors` and `data` cannot be set for a JSON response")
 	}
 	if !d.HasData() && d.Included != nil {

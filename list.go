@@ -55,15 +55,23 @@ func (list *List) UnmarshalJSON(rawData []byte) error {
 MarshalJSON returns a top level object for the "data" attribute if a single object. In
 all other cases returns a JSON encoded list for "data".
 */
-func (list List) MarshalJSON() ([]byte, error) {
+func (list *List) MarshalJSON() ([]byte, error) {
 	// avoid stack overflow by using this subtype for marshaling
 	type MarshalList List
-	marshalList := MarshalList(list)
-	count := len(marshalList)
+	marshalList := (*MarshalList)(list)
+	isnil := marshalList == nil
+	count := 0
+	if !isnil {
+		count = len(*marshalList)
+	}
 
 	switch {
+	case isnil:
+		return nil, nil
+	case count == 0:
+		return []byte("[]"), nil
 	case count == 1:
-		return json.Marshal(marshalList[0])
+		return json.Marshal((*marshalList)[0])
 	default:
 		return json.Marshal(marshalList)
 	}
