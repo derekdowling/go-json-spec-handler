@@ -51,6 +51,41 @@ func TestList(t *testing.T) {
 			})
 		})
 
+		Convey("->Send(empty list)", func() {
+
+			Convey("should send a properly formatted empty List response", func() {
+
+				writer := httptest.NewRecorder()
+				err := Send(writer, req, List([]*Object{}))
+				So(err, ShouldBeNil)
+				So(writer.Code, ShouldEqual, http.StatusOK)
+
+				contentLength, convErr := strconv.Atoi(writer.HeaderMap.Get("Content-Length"))
+				So(convErr, ShouldBeNil)
+				So(contentLength, ShouldBeGreaterThan, 0)
+				So(writer.HeaderMap.Get("Content-Type"), ShouldEqual, ContentType)
+
+				req, reqErr := testRequest(writer.Body.Bytes())
+				So(reqErr, ShouldBeNil)
+
+				responseList, parseErr := ParseList(req)
+				So(parseErr, ShouldBeNil)
+				So(len(responseList), ShouldEqual, 0)
+			})
+		})
+
+		Convey("->Send(nil list)", func() {
+
+			Convey("should fail with a 500 ISE", func() {
+
+				writer := httptest.NewRecorder()
+				var list []*Object
+				err := Send(writer, req, List(list))
+				So(err, ShouldNotBeNil)
+				So(writer.Code, ShouldEqual, http.StatusInternalServerError)
+			})
+		})
+
 		Convey("->UnmarshalJSON()", func() {
 
 			Convey("should handle a data object", func() {
