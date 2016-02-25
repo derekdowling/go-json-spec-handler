@@ -21,8 +21,8 @@
 		},
 		{
 			"ImportPath": "github.com/derekdowling/jsh-api",
-			"Comment": "0.4.4-6-ge6a4db2",
-			"Rev": "e6a4db23362ab570c8c47038bbef5101f2520423"
+			"Comment": "0.4.5-1-gb9fb2c1",
+			"Rev": "b9fb2c1082cd87ec29c1f4e569fb2f30376faec8"
 		},
 		{
 			"ImportPath": "github.com/jtolds/gls",
