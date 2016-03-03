@@ -16,11 +16,19 @@ var DefaultErrorDetail = "Request failed, something went wrong."
 // DefaultTitle can be customized to provide a more customized ISE Title
 var DefaultErrorTitle = "Internal Server Error"
 
-// ErrorType represents the common interface requirements that libraries may
-// specify if they would like to accept either a single error or a list
+/*
+ErrorType represents the common interface requirements that libraries may
+specify if they would like to accept either a single error or a list.
+*/
 type ErrorType interface {
+	// Error returns a formatted error and allows it to conform to the stdErr
+	// interface.
 	Error() string
+	// Validate checks that the error is valid in the context of JSONAPI
 	Validate(r *http.Request, response bool) *Error
+	// StatusCode returns the first encountered HTTP Status Code for the error type.
+	// Returns 0 if none is set.
+	StatusCode() int
 }
 
 // ErrorList is wraps an Error Array so that it can implement Sendable
@@ -47,6 +55,18 @@ func (e ErrorList) Error() string {
 	}
 
 	return msg
+}
+
+/*
+StatusCode (HTTP) of the first error in the list. Defaults to 0 if the list is
+empty or one has not yet been set for the first error.
+*/
+func (e ErrorList) StatusCode() int {
+	if len(e) == 0 {
+		return 0
+	}
+
+	return e[0].Status
 }
 
 /*
@@ -95,13 +115,23 @@ Validate ensures that the an error meets all JSON API criteria.
 */
 func (e *Error) Validate(r *http.Request, response bool) *Error {
 
-	if e.Status < 400 || e.Status > 600 {
-		return ISE(fmt.Sprintf("Invalid HTTP Status for error %+v\n", e))
-	} else if e.Status == 422 && e.Source.Pointer == "" {
-		return ISE(fmt.Sprintf("Source Pointer must be set for 422 Status errors"))
+	switch {
+	case e.Status == 0:
+		return ISE(fmt.Sprintf("No HTTP Status set for error %+v\n", e))
+	case e.Status < 400 || e.Status > 600:
+		return ISE(fmt.Sprintf("HTTP Status out of valid range for error %+v\n", e))
+	case e.Status == 422 && e.Source.Pointer == "":
+		return ISE(fmt.Sprintf("Source Pointer must be set for 422 Status error"))
 	}
 
 	return nil
+}
+
+/*
+StatusCode (HTTP) for the error. Defaults to 0.
+*/
+func (e *Error) StatusCode() int {
+	return e.Status
 }
 
 /*
