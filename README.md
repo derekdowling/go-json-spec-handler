@@ -130,7 +130,9 @@ If you're looking for a good place to start with a new API, I've since created
 [jshapi](https://github.com/derekdowling/jsh-api) which builds on top of [Goji 2](https://goji.io/)
 and `jsh` in order to handle the routing structure that JSON API requires as
 well as a number of other useful tools for testing and mocking APIs as you
-develop your own projects.
+develop your own projects. JSHAPI is similar in spirit to this project as it
+inteniontally focuses on eliminating boilerplate from your projects without
+trying to solve all of the world's problems.
 
 ## Examples
 
