@@ -37,7 +37,10 @@ import github.com/derekdowling/jsh-api
 api := jshapi.New("<prefix>")
 
 // add a custom send handler
-jshapi.SendHandler = customHandler
+jshapi.SendHandler = func(c context.Context, w http.ResponseWriter, r *http.Request, sendable jsh.Sendable) {
+    // do some custom logging, or manipulation
+    jsh.Send(w, r, sendable)
+}
 
 // add top level Goji Middleware
 api.UseC(yourTopLevelAPIMiddleware)
@@ -47,45 +50,62 @@ http.ListenAndServe("localhost:8000", api)
 
 ## Feature Overview
 
-### Fast CRUD Implementation
+There are a few things you should know about JSHAPI. First, this project is maintained with emphasis on these two guiding principles:
+
+* reduce JSONAPI boilerplate in your code as much as possible
+* keep separation of concerns in mind, let developers decide and customize as much as possible
+
+The other major point is that this project uses a small set of storage interfaces that make handling API actions endpoint simple and consistent. In each of the following examples, these storage interfaces are utilized. For more information about how these work, see the [Storage Example](#storage-driver-example). 
+
+#### Simple Default CRUD Implementation
 
 Quickly build resource APIs for:
 
-```
-POST /resources
-GET /resources
-GET /resources/:id
-DELETE /resources/:id
-PATCH /resources/:id
+* POST /resources
+* GET /resources
+* GET /resources/:id
+* DELETE /resources/:id
+* PATCH /resources/:id
+
+```go
+resourceStorage := &ResourceStorage{}
+resource := jshapi.NewCRUDResource("resources", resourceStorage)
 ```
 
-### Relationships
+#### Relationships
 
 Routing for relationships too:
 
+* GET /resources/:id/relationships/otherResource[s]
+* GET /resources/:id/otherResource[s]
+
+```go
+resourceStorage := &ResourceStorage{}
+resource := jshapi.NewResource("resources", resourceStorage)
+resource.ToOne("foo", fooToOneStorage)
+resource.ToMany("bar", barToManyStorage)
 ```
-GET /resources/:id/relationships/otherResource(s)
-GET /resources/:id/otherResource(s)
+
+#### Custom Actions
+
+* GET /resources/:id/<action>
+
+```go
+resourceStorage := &ResourceStorage{}
+resource := jshapi.NewResource("resources", resourceStorage)
+resource.Action("reset", resetAction)
 ```
 
-### Mutations
+#### Other Features
 
-```
-GET /resources/:id/<action>
-```
+* Default Request, Response, and 5XX Auto-Logging
 
-### Other
+## Working With Storage Interfaces
 
-* Request, Response, and 5XX Auto-Logging
-
-## Storage Driver Example
-
-Here is a basic example of how you might implement a CRUD usable
-[Storage Driver](https://godoc.org/github.com/derekdowling/jsh-api/store#CRUD)
-for a given resource using [jsh](https://godoc.org/github.com/derekdowling/go-json-spec-handler)
+Below is a basic example of how one might implement parts of a [CRUD Storage](https://godoc.org/github.com/derekdowling/jsh-api/store#CRUD)
+interface for a basic user resource using [jsh](https://godoc.org/github.com/derekdowling/go-json-spec-handler)
 for Save and Update. This should give you a pretty good idea of how easy it is to
 implement the Storage driver with jsh.
-
 
 ```go
 type User struct {
