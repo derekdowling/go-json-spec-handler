@@ -15,7 +15,7 @@ func Fetch(baseURL string, resourceType string, id string) (*jsh.Document, *http
 		return nil, nil, err
 	}
 
-	return Do(request)
+	return Do(request, jsh.ObjectMode)
 }
 
 /*
@@ -44,7 +44,7 @@ func List(baseURL string, resourceType string) (*jsh.Document, *http.Response, e
 		return nil, nil, err
 	}
 
-	return Do(request)
+	return Do(request, jsh.ListMode)
 }
 
 /*

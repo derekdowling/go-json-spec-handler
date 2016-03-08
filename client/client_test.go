@@ -55,7 +55,7 @@ func TestParseResponse(t *testing.T) {
 		}
 
 		Convey("404 response parsing should not return a 406 error", func() {
-			doc, err := ParseResponse(response)
+			doc, err := ParseResponse(response, jsh.ObjectMode)
 			So(doc, ShouldBeNil)
 			So(err, ShouldBeNil)
 		})
@@ -75,7 +75,7 @@ func TestResponseParsing(t *testing.T) {
 			So(err, ShouldBeNil)
 
 			Convey("should parse successfully", func() {
-				doc, err := Document(response)
+				doc, err := Document(response, jsh.ObjectMode)
 
 				So(err, ShouldBeNil)
 				So(doc.HasData(), ShouldBeTrue)
@@ -94,7 +94,7 @@ func TestResponseParsing(t *testing.T) {
 			So(err, ShouldBeNil)
 
 			Convey("should parse successfully", func() {
-				doc, err := Document(response)
+				doc, err := Document(response, jsh.ListMode)
 
 				So(err, ShouldBeNil)
 				So(doc.HasData(), ShouldBeTrue)

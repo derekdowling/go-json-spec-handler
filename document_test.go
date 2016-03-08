@@ -6,6 +6,7 @@ import (
 
 	"encoding/json"
 
+	"github.com/davecgh/go-spew/spew"
 	. "github.com/smartystreets/goconvey/convey"
 )
 
@@ -36,12 +37,23 @@ func TestDocument(t *testing.T) {
 		})
 
 		Convey("->AddObject()", func() {
+
 			obj, err := NewObject("1", "user", nil)
 			So(err, ShouldBeNil)
 
-			err = doc.AddObject(obj)
-			So(err, ShouldBeNil)
-			So(len(doc.Data), ShouldEqual, 1)
+			Convey("should successfully add an object", func() {
+				err := doc.AddObject(obj)
+				So(err, ShouldBeNil)
+				So(len(doc.Data), ShouldEqual, 1)
+			})
+
+			Convey("should prevent multiple data objects in ObjectMode", func() {
+				err := doc.AddObject(obj)
+				So(err, ShouldBeNil)
+
+				err = doc.AddObject(obj)
+				So(err, ShouldNotBeNil)
+			})
 		})
 
 		Convey("->AddError()", func() {
@@ -65,6 +77,14 @@ func TestDocument(t *testing.T) {
 			})
 		})
 
+		Convey("->First()", func() {
+
+			Convey("should not explode for nil data", func() {
+				data := doc.First()
+				So(data, ShouldBeNil)
+			})
+		})
+
 		Convey("->Build()", func() {
 
 			testObject := &Object{
@@ -83,8 +103,9 @@ func TestDocument(t *testing.T) {
 			Convey("should accept an object", func() {
 				doc := Build(testObject)
 
-				So(doc.Data, ShouldBeNil)
-				So(doc.Object, ShouldResemble, testObject)
+				// So(doc.Data, ShouldBeNil)
+				// So(doc.Object, ShouldResemble, testObject)
+				So(doc.Data, ShouldResemble, List{testObject})
 				So(doc.Status, ShouldEqual, http.StatusAccepted)
 			})
 
@@ -105,8 +126,9 @@ func TestDocument(t *testing.T) {
 				validationErrors := doc.Validate(req, true)
 
 				So(validationErrors, ShouldBeNil)
-				So(doc.Data, ShouldBeNil)
-				So(doc.Object, ShouldResemble, testObject)
+				// So(doc.Data, ShouldBeNil)
+				// So(doc.Object, ShouldResemble, testObject)
+				So(doc.Data, ShouldResemble, List{testObject})
 				So(doc.Included, ShouldNotBeEmpty)
 				So(doc.Included[0], ShouldResemble, testObjectForInclusion)
 				So(doc.Status, ShouldEqual, http.StatusAccepted)
@@ -130,38 +152,99 @@ func TestDocument(t *testing.T) {
 		})
 
 		Convey("->MarshalJSON()", func() {
+
 			testObject := &Object{
 				ID:     "1",
 				Type:   "Test",
 				Status: http.StatusAccepted,
 			}
 
-			Convey("should marshal a list with a single element as an array", func() {
-				list := List{testObject}
-				doc := Build(list)
+			Convey("should not include data for error response", func() {
+				doc.Data = nil
+				doc.AddError(ISE("Test Error"))
 				j, err := json.Marshal(doc)
 				So(err, ShouldBeNil)
+
 				m := map[string]json.RawMessage{}
 				err = json.Unmarshal(j, &m)
 				So(err, ShouldBeNil)
-				data := string(m["data"])
-				So(data, ShouldStartWith, "[")
-				So(data, ShouldEndWith, "]")
+				spew.Dump(m)
+
+				_, exists := m["data"]
+				So(exists, ShouldBeFalse)
+
+				errors := string(m["errors"])
+				So(errors, ShouldStartWith, "[")
+				So(errors, ShouldEndWith, "]")
 			})
 
-			Convey("should marshal a single object as an object", func() {
-				doc := Build(testObject)
-				j, err := json.Marshal(doc)
-				So(err, ShouldBeNil)
-				m := map[string]json.RawMessage{}
-				err = json.Unmarshal(j, &m)
-				So(err, ShouldBeNil)
-				data := string(m["data"])
-				So(data, ShouldStartWith, "{")
-				So(data, ShouldEndWith, "}")
+			Convey("ListMode", func() {
+
+				Convey("should marshal a list with a single element as an array", func() {
+					spew.Dump("listTest")
+					list := List{testObject}
+					doc := Build(list)
+
+					spew.Dump(doc)
+
+					j, err := json.Marshal(doc)
+					So(err, ShouldBeNil)
+
+					m := map[string]json.RawMessage{}
+					err = json.Unmarshal(j, &m)
+					So(err, ShouldBeNil)
+
+					data := string(m["data"])
+					So(data, ShouldStartWith, "[")
+					So(data, ShouldEndWith, "]")
+				})
 			})
 
+			Convey("ObjectMode", func() {
+
+				Convey("should marshal a single object as an object", func() {
+					doc := Build(testObject)
+					j, err := json.Marshal(doc)
+					So(err, ShouldBeNil)
+
+					m := map[string]json.RawMessage{}
+					err = json.Unmarshal(j, &m)
+					So(err, ShouldBeNil)
+
+					data := string(m["data"])
+					So(data, ShouldStartWith, "{")
+					So(data, ShouldEndWith, "}")
+				})
+
+				Convey("null case", func() {
+					doc := New()
+
+					Convey("should marshal nil to null", func() {
+						doc.Data = nil
+						j, err := json.Marshal(doc)
+						So(err, ShouldBeNil)
+
+						m := map[string]json.RawMessage{}
+						err = json.Unmarshal(j, &m)
+						So(err, ShouldBeNil)
+
+						data := string(m["data"])
+						So(data, ShouldEqual, "null")
+					})
+
+					Convey("should marshal an empty list to null", func() {
+						j, err := json.Marshal(doc)
+						So(err, ShouldBeNil)
+
+						m := map[string]json.RawMessage{}
+						err = json.Unmarshal(j, &m)
+						So(err, ShouldBeNil)
+
+						data := string(m["data"])
+						So(data, ShouldEqual, "null")
+					})
+				})
+			})
 		})
 	})
-
 }

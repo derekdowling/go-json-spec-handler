@@ -17,8 +17,8 @@ import (
 Document validates the HTTP response and attempts to parse a JSON API compatible
 Document from the response body before closing it.
 */
-func Document(response *http.Response) (*jsh.Document, *jsh.Error) {
-	document, err := buildParser(response).Document(response.Body)
+func Document(response *http.Response, mode jsh.DocumentMode) (*jsh.Document, *jsh.Error) {
+	document, err := buildParser(response).Document(response.Body, mode)
 	if err != nil {
 		return nil, err
 	}
@@ -110,7 +110,7 @@ Useful in conjunction with any of the method Request builders or
 for times when you want to send a request to a custom endpoint, but would still
 like a JSONAPI response.
 */
-func Do(request *http.Request) (*jsh.Document, *http.Response, error) {
+func Do(request *http.Request, mode jsh.DocumentMode) (*jsh.Document, *http.Response, error) {
 
 	client := &http.Client{}
 	response, clientErr := client.Do(request)
@@ -121,7 +121,7 @@ func Do(request *http.Request) (*jsh.Document, *http.Response, error) {
 		)
 	}
 
-	doc, parseErr := ParseResponse(response)
+	doc, parseErr := ParseResponse(response, mode)
 	if parseErr != nil {
 		return nil, response, fmt.Errorf("Error parsing response: %s", parseErr.Error())
 	}
@@ -133,7 +133,7 @@ func Do(request *http.Request) (*jsh.Document, *http.Response, error) {
 ParseResponse handles parsing an HTTP response into a JSON Document if
 possible.
 */
-func ParseResponse(response *http.Response) (*jsh.Document, error) {
+func ParseResponse(response *http.Response, mode jsh.DocumentMode) (*jsh.Document, error) {
 
 	skipCodes := []int{
 		http.StatusNoContent,
@@ -146,7 +146,7 @@ func ParseResponse(response *http.Response) (*jsh.Document, error) {
 		}
 	}
 
-	document, err := Document(response)
+	document, err := Document(response, mode)
 	if err != nil {
 		return nil, err
 	}

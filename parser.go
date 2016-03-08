@@ -43,7 +43,7 @@ as part of your full flow.
 	}
 */
 func ParseObject(r *http.Request) (*Object, *Error) {
-	document, err := ParseJSON(r)
+	document, err := ParseDoc(r, ObjectMode)
 	if err != nil {
 		return nil, err
 	}
@@ -65,7 +65,7 @@ ParseList validates the HTTP request and returns a resulting list of objects
 parsed from the request Body. Use just like ParseObject.
 */
 func ParseList(r *http.Request) (List, *Error) {
-	document, err := ParseJSON(r)
+	document, err := ParseDoc(r, ListMode)
 	if err != nil {
 		return nil, err
 	}
@@ -73,13 +73,16 @@ func ParseList(r *http.Request) (List, *Error) {
 	return document.Data, nil
 }
 
-// ParseJSON is a convenience function that returns a top level jsh.JSON document
-func ParseJSON(r *http.Request) (*Document, *Error) {
-	return NewParser(r).Document(r.Body)
+/*
+ParseDoc parses and returns a top level jsh.Document. In most cases, using
+"ParseList" or "ParseObject" is preferable.
+*/
+func ParseDoc(r *http.Request, mode DocumentMode) (*Document, *Error) {
+	return NewParser(r).Document(r.Body, mode)
 }
 
-// Parser is an abstraction layer to support parsing JSON payload from many types
-// of sources in order to allow other packages to use this parser
+// Parser is an abstraction layer that helps to support parsing JSON payload from
+// many types of sources, and allows other libraries to leverage this if desired.
 type Parser struct {
 	Method  string
 	Headers http.Header
@@ -94,10 +97,10 @@ func NewParser(request *http.Request) *Parser {
 }
 
 /*
-Document returns a single JSON data object from the parser. In the process it will also validate
-any data objects against the JSON API.
+Document returns a single JSON data object from the parser. In the process it will
+also validate any data objects against the JSON API.
 */
-func (p *Parser) Document(payload io.ReadCloser) (*Document, *Error) {
+func (p *Parser) Document(payload io.ReadCloser, mode DocumentMode) (*Document, *Error) {
 	defer closeReader(payload)
 
 	err := validateHeaders(p.Headers)
@@ -105,7 +108,11 @@ func (p *Parser) Document(payload io.ReadCloser) (*Document, *Error) {
 		return nil, err
 	}
 
-	document := &Document{Data: List{}}
+	document := &Document{
+		Data: List{},
+		Mode: mode,
+	}
+
 	decodeErr := json.NewDecoder(payload).Decode(document)
 	if decodeErr != nil {
 		return nil, ISE(fmt.Sprintf("Error parsing JSON Document: %s", decodeErr.Error()))
@@ -114,7 +121,7 @@ func (p *Parser) Document(payload io.ReadCloser) (*Document, *Error) {
 	// If the document has data, validate against specification
 	if document.HasData() {
 		for _, object := range document.Data {
-			
+
 			// TODO: currently this doesn't really do any user input
 			// validation since it is validating against the jsh
 			// "Object" type. Figure out how to options pass the

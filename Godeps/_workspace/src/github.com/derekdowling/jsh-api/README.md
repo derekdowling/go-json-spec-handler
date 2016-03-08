@@ -9,29 +9,39 @@ A [JSON API](http://jsonapi.org) specification micro-service builder created on 
 
 ## Setup
 
+The easiest way to get started is like so:
+
 ```go
 import github.com/derekdowling/jsh-api
 
-// if you want a custom logger
-jshapi.Logger = yourLogger
-
-// create the base api
-api := jshapi.New("<prefix>")
-
-// implement jshapi/store.CRUD interface
+// implement jshapi/store.CRUD interface and add resource specific middleware via Goji
 userStorage := &UserStorage{}
 resource := jshapi.NewCRUDResource("user", userStorage)
+resource.UseC(yourUserMiddleware)
 
-// resource specific middleware via Goji
-resource.Use(yourUserMiddleware)
-
-// add resources to the API
+// setup a logger, your shiny new API, and give it a resource
+logger := log.New(os.Stderr, "<yourapi>: ", log.LstdFlags)
+api := jshapi.Default("<prefix>", true, logger)
 api.Add(resource)
 
-// add top level API middleware
-api.Use(yourTopLevelAPIMiddleware)
-
 // launch your api
+http.ListenAndServe("localhost:8000", api)
+```
+
+For a completely custom setup:
+
+```go
+import github.com/derekdowling/jsh-api
+
+// manually setup your API
+api := jshapi.New("<prefix>")
+
+// add a custom send handler
+jshapi.SendHandler = customHandler
+
+// add top level Goji Middleware
+api.UseC(yourTopLevelAPIMiddleware)
+
 http.ListenAndServe("localhost:8000", api)
 ```
 

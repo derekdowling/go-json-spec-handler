@@ -19,7 +19,7 @@ func Delete(urlStr string, resourceType string, id string) (*http.Response, erro
 		return nil, err
 	}
 
-	_, response, err := Do(request)
+	_, response, err := Do(request, jsh.ObjectMode)
 	if err != nil {
 		return nil, err
 	}
