@@ -190,11 +190,11 @@ AddError adds an error to the Document. It will also set the document Mode to
 func (d *Document) AddError(newErr *Error) *Error {
 
 	if d.HasData() {
-		return ISE("Cannot add an error to a document already possessing data")
+		return ISE("Attempting to set an error, when the document has prepared response data")
 	}
 
 	if newErr.Status == 0 {
-		return ISE("Status code must be set for an error")
+		return ISE("No HTTP Status code provided for error, cannot add to document")
 	}
 
 	if d.Status == 0 {
@@ -273,8 +273,9 @@ func (d *Document) MarshalJSON() ([]byte, error) {
 	// since it was a fetch request. Achieve this by replacing the single value array
 	// with the object itself
 	case ObjectMode:
-		if len(d.Data) == 0 {
+		if d.Data == nil || len(d.Data) == 0 {
 			jDoc["data"] = nil
+			break
 		}
 
 		objects, success := jDoc["data"].([]interface{})
