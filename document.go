@@ -248,43 +248,46 @@ element of a document might be either a single resource object, or a collection 
 them.
 */
 func (d *Document) MarshalJSON() ([]byte, error) {
+	// we use the MarshalDoc type to avoid recursively calling this function below
+	// when we marshal
 	type MarshalDoc Document
 	doc := MarshalDoc(*d)
 
-	// get raw data so we can perform top level operations
-	rawData, err := json.Marshal(doc)
-	if err != nil {
-		return nil, err
-	}
-
-	// map back to top level JSON map for ease of use, SHITTY, I KNOW.
-	jDoc := map[string]interface{}{}
-	err = json.Unmarshal(rawData, &jDoc)
-	if err != nil {
-		return nil, ISE("Error marshaling document")
-	}
-
 	switch d.Mode {
-	case ErrorMode:
-		delete(jDoc, "data")
-		break
-
-	// here we're expected to return an object as the data value rather than an array
-	// since it was a fetch request. Achieve this by replacing the single value array
-	// with the object itself
 	case ObjectMode:
-		if d.Data == nil || len(d.Data) == 0 {
-			jDoc["data"] = nil
-			break
+		var data *Object
+		if len(d.Data) > 0 {
+			data = d.Data[0]
 		}
 
-		objects, success := jDoc["data"].([]interface{})
-		if !success {
-			return nil, ISE("Unable to cast data to []interface{}")
+		// subtype that overrides regular data List with a single Object for
+		// fetch style request/responses
+		type MarshalObject struct {
+			MarshalDoc
+			Data *Object `json:"data"`
 		}
-		jDoc["data"] = objects[0]
-		break
+
+		return json.Marshal(MarshalObject{
+			MarshalDoc: doc,
+			Data:       data,
+		})
+
+	case ErrorMode:
+		// subtype that omits data as expected for error responses. We cannot simply
+		// use json:"-" for the data attribute otherwise it will not override the
+		// default struct tag of it the composed MarshalDoc struct.
+		type MarshalError struct {
+			MarshalDoc
+			Data *Object `json:"data,omitempty"`
+		}
+
+		return json.Marshal(MarshalError{
+			MarshalDoc: doc,
+		})
+
+	case ListMode:
+		return json.Marshal(doc)
+	default:
+		return nil, ISE(fmt.Sprintf("Unexpected DocumentMode value when marshaling: %d", d.Mode))
 	}
-
-	return json.Marshal(jDoc)
 }
