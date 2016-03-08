@@ -1,6 +1,7 @@
 package jsh
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"strings"
@@ -13,6 +14,7 @@ of each attribute: http://jsonapi.org/format/#document-structure
 */
 type Document struct {
 	Data     List        `json:"data"`
+	Object   *Object     `json:"-"`
 	Errors   ErrorList   `json:"errors,omitempty"`
 	Links    *Link       `json:"links,omitempty"`
 	Included []*Object   `json:"included,omitempty"`
@@ -50,7 +52,7 @@ func Build(payload Sendable) *Document {
 
 	object, isObject := payload.(*Object)
 	if isObject {
-		document.Data = List{object}
+		document.Object = object
 		document.Status = object.Status
 	}
 
@@ -89,7 +91,10 @@ func (d *Document) Validate(r *http.Request, response bool) *Error {
 		return nil
 	}
 
-	if !d.HasErrors() && d.Data == nil {
+	if d.Object != nil && d.Data != nil {
+		return ISE("Both `Data` and `Object` cannot be set for a JSON response")
+	}
+	if !d.HasErrors() && d.Object == nil && d.Data == nil {
 		return ISE("Both `errors` and `data` cannot be blank for a JSON response")
 	}
 	if d.HasErrors() && d.Data != nil {
@@ -104,6 +109,11 @@ func (d *Document) Validate(r *http.Request, response bool) *Error {
 		return nil
 	}
 
+	if d.Object != nil {
+		if err := d.Object.Validate(r, response); err != nil {
+			return err
+		}
+	}
 	err := d.Data.Validate(r, response)
 	if err != nil {
 		return err
@@ -122,6 +132,10 @@ func (d *Document) AddObject(object *Object) *Error {
 
 	if d.HasErrors() {
 		return ISE("Cannot add data to a document already possessing errors")
+	}
+
+	if d.Object != nil {
+		return ISE("Cannot add data to a non-collection")
 	}
 
 	if d.Status == 0 {
@@ -166,12 +180,15 @@ First is just a convenience function that returns the first data object from the
 array
 */
 func (d *Document) First() *Object {
+	if d.Object != nil {
+		return d.Object
+	}
 	return d.Data[0]
 }
 
 // HasData will return true if the JSON document's Data field is set
 func (d *Document) HasData() bool {
-	return d.Data != nil && len(d.Data) > 0
+	return d.Object != nil || (d.Data != nil && len(d.Data) > 0)
 }
 
 // HasErrors will return true if the Errors attribute is not nil.
@@ -185,4 +202,30 @@ func (d *Document) Error() string {
 		errStr = strings.Join([]string{errStr, fmt.Sprintf("%s;", err.Error())}, "\n")
 	}
 	return errStr
+}
+
+/*
+MarshalJSON handles custom serialization required because the "data" element of a document
+might be a collection of objects or a single object.
+*/
+func (d *Document) MarshalJSON() ([]byte, error) {
+	// subtype that overrides data with a single object
+	type MarshalObject struct {
+		Document
+		Data *Object `json:"data,omitempty"`
+	}
+
+	if d == nil {
+		return nil, nil
+	}
+	if d.Object != nil {
+		return json.Marshal(MarshalObject{
+			Document: *d,
+			Data:     d.Object,
+		})
+	}
+
+	// avoid stack overflow by using this subtype for marshaling
+	type MarshalList Document
+	return json.Marshal(MarshalList(*d))
 }

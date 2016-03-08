@@ -4,6 +4,8 @@ import (
 	"net/http"
 	"testing"
 
+	"encoding/json"
+
 	. "github.com/smartystreets/goconvey/convey"
 )
 
@@ -72,7 +74,7 @@ func TestDocument(t *testing.T) {
 			}
 
 			testObjectForInclusion := &Object{
-				ID: "1",
+				ID:   "1",
 				Type: "Included",
 			}
 
@@ -81,7 +83,8 @@ func TestDocument(t *testing.T) {
 			Convey("should accept an object", func() {
 				doc := Build(testObject)
 
-				So(doc.Data, ShouldResemble, List{testObject})
+				So(doc.Data, ShouldBeNil)
+				So(doc.Object, ShouldResemble, testObject)
 				So(doc.Status, ShouldEqual, http.StatusAccepted)
 			})
 
@@ -102,12 +105,12 @@ func TestDocument(t *testing.T) {
 				validationErrors := doc.Validate(req, true)
 
 				So(validationErrors, ShouldBeNil)
-				So(doc.Data, ShouldResemble, List{testObject})
+				So(doc.Data, ShouldBeNil)
+				So(doc.Object, ShouldResemble, testObject)
 				So(doc.Included, ShouldNotBeEmpty)
 				So(doc.Included[0], ShouldResemble, testObjectForInclusion)
 				So(doc.Status, ShouldEqual, http.StatusAccepted)
 			})
-
 
 			Convey("should accept a list", func() {
 				list := List{testObject}
@@ -126,6 +129,39 @@ func TestDocument(t *testing.T) {
 			})
 		})
 
+		Convey("->MarshalJSON()", func() {
+			testObject := &Object{
+				ID:     "1",
+				Type:   "Test",
+				Status: http.StatusAccepted,
+			}
+
+			Convey("should marshal a list with a single element as an array", func() {
+				list := List{testObject}
+				doc := Build(list)
+				j, err := json.Marshal(doc)
+				So(err, ShouldBeNil)
+				m := map[string]json.RawMessage{}
+				err = json.Unmarshal(j, &m)
+				So(err, ShouldBeNil)
+				data := string(m["data"])
+				So(data, ShouldStartWith, "[")
+				So(data, ShouldEndWith, "]")
+			})
+
+			Convey("should marshal a single object as an object", func() {
+				doc := Build(testObject)
+				j, err := json.Marshal(doc)
+				So(err, ShouldBeNil)
+				m := map[string]json.RawMessage{}
+				err = json.Unmarshal(j, &m)
+				So(err, ShouldBeNil)
+				data := string(m["data"])
+				So(data, ShouldStartWith, "{")
+				So(data, ShouldEndWith, "}")
+			})
+
+		})
 	})
 
 }
