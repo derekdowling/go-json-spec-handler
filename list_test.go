@@ -105,6 +105,27 @@ func TestList(t *testing.T) {
 				So(err, ShouldBeNil)
 				So(l, ShouldNotBeEmpty)
 			})
+
+			Convey("should handle an empty array", func() {
+				jObj := `{"data": []}`
+
+				l := List{}
+				err := l.UnmarshalJSON([]byte(jObj))
+				So(err, ShouldBeNil)
+				So(l, ShouldNotBeNil)
+			})
+		})
+
+		Convey("->MarshalJSON()", func() {
+
+			Convey("should preserve an empty list", func() {
+				list := List{}
+
+				jData, err := json.Marshal(list)
+				So(err, ShouldBeNil)
+
+				So(string(jData), ShouldEqual, "[]")
+			})
 		})
 	})
 }

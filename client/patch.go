@@ -22,7 +22,7 @@ func Patch(baseURL string, object *jsh.Object) (*jsh.Document, *http.Response, e
 		return nil, nil, err
 	}
 
-	return Do(request)
+	return Do(request, jsh.ObjectMode)
 }
 
 // PatchRequest returns a fully formatted request with JSON body for performing

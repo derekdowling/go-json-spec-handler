@@ -16,7 +16,7 @@ func Action(baseURL string, resourceType string, id string, action string) (*jsh
 		return nil, nil, err
 	}
 
-	return Do(request)
+	return Do(request, jsh.ObjectMode)
 }
 
 /*

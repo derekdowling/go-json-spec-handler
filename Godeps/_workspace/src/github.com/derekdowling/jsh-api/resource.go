@@ -252,17 +252,17 @@ func (res *Resource) Action(actionName string, storage store.Get) {
 func (res *Resource) postHandler(ctx context.Context, w http.ResponseWriter, r *http.Request, storage store.Save) {
 	parsedObject, parseErr := jsh.ParseObject(r)
 	if parseErr != nil && reflect.ValueOf(parseErr).IsNil() == false {
-		SendAndLog(ctx, w, r, parseErr)
+		SendHandler(ctx, w, r, parseErr)
 		return
 	}
 
 	object, err := storage(ctx, parsedObject)
 	if err != nil && reflect.ValueOf(err).IsNil() == false {
-		SendAndLog(ctx, w, r, err)
+		SendHandler(ctx, w, r, err)
 		return
 	}
 
-	SendAndLog(ctx, w, r, object)
+	SendHandler(ctx, w, r, object)
 }
 
 // GET /resources/:id
@@ -271,22 +271,22 @@ func (res *Resource) getHandler(ctx context.Context, w http.ResponseWriter, r *h
 
 	object, err := storage(ctx, id)
 	if err != nil && reflect.ValueOf(err).IsNil() == false {
-		SendAndLog(ctx, w, r, err)
+		SendHandler(ctx, w, r, err)
 		return
 	}
 
-	SendAndLog(ctx, w, r, object)
+	SendHandler(ctx, w, r, object)
 }
 
 // GET /resources
 func (res *Resource) listHandler(ctx context.Context, w http.ResponseWriter, r *http.Request, storage store.List) {
 	list, err := storage(ctx)
 	if err != nil && reflect.ValueOf(err).IsNil() == false {
-		SendAndLog(ctx, w, r, err)
+		SendHandler(ctx, w, r, err)
 		return
 	}
 
-	SendAndLog(ctx, w, r, list)
+	SendHandler(ctx, w, r, list)
 }
 
 // DELETE /resources/:id
@@ -295,7 +295,7 @@ func (res *Resource) deleteHandler(ctx context.Context, w http.ResponseWriter, r
 
 	err := storage(ctx, id)
 	if err != nil && reflect.ValueOf(err).IsNil() == false {
-		SendAndLog(ctx, w, r, err)
+		SendHandler(ctx, w, r, err)
 		return
 	}
 
@@ -306,17 +306,17 @@ func (res *Resource) deleteHandler(ctx context.Context, w http.ResponseWriter, r
 func (res *Resource) patchHandler(ctx context.Context, w http.ResponseWriter, r *http.Request, storage store.Update) {
 	parsedObject, parseErr := jsh.ParseObject(r)
 	if parseErr != nil && reflect.ValueOf(parseErr).IsNil() == false {
-		SendAndLog(ctx, w, r, parseErr)
+		SendHandler(ctx, w, r, parseErr)
 		return
 	}
 
 	object, err := storage(ctx, parsedObject)
 	if err != nil && reflect.ValueOf(err).IsNil() == false {
-		SendAndLog(ctx, w, r, err)
+		SendHandler(ctx, w, r, err)
 		return
 	}
 
-	SendAndLog(ctx, w, r, object)
+	SendHandler(ctx, w, r, object)
 }
 
 // GET /resources/:id/(relationships/)<resourceType>s
@@ -325,11 +325,11 @@ func (res *Resource) toManyHandler(ctx context.Context, w http.ResponseWriter, r
 
 	list, err := storage(ctx, id)
 	if err != nil && reflect.ValueOf(err).IsNil() == false {
-		SendAndLog(ctx, w, r, err)
+		SendHandler(ctx, w, r, err)
 		return
 	}
 
-	SendAndLog(ctx, w, r, list)
+	SendHandler(ctx, w, r, list)
 }
 
 // All HTTP Methods for /resources/:id/<mutate>
@@ -338,11 +338,11 @@ func (res *Resource) actionHandler(ctx context.Context, w http.ResponseWriter, r
 
 	response, err := storage(ctx, id)
 	if err != nil && reflect.ValueOf(err).IsNil() == false {
-		SendAndLog(ctx, w, r, err)
+		SendHandler(ctx, w, r, err)
 		return
 	}
 
-	SendAndLog(ctx, w, r, response)
+	SendHandler(ctx, w, r, response)
 }
 
 // addRoute adds the new method and route to a route Tree for debugging and

@@ -2,12 +2,15 @@ package jshapi
 
 import (
 	"fmt"
+	"log"
+	"os"
 	"path"
 	"strings"
 
 	"goji.io"
 	"goji.io/pat"
 
+	"github.com/derekdowling/go-stdlogger"
 	"github.com/derekdowling/goji2-logger"
 )
 
@@ -19,31 +22,53 @@ type API struct {
 	Debug     bool
 }
 
-// New initializes a new top level API Resource Handler. The most basic implementation
-// is:
-//
-//	// optionally, set your own logger
-//	jshapi.Logger = yourLogger
-//
-//	// create a new API
-//	api := jshapi.New("<prefix>", nil)
-func New(prefix string, debug bool) *API {
+/*
+SendHandler allows the customization of how API responses are sent and logged. This
+is used by all jshapi.Resource objects.
+*/
+var SendHandler = DefaultSender(log.New(os.Stderr, "jshapi: ", log.LstdFlags))
+
+/*
+New initializes a new top level API Resource without doing any additional setup.
+*/
+func New(prefix string) *API {
 
 	// ensure that our top level prefix is "/" prefixed
 	if !strings.HasPrefix(prefix, "/") {
 		prefix = fmt.Sprintf("/%s", prefix)
 	}
 
-	// create our new logger
-	api := &API{
+	// create our new API
+	return &API{
 		Mux:       goji.NewMux(),
 		prefix:    prefix,
 		Resources: map[string]*Resource{},
-		Debug:     debug,
 	}
+}
+
+/*
+Default builds a new top-level API with a few out of the box additions to get people
+started without needing to add a lot of extra functionality.
+
+The most basic implementation is:
+
+	// create a logger, the std log package works, as do most other loggers
+	// std.Logger interface defined here:
+	// https://github.com/derekdowling/go-stdlogger/blob/master/logger.go
+	logger := log.New(os.Stderr, "jshapi: ", log.LstdFlags)
+
+	// create the API. Specify a http://yourapi/<prefix>/ if required
+	api := jshapi.Default("<prefix>", false, logger)
+	api.Add(yourResource)
+
+*/
+func Default(prefix string, debug bool, logger std.Logger) *API {
+
+	api := New(prefix)
+	SendHandler = DefaultSender(logger)
 
 	// register logger middleware
-	gojilogger := gojilogger.New(Logger, debug)
+	gojilogger := gojilogger.New(logger, debug)
 	api.UseC(gojilogger.Middleware)
 
 	return api

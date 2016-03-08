@@ -19,7 +19,7 @@ func Post(baseURL string, object *jsh.Object) (*jsh.Document, *http.Response, er
 		return nil, nil, err
 	}
 
-	return Do(request)
+	return Do(request, jsh.ObjectMode)
 }
 
 // PostRequest returns a fully formatted request with JSON body for performing
