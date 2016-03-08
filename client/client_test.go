@@ -118,7 +118,7 @@ func testAPI() *jshapi.API {
 		return object, nil
 	})
 
-	api := jshapi.New("", true)
+	api := jshapi.New("")
 	api.Add(resource)
 
 	return api
