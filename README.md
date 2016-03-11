@@ -31,7 +31,7 @@ type User struct {
   Name string `json:"name" valid:"alphanum"`
 }
 
-// example http.HandlerFunc
+// example http.HandlerFunc for PATCH /users/1
 func PatchUser(w http.ResponseWriter, r *http.Request) {
 
   // performs Specification checks against the request
@@ -47,7 +47,7 @@ func PatchUser(w http.ResponseWriter, r *http.Request) {
   
   // unmarshal data into relevant internal types if govalidator passes, otherwise
   // return the pre-formatted HTTP 422 error to signify how the input failed
-  err = object.Unmarshal("user", user)
+  err = object.Unmarshal("users", user)
   if err != nil {
     jsh.Send(w, r, err)
     return
