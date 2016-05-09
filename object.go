@@ -15,6 +15,7 @@ type Object struct {
 	Attributes    json.RawMessage          `json:"attributes,omitempty"`
 	Links         map[string]*Link         `json:"links,omitempty"`
 	Relationships map[string]*Relationship `json:"relationships,omitempty"`
+	Meta          map[string]interface{}   `json:"meta,omitempty"`
 	// Status is the HTTP Status Code that should be associated with the object
 	// when it is sent.
 	Status int `json:"-"`
