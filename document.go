@@ -20,6 +20,16 @@ const (
 	ErrorMode
 )
 
+// IncludeJSONAPIVersion is an option that allows consumers to include/remove the `jsonapi`
+// top-level member from server responses.
+var IncludeJSONAPIVersion = true
+
+// JSONAPI is the top-level member of a JSONAPI document that includes
+// the server compatible version of the JSONAPI specification.
+type JSONAPI struct {
+	Version string `json:"version"`
+}
+
 /*
 Document represents a top level JSON formatted Document.
 Refer to the JSON API Specification for a full descriptor
@@ -32,9 +42,7 @@ type Document struct {
 	Links    *Link       `json:"links,omitempty"`
 	Included []*Object   `json:"included,omitempty"`
 	Meta     interface{} `json:"meta,omitempty"`
-	JSONAPI  struct {
-		Version string `json:"version"`
-	} `json:"jsonapi"`
+	JSONAPI  *JSONAPI    `json:"jsonapi,omitempty"`
 	// Status is an HTTP Status Code
 	Status int `json:"-"`
 	// DataMode to enforce for the document
@@ -53,7 +61,11 @@ New instantiates a new JSON Document object.
 */
 func New() *Document {
 	json := &Document{}
-	json.JSONAPI.Version = JSONAPIVersion
+	if IncludeJSONAPIVersion {
+		json.JSONAPI = &JSONAPI{
+			Version: JSONAPIVersion,
+		}
+	}
 
 	return json
 }
