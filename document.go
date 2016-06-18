@@ -29,7 +29,7 @@ type Document struct {
 	Data List `json:"data"`
 	// Object   *Object     `json:"-"`
 	Errors   ErrorList   `json:"errors,omitempty"`
-	Links    *Link       `json:"links,omitempty"`
+	Links    *Links      `json:"links,omitempty"`
 	Included []*Object   `json:"included,omitempty"`
 	Meta     interface{} `json:"meta,omitempty"`
 	JSONAPI  struct {
