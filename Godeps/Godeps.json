@@ -20,11 +20,6 @@
 			"Rev": "148764a2aea6cdd93a6776e20da13f6dfa38775f"
 		},
 		{
-			"ImportPath": "github.com/derekdowling/jsh-api",
-			"Comment": "0.5.1",
-			"Rev": "c3348ad7e3af7734ac9d3085a729125f15568d43"
-		},
-		{
 			"ImportPath": "github.com/jtolds/gls",
 			"Rev": "9a4a02dbe491bef4bab3c24fd9f3087d6c4c6690"
 		},
