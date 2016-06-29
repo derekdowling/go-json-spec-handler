@@ -1,6 +1,6 @@
 {
 	"ImportPath": "github.com/derekdowling/go-json-spec-handler",
-	"GoVersion": "go1.5",
+	"GoVersion": "go1.6.2",
 	"Packages": [
 		"./..."
 	],
