@@ -1,11 +1,13 @@
 language: go
 go:
   - tip
-  - 1.5
+  - 1.6
 
 install:
-  - go get github.com/tools/godep
   - go get github.com/smartystreets/goconvey
 
+before_script:
+  - ln -s _vendor vendor
+
 script:
-  - godep go test ./...
+  - go test ./...
