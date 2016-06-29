@@ -73,6 +73,10 @@ func ParseList(r *http.Request) (List, *Error) {
 	return document.Data, nil
 }
 
+// MaxContentLength is 10MB
+// https://github.com/golang/go/blob/abb3c0618b658a41bf91a087f1737412e93ff6d9/src/pkg/net/http/request.go#L617
+const MaxContentLength int64 = 10 << 20
+
 /*
 ParseDoc parses and returns a top level jsh.Document. In most cases, using
 "ParseList" or "ParseObject" is preferable.
@@ -113,7 +117,7 @@ func (p *Parser) Document(payload io.ReadCloser, mode DocumentMode) (*Document, 
 		Mode: mode,
 	}
 
-	decodeErr := json.NewDecoder(payload).Decode(document)
+	decodeErr := json.NewDecoder(io.LimitReader(payload, MaxContentLength)).Decode(document)
 	if decodeErr != nil {
 		return nil, ISE(fmt.Sprintf("Error parsing JSON Document: %s", decodeErr.Error()))
 	}
