@@ -93,7 +93,7 @@ sending JSONAPI compatible responses.
     Not Implementing:
 
     * These features aren't handled because they are beyond the scope of what
-      this module is meant to achieve. See [jshapi](https://github.com/derekdowling/jsh-api)
+      this module is meant to achieve. See [jshapi](https://github.com/derekdowling/go-json-spec-handler/tree/master/jsh-api)
       for a full-fledged API solution that solves many of these problems.
 
     - Routing
@@ -126,10 +126,10 @@ user := &yourUser{}
 err := object.Unmarshal("users", user)
 ```
 
-### [JSH-API](https://github.com/derekdowling/jsh-api)
+### [JSH-API](https://github.com/derekdowling/go-json-spec-handler/tree/master/jsh-api)
 
 If you're looking for a good place to start with a new API, I've since created
-[jshapi](https://github.com/derekdowling/jsh-api) which builds on top of [Goji 2](https://goji.io/)
+[jshapi](https://github.com/derekdowling/go-json-spec-handler/tree/master/jsh-api) which builds on top of [Goji 2](https://goji.io/)
 and `jsh` in order to handle the routing structure that JSON API requires as
 well as a number of other useful tools for testing and mocking APIs as you
 develop your own projects. JSHAPI is similar in spirit to this project as it

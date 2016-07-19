@@ -1,8 +1,6 @@
 # JSH-API
 
-[![GoDoc](https://godoc.org/github.com/derekdowling/go-json-spec-handler?status.png)](https://godoc.org/github.com/derekdowling/jsh-api)
-[![Build Status](https://travis-ci.org/derekdowling/jsh-api.svg?branch=master)](https://travis-ci.org/derekdowling/jsh-api)
-[![Go Report Card](http://goreportcard.com/badge/manyminds/api2go)](http://goreportcard.com/report/derekdowling/jsh-api)
+[![GoDoc](https://godoc.org/github.com/derekdowling/go-json-spec-handler/jsh-api?status.png)](https://godoc.org/github.com/derekdowling/go-json-spec-handler/jsh-api)
 
 A [JSON API](http://jsonapi.org) specification micro-service builder created on top of
 [jsh](http://github.com/derekdowling/go-json-spec-handler), [Goji](http://goji.io), and [context](https://godoc.org/golang.org/x/net/context) to handle the nitty gritty but predictable (un)wrapping, validating, preparing, and logging necessary for any JSON API written in Go. The rest (storage, and business logic) is up to you.
@@ -12,7 +10,7 @@ A [JSON API](http://jsonapi.org) specification micro-service builder created on 
 The easiest way to get started is like so:
 
 ```go
-import github.com/derekdowling/jsh-api
+import github.com/derekdowling/go-json-spec-handler/jsh-api
 
 // implement jshapi/store.CRUD interface and add resource specific middleware via Goji
 userStorage := &UserStorage{}
@@ -31,7 +29,7 @@ http.ListenAndServe("localhost:8000", api)
 For a completely custom setup:
 
 ```go
-import github.com/derekdowling/jsh-api
+import github.com/derekdowling/go-json-spec-handler/jsh-api
 
 // manually setup your API
 api := jshapi.New("<prefix>")
@@ -102,7 +100,7 @@ resource.Action("reset", resetAction)
 
 ## Working With Storage Interfaces
 
-Below is a basic example of how one might implement parts of a [CRUD Storage](https://godoc.org/github.com/derekdowling/jsh-api/store#CRUD)
+Below is a basic example of how one might implement parts of a [CRUD Storage](https://godoc.org/github.com/derekdowling/go-json-spec-handler/tree/master/jsh-api/store#CRUD)
 interface for a basic user resource using [jsh](https://godoc.org/github.com/derekdowling/go-json-spec-handler)
 for Save and Update. This should give you a pretty good idea of how easy it is to
 implement the Storage driver with jsh.

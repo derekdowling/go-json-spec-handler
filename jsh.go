@@ -4,7 +4,7 @@
 //
 // For a request client, see: jsc: https://godoc.org/github.com/derekdowling/go-json-spec-handler/client
 //
-// For a full http.Handler API builder see jshapi: https://godoc.org/github.com/derekdowling/jsh-api
+// For a full http.Handler API builder see jshapi: https://godoc.org/github.com/derekdowling/go-json-spec-handler/jsh-api
 package jsh
 
 const (

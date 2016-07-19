@@ -13,7 +13,7 @@ import (
 	"golang.org/x/net/context"
 
 	"github.com/derekdowling/go-json-spec-handler"
-	"github.com/derekdowling/jsh-api/store"
+	"github.com/derekdowling/go-json-spec-handler/jsh-api/store"
 )
 
 const (
@@ -307,6 +307,12 @@ func (res *Resource) patchHandler(ctx context.Context, w http.ResponseWriter, r 
 	parsedObject, parseErr := jsh.ParseObject(r)
 	if parseErr != nil && reflect.ValueOf(parseErr).IsNil() == false {
 		SendHandler(ctx, w, r, parseErr)
+		return
+	}
+
+	id := pat.Param(ctx, "id")
+	if id != parsedObject.ID {
+		SendHandler(ctx, w, r, jsh.InputError("Request ID does not match URL's", "id"))
 		return
 	}
 
