@@ -33,7 +33,7 @@ string BUT DOESN'T close the ReadCloser. Useful for debugging.
 */
 func DumpBody(response *http.Response) (string, *jsh.Error) {
 
-	byteData, err := ioutil.ReadAll(response.Body)
+	byteData, err := ioutil.ReadAll(io.LimitReader(response.Body, jsh.MaxContentLength))
 	if err != nil {
 		return "", jsh.ISE(fmt.Sprintf("Error attempting to read request body: %s", err.Error()))
 	}
