@@ -20,7 +20,7 @@ compatible software in Go. Works with [Ember/Ember-Data](https://github.com/embe
 
 ### jsh - JSON Specification Handler
 
-For streamlined JSONAPI object serialization. Uses [govalidator](github.com/asaskevich/govalidator) for input validation.
+For streamlined JSONAPI object serialization. Uses [govalidator](https://github.com/asaskevich/govalidator) for input validation.
 
 ```go
 import github.com/derekdowling/go-json-spec-handler
