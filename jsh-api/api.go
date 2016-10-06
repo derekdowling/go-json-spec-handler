@@ -10,8 +10,8 @@ import (
 	"goji.io"
 	"goji.io/pat"
 
+	"github.com/derekdowling/go-json-spec-handler/goji2-logger"
 	"github.com/derekdowling/go-stdlogger"
-	"github.com/derekdowling/goji2-logger"
 )
 
 // API is used to direct HTTP requests to resources

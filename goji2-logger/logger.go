@@ -112,7 +112,7 @@ func (l *Logger) printRequest(ctx context.Context, r *http.Request) {
 	}
 
 	colorWrite(&buf, bBlue, "%q", urlStr)
-	log.Print(buf.String())
+	l.Logger.Print(buf.String())
 }
 
 func (l *Logger) printResponse(w mutil.WriterProxy, delta time.Duration) {
@@ -143,5 +143,5 @@ func (l *Logger) printResponse(w mutil.WriterProxy, delta time.Duration) {
 		colorWrite(&buf, nRed, "%s", delta.String())
 	}
 
-	log.Print(buf.String())
+	l.Logger.Print(buf.String())
 }

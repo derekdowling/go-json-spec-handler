@@ -15,11 +15,6 @@
 			"Rev": "cfa80b78b82f8d241ceece0b733b1161bb6a885c"
 		},
 		{
-			"ImportPath": "github.com/derekdowling/goji2-logger",
-			"Comment": "0.2-1-g148764a",
-			"Rev": "148764a2aea6cdd93a6776e20da13f6dfa38775f"
-		},
-		{
 			"ImportPath": "github.com/jtolds/gls",
 			"Rev": "9a4a02dbe491bef4bab3c24fd9f3087d6c4c6690"
 		},
