@@ -10,8 +10,6 @@ import (
 	"goji.io"
 	"goji.io/pat"
 
-	"golang.org/x/net/context"
-
 	"github.com/derekdowling/go-json-spec-handler"
 	"github.com/derekdowling/go-json-spec-handler/jsh-api/store"
 )
@@ -38,8 +36,8 @@ registering storage handlers via .Post(), .Get(), .List(), .Patch(), and .Delete
 Besides the built in registration helpers, it isn't recommended, but you can add
 your own routes using the goji.Mux API:
 
-	func searchHandler(ctx context.Context, w http.ResponseWriter, r *http.Request) {
-		name := pat.Param(ctx, "name")
+	func searchHandler(w http.ResponseWriter, r *http.Request) {
+		name := pat.Param("name")
 		fmt.Fprintf(w, "Hello, %s!", name)
 	}
 
@@ -104,10 +102,10 @@ func (res *Resource) CRUD(storage store.CRUD) {
 
 // Post registers a `POST /resource` handler with the resource
 func (res *Resource) Post(storage store.Save) {
-	res.HandleFuncC(
+	res.HandleFunc(
 		pat.Post(patRoot),
-		func(ctx context.Context, w http.ResponseWriter, r *http.Request) {
-			res.postHandler(ctx, w, r, storage)
+		func(w http.ResponseWriter, r *http.Request) {
+			res.postHandler(w, r, storage)
 		},
 	)
 
@@ -116,10 +114,10 @@ func (res *Resource) Post(storage store.Save) {
 
 // Get registers a `GET /resource/:id` handler for the resource
 func (res *Resource) Get(storage store.Get) {
-	res.HandleFuncC(
+	res.HandleFunc(
 		pat.Get(patID),
-		func(ctx context.Context, w http.ResponseWriter, r *http.Request) {
-			res.getHandler(ctx, w, r, storage)
+		func(w http.ResponseWriter, r *http.Request) {
+			res.getHandler(w, r, storage)
 		},
 	)
 
@@ -128,10 +126,10 @@ func (res *Resource) Get(storage store.Get) {
 
 // List registers a `GET /resource` handler for the resource
 func (res *Resource) List(storage store.List) {
-	res.HandleFuncC(
+	res.HandleFunc(
 		pat.Get(patRoot),
-		func(ctx context.Context, w http.ResponseWriter, r *http.Request) {
-			res.listHandler(ctx, w, r, storage)
+		func(w http.ResponseWriter, r *http.Request) {
+			res.listHandler(w, r, storage)
 		},
 	)
 
@@ -140,10 +138,10 @@ func (res *Resource) List(storage store.List) {
 
 // Delete registers a `DELETE /resource/:id` handler for the resource
 func (res *Resource) Delete(storage store.Delete) {
-	res.HandleFuncC(
+	res.HandleFunc(
 		pat.Delete(patID),
-		func(ctx context.Context, w http.ResponseWriter, r *http.Request) {
-			res.deleteHandler(ctx, w, r, storage)
+		func(w http.ResponseWriter, r *http.Request) {
+			res.deleteHandler(w, r, storage)
 		},
 	)
 
@@ -152,10 +150,10 @@ func (res *Resource) Delete(storage store.Delete) {
 
 // Patch registers a `PATCH /resource/:id` handler for the resource
 func (res *Resource) Patch(storage store.Update) {
-	res.HandleFuncC(
+	res.HandleFunc(
 		pat.Patch(patID),
-		func(ctx context.Context, w http.ResponseWriter, r *http.Request) {
-			res.patchHandler(ctx, w, r, storage)
+		func(w http.ResponseWriter, r *http.Request) {
+			res.patchHandler(w, r, storage)
 		},
 	)
 
@@ -177,8 +175,8 @@ func (res *Resource) ToOne(
 
 	res.relationshipHandler(
 		resourceType,
-		func(ctx context.Context, w http.ResponseWriter, r *http.Request) {
-			res.getHandler(ctx, w, r, storage)
+		func(w http.ResponseWriter, r *http.Request) {
+			res.getHandler(w, r, storage)
 		},
 	)
 
@@ -201,8 +199,8 @@ func (res *Resource) ToMany(
 
 	res.relationshipHandler(
 		resourceType,
-		func(ctx context.Context, w http.ResponseWriter, r *http.Request) {
-			res.toManyHandler(ctx, w, r, storage)
+		func(w http.ResponseWriter, r *http.Request) {
+			res.toManyHandler(w, r, storage)
 		},
 	)
 
@@ -213,12 +211,12 @@ func (res *Resource) ToMany(
 // relationship
 func (res *Resource) relationshipHandler(
 	resourceType string,
-	handler goji.HandlerFunc,
+	handler http.HandlerFunc,
 ) {
 
 	// handle /.../:id/<resourceType>
 	matcher := fmt.Sprintf("%s/%s", patID, resourceType)
-	res.HandleFuncC(
+	res.HandleFunc(
 		pat.Get(matcher),
 		handler,
 	)
@@ -226,7 +224,7 @@ func (res *Resource) relationshipHandler(
 
 	// handle /.../:id/relationships/<resourceType>
 	relationshipMatcher := fmt.Sprintf("%s/relationships/%s", patID, resourceType)
-	res.HandleFuncC(
+	res.HandleFunc(
 		pat.Get(relationshipMatcher),
 		handler,
 	)
@@ -238,10 +236,10 @@ func (res *Resource) relationshipHandler(
 func (res *Resource) Action(actionName string, storage store.Get) {
 	matcher := path.Join(patID, actionName)
 
-	res.HandleFuncC(
+	res.HandleFunc(
 		pat.Get(matcher),
-		func(ctx context.Context, w http.ResponseWriter, r *http.Request) {
-			res.actionHandler(ctx, w, r, storage)
+		func(w http.ResponseWriter, r *http.Request) {
+			res.actionHandler(w, r, storage)
 		},
 	)
 
@@ -249,53 +247,53 @@ func (res *Resource) Action(actionName string, storage store.Get) {
 }
 
 // POST /resources
-func (res *Resource) postHandler(ctx context.Context, w http.ResponseWriter, r *http.Request, storage store.Save) {
+func (res *Resource) postHandler(w http.ResponseWriter, r *http.Request, storage store.Save) {
 	parsedObject, parseErr := jsh.ParseObject(r)
 	if parseErr != nil && reflect.ValueOf(parseErr).IsNil() == false {
-		SendHandler(ctx, w, r, parseErr)
+		SendHandler(w, r, parseErr)
 		return
 	}
 
-	object, err := storage(ctx, parsedObject)
+	object, err := storage(r.Context(), parsedObject)
 	if err != nil && reflect.ValueOf(err).IsNil() == false {
-		SendHandler(ctx, w, r, err)
+		SendHandler(w, r, err)
 		return
 	}
 
-	SendHandler(ctx, w, r, object)
+	SendHandler(w, r, object)
 }
 
 // GET /resources/:id
-func (res *Resource) getHandler(ctx context.Context, w http.ResponseWriter, r *http.Request, storage store.Get) {
-	id := pat.Param(ctx, "id")
+func (res *Resource) getHandler(w http.ResponseWriter, r *http.Request, storage store.Get) {
+	id := pat.Param(r, "id")
 
-	object, err := storage(ctx, id)
+	object, err := storage(r.Context(), id)
 	if err != nil && reflect.ValueOf(err).IsNil() == false {
-		SendHandler(ctx, w, r, err)
+		SendHandler(w, r, err)
 		return
 	}
 
-	SendHandler(ctx, w, r, object)
+	SendHandler(w, r, object)
 }
 
 // GET /resources
-func (res *Resource) listHandler(ctx context.Context, w http.ResponseWriter, r *http.Request, storage store.List) {
-	list, err := storage(ctx)
+func (res *Resource) listHandler(w http.ResponseWriter, r *http.Request, storage store.List) {
+	list, err := storage(r.Context())
 	if err != nil && reflect.ValueOf(err).IsNil() == false {
-		SendHandler(ctx, w, r, err)
+		SendHandler(w, r, err)
 		return
 	}
 
-	SendHandler(ctx, w, r, list)
+	SendHandler(w, r, list)
 }
 
 // DELETE /resources/:id
-func (res *Resource) deleteHandler(ctx context.Context, w http.ResponseWriter, r *http.Request, storage store.Delete) {
-	id := pat.Param(ctx, "id")
+func (res *Resource) deleteHandler(w http.ResponseWriter, r *http.Request, storage store.Delete) {
+	id := pat.Param(r, "id")
 
-	err := storage(ctx, id)
+	err := storage(r.Context(), id)
 	if err != nil && reflect.ValueOf(err).IsNil() == false {
-		SendHandler(ctx, w, r, err)
+		SendHandler(w, r, err)
 		return
 	}
 
@@ -303,52 +301,52 @@ func (res *Resource) deleteHandler(ctx context.Context, w http.ResponseWriter, r
 }
 
 // PATCH /resources/:id
-func (res *Resource) patchHandler(ctx context.Context, w http.ResponseWriter, r *http.Request, storage store.Update) {
+func (res *Resource) patchHandler(w http.ResponseWriter, r *http.Request, storage store.Update) {
 	parsedObject, parseErr := jsh.ParseObject(r)
 	if parseErr != nil && reflect.ValueOf(parseErr).IsNil() == false {
-		SendHandler(ctx, w, r, parseErr)
+		SendHandler(w, r, parseErr)
 		return
 	}
 
-	id := pat.Param(ctx, "id")
+	id := pat.Param(r, "id")
 	if id != parsedObject.ID {
-		SendHandler(ctx, w, r, jsh.InputError("Request ID does not match URL's", "id"))
+		SendHandler(w, r, jsh.InputError("Request ID does not match URL's", "id"))
 		return
 	}
 
-	object, err := storage(ctx, parsedObject)
+	object, err := storage(r.Context(), parsedObject)
 	if err != nil && reflect.ValueOf(err).IsNil() == false {
-		SendHandler(ctx, w, r, err)
+		SendHandler(w, r, err)
 		return
 	}
 
-	SendHandler(ctx, w, r, object)
+	SendHandler(w, r, object)
 }
 
 // GET /resources/:id/(relationships/)<resourceType>s
-func (res *Resource) toManyHandler(ctx context.Context, w http.ResponseWriter, r *http.Request, storage store.ToMany) {
-	id := pat.Param(ctx, "id")
+func (res *Resource) toManyHandler(w http.ResponseWriter, r *http.Request, storage store.ToMany) {
+	id := pat.Param(r, "id")
 
-	list, err := storage(ctx, id)
+	list, err := storage(r.Context(), id)
 	if err != nil && reflect.ValueOf(err).IsNil() == false {
-		SendHandler(ctx, w, r, err)
+		SendHandler(w, r, err)
 		return
 	}
 
-	SendHandler(ctx, w, r, list)
+	SendHandler(w, r, list)
 }
 
 // All HTTP Methods for /resources/:id/<mutate>
-func (res *Resource) actionHandler(ctx context.Context, w http.ResponseWriter, r *http.Request, storage store.Get) {
-	id := pat.Param(ctx, "id")
+func (res *Resource) actionHandler(w http.ResponseWriter, r *http.Request, storage store.Get) {
+	id := pat.Param(r, "id")
 
-	response, err := storage(ctx, id)
+	response, err := storage(r.Context(), id)
 	if err != nil && reflect.ValueOf(err).IsNil() == false {
-		SendHandler(ctx, w, r, err)
+		SendHandler(w, r, err)
 		return
 	}
 
-	SendHandler(ctx, w, r, response)
+	SendHandler(w, r, response)
 }
 
 // addRoute adds the new method and route to a route Tree for debugging and

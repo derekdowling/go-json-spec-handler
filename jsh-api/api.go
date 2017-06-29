@@ -10,7 +10,7 @@ import (
 	"goji.io"
 	"goji.io/pat"
 
-	"github.com/derekdowling/go-json-spec-handler/goji2-logger"
+	gojilogger "github.com/derekdowling/go-json-spec-handler/goji2-logger"
 	"github.com/derekdowling/go-stdlogger"
 )
 
@@ -69,7 +69,7 @@ func Default(prefix string, debug bool, logger std.Logger) *API {
 
 	// register logger middleware
 	gojilogger := gojilogger.New(logger, debug)
-	api.UseC(gojilogger.Middleware)
+	api.Use(gojilogger.Middleware)
 
 	return api
 }
@@ -86,12 +86,12 @@ func (a *API) Add(resource *Resource) {
 	// We need two separate routes,
 	// /(prefix/)resources
 	matcher := path.Join(a.prefix, resource.Type)
-	a.Mux.HandleC(pat.New(matcher), resource)
+	a.Mux.Handle(pat.New(matcher), resource)
 
 	// And:
 	// /(prefix/)resources/*
 	idMatcher := path.Join(a.prefix, resource.Type, "*")
-	a.Mux.HandleC(pat.New(idMatcher), resource)
+	a.Mux.Handle(pat.New(idMatcher), resource)
 }
 
 // RouteTree prints out all accepted routes for the API that use jshapi implemented

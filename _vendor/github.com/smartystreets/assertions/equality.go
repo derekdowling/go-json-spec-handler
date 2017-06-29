@@ -7,11 +7,9 @@ import (
 	"reflect"
 	"strings"
 
+	"github.com/smartystreets/assertions/internal/go-render/render"
 	"github.com/smartystreets/assertions/internal/oglematchers"
 )
-
-// default acceptable delta for ShouldAlmostEqual
-const defaultDelta = 0.0000000001
 
 // ShouldEqual receives exactly two parameters and does an equality check.
 func ShouldEqual(actual interface{}, expected ...interface{}) string {
@@ -29,7 +27,14 @@ func shouldEqual(actual, expected interface{}) (message string) {
 	}()
 
 	if matchError := oglematchers.Equals(expected).Matches(actual); matchError != nil {
-		message = serializer.serialize(expected, actual, fmt.Sprintf(shouldHaveBeenEqual, expected, actual))
+		expectedSyntax := fmt.Sprintf("%v", expected)
+		actualSyntax := fmt.Sprintf("%v", actual)
+		if expectedSyntax == actualSyntax && reflect.TypeOf(expected) != reflect.TypeOf(actual) {
+			message = fmt.Sprintf(shouldHaveBeenEqualTypeMismatch, expected, expected, actual, actual)
+		} else {
+			message = fmt.Sprintf(shouldHaveBeenEqual, expected, actual)
+		}
+		message = serializer.serialize(expected, actual, message)
 		return
 	}
 
@@ -87,7 +92,7 @@ func cleanAlmostEqualInput(actual interface{}, expected ...interface{}) (float64
 		delta, err := getFloat(expected[1])
 
 		if err != nil {
-			return 0.0, 0.0, 0.0, "delta must be a numerical type"
+			return 0.0, 0.0, 0.0, "The delta value " + err.Error()
 		}
 
 		deltaFloat = delta
@@ -96,15 +101,13 @@ func cleanAlmostEqualInput(actual interface{}, expected ...interface{}) (float64
 	}
 
 	actualFloat, err := getFloat(actual)
-
 	if err != nil {
-		return 0.0, 0.0, 0.0, err.Error()
+		return 0.0, 0.0, 0.0, "The actual value " + err.Error()
 	}
 
 	expectedFloat, err := getFloat(expected[0])
-
 	if err != nil {
-		return 0.0, 0.0, 0.0, err.Error()
+		return 0.0, 0.0, 0.0, "The comparison value " + err.Error()
 	}
 
 	return actualFloat, expectedFloat, deltaFloat, ""
@@ -131,7 +134,7 @@ func getFloat(num interface{}) (float64, error) {
 		numKind == reflect.Float64 {
 		return numValue.Float(), nil
 	} else {
-		return 0.0, errors.New("must be a numerical type, but was " + numKind.String())
+		return 0.0, errors.New("must be a numerical type, but was: " + numKind.String())
 	}
 }
 
@@ -142,15 +145,8 @@ func ShouldResemble(actual interface{}, expected ...interface{}) string {
 	}
 
 	if matchError := oglematchers.DeepEquals(expected[0]).Matches(actual); matchError != nil {
-		expectedSyntax := fmt.Sprintf("%#v", expected[0])
-		actualSyntax := fmt.Sprintf("%#v", actual)
-		var message string
-		if expectedSyntax == actualSyntax {
-			message = fmt.Sprintf(shouldHaveResembledTypeMismatch, expected[0], actual, expected[0], actual)
-		} else {
-			message = fmt.Sprintf(shouldHaveResembled, expected[0], actual)
-		}
-		return serializer.serializeDetailed(expected[0], actual, message)
+		return serializer.serializeDetailed(expected[0], actual,
+			fmt.Sprintf(shouldHaveResembled, render.Render(expected[0]), render.Render(actual)))
 	}
 
 	return success
@@ -161,7 +157,7 @@ func ShouldNotResemble(actual interface{}, expected ...interface{}) string {
 	if message := need(1, expected); message != success {
 		return message
 	} else if ShouldResemble(actual, expected[0]) == success {
-		return fmt.Sprintf(shouldNotHaveResembled, actual, expected[0])
+		return fmt.Sprintf(shouldNotHaveResembled, render.Render(actual), render.Render(expected[0]))
 	}
 	return success
 }

@@ -11,10 +11,6 @@ import (
 
 	"goji.io/pattern"
 
-	"goji.io"
-
-	"golang.org/x/net/context"
-
 	"github.com/derekdowling/go-stdlogger"
 	"github.com/zenazn/goji/web/mutil"
 )
@@ -59,15 +55,15 @@ func New(logger std.Logger, debug bool) *Logger {
 // Use like so with Goji2:
 //	gLogger := gojilogger.New(nil, false)
 //	yourGoji.UseC(gLogger.Middleware)
-func (l *Logger) Middleware(next goji.Handler) goji.Handler {
-	middleware := func(ctx context.Context, w http.ResponseWriter, r *http.Request) {
-		l.printRequest(ctx, r)
+func (l *Logger) Middleware(next http.Handler) http.Handler {
+	middleware := func(w http.ResponseWriter, r *http.Request) {
+		l.printRequest(r)
 
 		// WrapWriter lets us peek at ResponseWriter outputs
 		lw := mutil.WrapWriter(w)
 
 		startTime := time.Now()
-		next.ServeHTTPC(ctx, lw, r)
+		next.ServeHTTP(lw, r)
 
 		if lw.Status() == 0 {
 			lw.WriteHeader(http.StatusOK)
@@ -78,10 +74,10 @@ func (l *Logger) Middleware(next goji.Handler) goji.Handler {
 		l.printResponse(lw, finishTime.Sub(startTime))
 	}
 
-	return goji.HandlerFunc(middleware)
+	return http.HandlerFunc(middleware)
 }
 
-func (l *Logger) printRequest(ctx context.Context, r *http.Request) {
+func (l *Logger) printRequest(r *http.Request) {
 	var buf bytes.Buffer
 
 	if l.Debug {
@@ -91,7 +87,7 @@ func (l *Logger) printRequest(ctx context.Context, r *http.Request) {
 	buf.WriteString("Serving route: ")
 
 	// Goji routing details
-	colorWrite(&buf, bGreen, "%s", pattern.Path(ctx))
+	colorWrite(&buf, bGreen, "%s", pattern.Path(r.Context()))
 
 	// Server details
 	buf.WriteString(fmt.Sprintf(" from %s ", r.RemoteAddr))

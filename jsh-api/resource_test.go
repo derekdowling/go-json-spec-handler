@@ -1,6 +1,7 @@
 package jshapi
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -10,7 +11,6 @@ import (
 	"github.com/derekdowling/go-json-spec-handler"
 	"github.com/derekdowling/go-json-spec-handler/client"
 	. "github.com/smartystreets/goconvey/convey"
-	"golang.org/x/net/context"
 )
 
 func TestResource(t *testing.T) {
