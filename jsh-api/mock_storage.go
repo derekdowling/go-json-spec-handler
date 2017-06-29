@@ -1,11 +1,11 @@
 package jshapi
 
 import (
+	"context"
 	"log"
 	"strconv"
 
 	"github.com/derekdowling/go-json-spec-handler"
-	"golang.org/x/net/context"
 )
 
 // MockStorage allows you to mock out APIs really easily, and is also used internally

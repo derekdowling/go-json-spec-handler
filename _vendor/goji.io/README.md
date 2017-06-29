@@ -1,18 +1,20 @@
 Goji
 ====
 
+[![GoDoc](https://godoc.org/goji.io?status.svg)](https://godoc.org/goji.io) [![Build Status](https://travis-ci.org/goji/goji.svg?branch=master)](https://travis-ci.org/goji/goji)
+
 Goji is a HTTP request multiplexer, similar to [`net/http.ServeMux`][servemux].
 It compares incoming requests to a list of registered [Patterns][pattern], and
-dispatches to the [Handler][handler] that corresponds to the first matching
+dispatches to the [http.Handler][handler] that corresponds to the first matching
 Pattern. Goji also supports [Middleware][middleware] (composable shared
-functionality applied to every request) and uses the de facto standard
-[`x/net/context`][context] to store request-scoped values.
+functionality applied to every request) and uses the standard
+[`context`][context] package to store request-scoped values.
 
 [servemux]: https://golang.org/pkg/net/http/#ServeMux
 [pattern]: https://godoc.org/goji.io#Pattern
-[handler]: https://godoc.org/goji.io#Handler
+[handler]: https://golang.org/pkg/net/http/#Handler
 [middleware]: https://godoc.org/goji.io#Mux.Use
-[context]: https://godoc.org/golang.org/x/net/context
+[context]: https://golang.org/pkg/context
 
 
 Quick Start
@@ -27,17 +29,16 @@ import (
 
         "goji.io"
         "goji.io/pat"
-        "golang.org/x/net/context"
 )
 
-func hello(ctx context.Context, w http.ResponseWriter, r *http.Request) {
-        name := pat.Param(ctx, "name")
+func hello(w http.ResponseWriter, r *http.Request) {
+        name := pat.Param(r, "name")
         fmt.Fprintf(w, "Hello, %s!", name)
 }
 
 func main() {
         mux := goji.NewMux()
-        mux.HandleFuncC(pat.Get("/hello/:name"), hello)
+        mux.HandleFunc(pat.Get("/hello/:name"), hello)
 
         http.ListenAndServe("localhost:8000", mux)
 }
@@ -51,17 +52,20 @@ Please refer to [Goji's GoDoc Documentation][godoc] for a full API reference.
 Stability
 ---------
 
-As of this writing (late November 2015), this version of Goji is still very new,
-and during this initial experimental stage it offers no API stability
-guarantees. After the API has had a little time to bake, Goji expects to adhere
-strictly to the Go project's [compatibility guidelines][compat], guaranteeing to
-never break compatibility with existing code.
+Goji's API was recently updated to use the new `net/http` and `context`
+integration, and is therefore some of its interfaces are in a state of flux. We
+don't expect any further changes to the API, and expect to be able to announce
+API stability soon. Goji is suitable for use in production.
 
-We expect to be able to make such a guarantee by early 2016. Although we reserve
-the right to do so, there are no breaking API changes planned until that point,
-and we are unlikely to accept any such breaking changes.
+Prior to Go 1.7, Goji promised API stability with a different API to the one
+that is offered today. The author broke this promise, and does not take this
+breach of trust lightly. While stability is obviously extremely important, the
+author and community have decided to follow the broader Go community in
+standardizing on the standard library copy of the `context` package.
 
-[compat]: https://golang.org/doc/go1compat
+Users of the old API can find that familiar API on the `net-context` branch. The
+author promises to maintain both the `net-context` branch and `master` for the
+forseeable future.
 
 
 Community / Contributing

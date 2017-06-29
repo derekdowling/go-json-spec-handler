@@ -1,6 +1,7 @@
 {
 	"ImportPath": "github.com/derekdowling/go-json-spec-handler",
-	"GoVersion": "go1.6.2",
+	"GoVersion": "go1.8",
+	"GodepVersion": "v79",
 	"Packages": [
 		"./..."
 	],
@@ -15,18 +16,42 @@
 			"Rev": "cfa80b78b82f8d241ceece0b733b1161bb6a885c"
 		},
 		{
+			"ImportPath": "github.com/gopherjs/gopherjs/js",
+			"Rev": "dc374d32704510cb387457180ca9d5193978b555"
+		},
+		{
 			"ImportPath": "github.com/jtolds/gls",
 			"Rev": "9a4a02dbe491bef4bab3c24fd9f3087d6c4c6690"
 		},
 		{
 			"ImportPath": "github.com/smartystreets/assertions",
-			"Comment": "1.5.0-389-g507a61a",
-			"Rev": "507a61adbdc8674907f6e491b559d600a4127dc0"
+			"Comment": "1.6.0-27-g4ea54c1",
+			"Rev": "4ea54c1f28ad3ae597e76607dea3871fa177e263"
+		},
+		{
+			"ImportPath": "github.com/smartystreets/assertions/internal/go-render/render",
+			"Comment": "1.6.0-27-g4ea54c1",
+			"Rev": "4ea54c1f28ad3ae597e76607dea3871fa177e263"
+		},
+		{
+			"ImportPath": "github.com/smartystreets/assertions/internal/oglematchers",
+			"Comment": "1.6.0-27-g4ea54c1",
+			"Rev": "4ea54c1f28ad3ae597e76607dea3871fa177e263"
 		},
 		{
 			"ImportPath": "github.com/smartystreets/goconvey/convey",
-			"Comment": "1.5.0-398-gab7641a",
-			"Rev": "ab7641a0db76b0e88765294b1377b026ec01f26b"
+			"Comment": "1.6.2-21-g9e8dc3f",
+			"Rev": "9e8dc3f972df6c8fcc0375ef492c24d0bb204857"
+		},
+		{
+			"ImportPath": "github.com/smartystreets/goconvey/convey/gotest",
+			"Comment": "1.6.2-21-g9e8dc3f",
+			"Rev": "9e8dc3f972df6c8fcc0375ef492c24d0bb204857"
+		},
+		{
+			"ImportPath": "github.com/smartystreets/goconvey/convey/reporting",
+			"Comment": "1.6.2-21-g9e8dc3f",
+			"Rev": "9e8dc3f972df6c8fcc0375ef492c24d0bb204857"
 		},
 		{
 			"ImportPath": "github.com/zenazn/goji/web/mutil",
@@ -35,11 +60,23 @@
 		},
 		{
 			"ImportPath": "goji.io",
-			"Rev": "8110ccbc05240c40d43ccb004e0542b3bcbf27da"
+			"Comment": "v2.0",
+			"Rev": "0d89ff54b2c18c9c4ba530e32496aef902d3c6cd"
 		},
 		{
-			"ImportPath": "golang.org/x/net/context",
-			"Rev": "28273ec927bee3bea305f112fc28ceee575ea893"
+			"ImportPath": "goji.io/internal",
+			"Comment": "v2.0",
+			"Rev": "0d89ff54b2c18c9c4ba530e32496aef902d3c6cd"
+		},
+		{
+			"ImportPath": "goji.io/pat",
+			"Comment": "v2.0",
+			"Rev": "0d89ff54b2c18c9c4ba530e32496aef902d3c6cd"
+		},
+		{
+			"ImportPath": "goji.io/pattern",
+			"Comment": "v2.0",
+			"Rev": "0d89ff54b2c18c9c4ba530e32496aef902d3c6cd"
 		}
 	]
 }

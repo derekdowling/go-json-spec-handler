@@ -1,12 +1,11 @@
 package jsc
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"net/url"
 	"testing"
-
-	"golang.org/x/net/context"
 
 	"github.com/derekdowling/go-json-spec-handler"
 	"github.com/derekdowling/go-json-spec-handler/jsh-api"

@@ -3,8 +3,9 @@
 package store
 
 import (
+	"context"
+
 	"github.com/derekdowling/go-json-spec-handler"
-	"golang.org/x/net/context"
 )
 
 // CRUD implements all sub-storage functions
